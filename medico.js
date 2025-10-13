@@ -32,6 +32,8 @@ const Medico = {
       return;
     }
 
+    
+
     // Verifica se está tentando excluir a si mesmo
     if (usuarioLogado && medico.usuarioId && medico.usuarioId.toString() === usuarioLogado.id.toString()) {
       alert("❌ Você não pode excluir seu próprio perfil.");
@@ -54,6 +56,66 @@ const Medico = {
     alert("✅ Médico excluído com sucesso!");
   },
 
+   getEspecialidades: () => {
+    return [
+      "Acupuntura",
+      "Alergologia e Imunologia", 
+      "Anestesiologia",
+      "Angiologia",
+      "Cancerologia",
+      "Cardiologia",
+      "Cirurgia Cardiovascular",
+      "Cirurgia da Mão",
+      "Cirurgia de Cabeça e Pescoço",
+      "Cirurgia do Aparelho Digestivo",
+      "Cirurgia Geral",
+      "Cirurgia Pediátrica",
+      "Cirurgia Plástica",
+      "Cirurgia Torácica",
+      "Cirurgia Vascular",
+      "Clínica Médica",
+      "Coloproctologia",
+      "Dermatologia",
+      "Endocrinologia e Metabologia",
+      "Endoscopia",
+      "Gastroenterologia",
+      "Genética Médica",
+      "Geriatria",
+      "Ginecologia e Obstetrícia",
+      "Hematologia e Hemoterapia",
+      "Homeopatia",
+      "Infectologia",
+      "Mastologia",
+      "Medicina de Emergência",
+      "Medicina do Trabalho",
+      "Medicina de Família e Comunidade",
+      "Medicina Esportiva",
+      "Medicina Física e Reabilitação",
+      "Medicina Intensiva",
+      "Medicina Legal e Perícia Médica",
+      "Medicina Nuclear",
+      "Medicina Preventiva e Social",
+      "Nefrologia",
+      "Neurocirurgia",
+      "Neurologia",
+      "Nutrologia",
+      "Oftalmologia",
+      "Oncologia Clínica",
+      "Ortopedia e Traumatologia",
+      "Otorrinolaringologia",
+      "Patologia",
+      "Patologia Clínica/Medicina Laboratorial",
+      "Pediatria",
+      "Pneumologia",
+      "Psiquiatria",
+      "Radiologia e Diagnóstico por Imagem",
+      "Radioterapia",
+      "Reumatologia",
+      "Urologia",
+      "Outra"
+    ];
+  },
+  
   // Adicione esta função ao objeto Medico para debug
 debugAgendamentosMedico: function(medicoId) {
     const agendamentos = Storage.getAgendamentos();
@@ -762,28 +824,29 @@ debugAgendamentos: function() {
 },
 
   filtrarMedicos: () => {
-    const searchInput = document.getElementById("searchInput");
-    const especialidadeFilter = document.getElementById("especialidadeFilter");
-    const statusFilter = document.getElementById("statusFilter");
+  const searchInput = document.getElementById("searchInput");
+  const especialidadeFilter = document.getElementById("especialidadeFilter");
+  const statusFilter = document.getElementById("statusFilter");
+  
+  if (!searchInput || !especialidadeFilter) return;
+  
+  const searchTerm = searchInput.value.toLowerCase();
+  const especialidade = especialidadeFilter.value;
+  const status = statusFilter ? statusFilter.value : '';
+  
+  const medicos = Medico.getAll();
+  const medicosFiltrados = medicos.filter(medico => {
+    const matchSearch = !searchTerm || 
+      (medico.nome && medico.nome.toLowerCase().includes(searchTerm)) ||
+      (medico.email && medico.email.toLowerCase().includes(searchTerm)) ||
+      (medico.telefone && medico.telefone.includes(searchTerm));
     
-    if (!searchInput || !especialidadeFilter) return;
+    const matchEspecialidade = !especialidade || medico.especialidade === especialidade;
+    const matchStatus = !status || medico.status === status;
     
-    const searchTerm = searchInput.value.toLowerCase();
-    const especialidade = especialidadeFilter.value;
-    const status = statusFilter ? statusFilter.value : '';
-    
-    const medicos = Medico.getAll();
-    const medicosFiltrados = medicos.filter(medico => {
-      const matchSearch = !searchTerm || 
-        (medico.nome && medico.nome.toLowerCase().includes(searchTerm)) ||
-        (medico.email && medico.email.toLowerCase().includes(searchTerm)) ||
-        (medico.telefone && medico.telefone.includes(searchTerm));
-      
-      const matchEspecialidade = !especialidade || medico.especialidade === especialidade;
-      const matchStatus = !status || medico.status === status;
-      
-      return matchSearch && matchEspecialidade && matchStatus;
-    });
+    return matchSearch && matchEspecialidade && matchStatus;
+  });
+
     
     // Atualiza a exibição
     const tbody = document.querySelector("#medicosTable tbody");
@@ -867,35 +930,36 @@ document.addEventListener("DOMContentLoaded", () => {
     Medico.renderTable();
 
     // Configura formulário
-    const form = document.getElementById("medicoForm");
-    if (form) {
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        console.log('📝 Submetendo formulário de médico...');
+  // Configura formulário
+const form = document.getElementById("medicoForm");
+if (form) {
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    console.log('📝 Submetendo formulário de médico...');
 
-        const medicoData = {
-          nome: document.getElementById("nome").value,
-          email: document.getElementById("email").value,
-          telefone: document.getElementById("telefone").value,
-          especialidade: document.getElementById("especialidade").value,
-          crm: document.getElementById("crm").value
-        };
+    const medicoData = {
+      nome: document.getElementById("nome").value,
+      email: document.getElementById("email").value,
+      telefone: document.getElementById("telefone").value,
+      especialidade: document.getElementById("especialidade").value,
+      crm: document.getElementById("crm").value
+    };
 
-        console.log('Dados do médico:', medicoData);
+    console.log('Dados do médico:', medicoData);
 
-        if (form.dataset.editId) {
-          // EDIÇÃO
-          Medico.update(parseInt(form.dataset.editId), medicoData);
-          delete form.dataset.editId;
-        } else {
-          // NOVO MÉDICO
-          Medico.add(medicoData);
-        }
-
-        form.reset();
-        document.getElementById("modalMedico").classList.remove("active");
-      });
+    if (form.dataset.editId) {
+      // EDIÇÃO
+      Medico.update(parseInt(form.dataset.editId), medicoData);
+      delete form.dataset.editId;
+    } else {
+      // NOVO MÉDICO
+      Medico.add(medicoData);
     }
+
+    form.reset();
+    document.getElementById("modalMedico").classList.remove("active");
+  });
+}
 
     // Configura modal
     const modal = document.getElementById('modalMedico');
