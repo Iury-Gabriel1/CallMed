@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#007bff">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agendar Consulta - AgendaMed</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="base.css">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="layout.css">
+  <link rel="stylesheet" href="forms.css">
+  <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="animations.css">
+
+  <style>
+    .agendamento-container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .agendamento-card {
+      background: var(--cor-card);
+      padding: var(--espaco-xl);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .passo-indicador {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: var(--espaco-xl);
+      position: relative;
+    }
+    
+    .passo-indicador::before {
+      content: '';
+      position: absolute;
+      top: 15px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--cor-borda);
+      z-index: 1;
+    }
+    
+    .passo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .passo-numero {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--cor-borda);
+      color: var(--cor-texto);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-bottom: var(--espaco-xs);
+      transition: all var(--transition-fast);
+    }
+    
+    .passo.ativo .passo-numero {
+      background: var(--cor-principal);
+      color: white;
+    }
+    
+    .passo.concluido .passo-numero {
+      background: var(--cor-sucesso);
+      color: white;
+    }
+    
+    .passo-texto {
+      font-size: 0.8rem;
+      text-align: center;
+    }
+    
+    .passo-conteudo {
+      display: none;
+    }
+    
+    .passo-conteudo.ativo {
+      display: block;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    .horarios-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      gap: var(--espaco-sm);
+      margin-top: var(--espaco-md);
+    }
+    
+    .horario-btn {
+      padding: var(--espaco-sm);
+      border: 2px solid var(--cor-borda);
+      border-radius: var(--radius-md);
+      background: var(--cor-card);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      text-align: center;
+    }
+    
+    .horario-btn:hover {
+      border-color: var(--cor-principal);
+    }
+    
+    .horario-btn.selecionado {
+      background: var(--cor-principal);
+      color: white;
+      border-color: var(--cor-principal);
+    }
+    
+    .horario-btn.ocupado {
+      background: var(--cor-erro);
+      color: white;
+      border-color: var(--cor-erro);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    
+    .resumo-consulta {
+      background: var(--cor-fundo);
+      padding: var(--espaco-lg);
+      border-radius: var(--radius-lg);
+      margin-top: var(--espaco-lg);
+    }
+    
+    .resumo-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: var(--espaco-sm);
+      padding-bottom: var(--espaco-sm);
+      border-bottom: 1px solid var(--cor-borda);
+    }
+    
+    .resumo-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+    
+    .nav-botoes {
+      display: flex;
+      justify-content: space-between;
+      margin-top: var(--espaco-xl);
+    }
+    
+    .loading {
+      text-align: center;
+      padding: var(--espaco-xl);
+      color: var(--cor-secundaria);
+    }
+    
+    @media (max-width: 768px) {
+      .agendamento-card {
+        padding: var(--espaco-lg);
+      }
+      
+      .passo-indicador {
+        flex-wrap: wrap;
+        gap: var(--espaco-md);
+      }
+      
+      .horarios-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="logo">
+      <img src="logo.png" alt="AgendaMed Logo">
+      <span>AgendaMed - Paciente</span>
+    </div>
+    <nav class="nav">
+  <ul>
+    <li><a href="paciente-dashboard.html">Início</a></li>
+    <li><a href="paciente-consultas.html">Minhas Consultas</a></li>
+    <li><a href="paciente-medicos.html">Médicos</a></li>
+    <li><a href="paciente-agendar.html" class="active">Agendar</a></li>
+    <li><a href="paciente-chatbot.html">Assistente</a></li>
+    <li><a href="paciente-configuracoes.html">Configurações</a></li>
+    <li><a href="paciente-ajuda.html">Ajuda</a></li>
+    <li><a href="#" id="logoutBtn">Sair</a></li>
+  </ul>
+</nav>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Agendar Nova Consulta</h1>
+      <p>Siga os passos para agendar sua consulta</p>
+    </div>
+
+    <div class="agendamento-container">
+      <div class="agendamento-card">
+        <!-- Indicador de Passos -->
+        <div class="passo-indicador">
+          <div class="passo ativo" data-passo="1">
+            <div class="passo-numero">1</div>
+            <div class="passo-texto">Médico</div>
+          </div>
+          <div class="passo" data-passo="2">
+            <div class="passo-numero">2</div>
+            <div class="passo-texto">Data</div>
+          </div>
+          <div class="passo" data-passo="3">
+            <div class="passo-numero">3</div>
+            <div class="passo-texto">Horário</div>
+          </div>
+          <div class="passo" data-passo="4">
+            <div class="passo-numero">4</div>
+            <div class="passo-texto">Confirmar</div>
+          </div>
+        </div>
+
+        <!-- Conteúdo dos Passos -->
+        <div class="passo-conteudo ativo" id="passo1">
+          <h3>Selecione o Médico</h3>
+          <p>Escolha o médico e especialidade desejada</p>
+          
+          <div class="form-group">
+            <label for="selectEspecialidade">Especialidade</label>
+            <select id="selectEspecialidade" required>
+              <option value="">Selecione uma especialidade</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="selectMedico">Médico</label>
+            <select id="selectMedico" required disabled>
+              <option value="">Primeiro selecione uma especialidade</option>
+            </select>
+          </div>
+          
+          <div id="infoMedico" style="display: none; margin-top: var(--espaco-lg); padding: var(--espaco-md); background: var(--cor-fundo); border-radius: var(--radius-md);">
+            <h4>Informações do Médico</h4>
+            <div id="detalhesMedico"></div>
+          </div>
+        </div>
+
+        <div class="passo-conteudo" id="passo2">
+          <h3>Escolha a Data</h3>
+          <p>Selecione uma data disponível para a consulta</p>
+          
+          <div class="form-group">
+            <label for="selectData">Data da Consulta</label>
+            <input type="date" id="selectData" required min="<?= date('Y-m-d') ?>">
+          </div>
+          
+          <div id="calendarioInfo" style="margin-top: var(--espaco-md); padding: var(--espaco-md); background: var(--cor-aviso); color: #000; border-radius: var(--radius-md);">
+            <small>📅 <strong>Horários de funcionamento:</strong> Segunda a Sexta: 8h-18h, Sábados: 8h-12h</small>
+          </div>
+        </div>
+
+        <div class="passo-conteudo" id="passo3">
+          <h3>Selecione o Horário</h3>
+          <p>Escolha um horário disponível</p>
+          
+          <div id="loadingHorarios" class="loading">
+            Carregando horários disponíveis...
+          </div>
+          
+          <div id="horariosContainer" style="display: none;">
+            <div class="horarios-grid" id="gridHorarios">
+              <!-- Horários serão carregados via JavaScript -->
+            </div>
+          </div>
+          
+          <div id="semHorarios" style="display: none; text-align: center; padding: var(--espaco-xl); color: var(--cor-secundaria);">
+            <p>Nenhum horário disponível para esta data.</p>
+            <p>Por favor, selecione outra data.</p>
+          </div>
+        </div>
+
+        <div class="passo-conteudo" id="passo4">
+          <h3>Confirme seu Agendamento</h3>
+          <p>Revise as informações antes de confirmar</p>
+          
+          <div class="resumo-consulta">
+            <div class="resumo-item">
+              <span>👨‍⚕️ Médico:</span>
+              <span id="resumoMedico">-</span>
+            </div>
+            <div class="resumo-item">
+              <span>📅 Data:</span>
+              <span id="resumoData">-</span>
+            </div>
+            <div class="resumo-item">
+              <span>⏰ Horário:</span>
+              <span id="resumoHorario">-</span>
+            </div>
+            <div class="resumo-item">
+              <span>📋 Especialidade:</span>
+              <span id="resumoEspecialidade">-</span>
+            </div>
+          </div>
+          
+          <div class="form-group" style="margin-top: var(--espaco-lg);">
+            <label for="observacoes">Observações (opcional)</label>
+            <textarea id="observacoes" placeholder="Alguma observação importante para o médico..."></textarea>
+          </div>
+        </div>
+
+        <!-- Navegação -->
+        <div class="nav-botoes">
+          <button type="button" class="btn-secondary" id="btnVoltar" style="display: none;">← Voltar</button>
+          <button type="button" class="btn-primary" id="btnAvancar">Avançar →</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+  <div class="footer-content">
+    <span class="footer-creator">Criado por Iury Gabriel Barreto</span>
+    <span class="footer-version">v1.0</span>
+  </div>
+</footer>
+
+  <script src="storage.js"></script>
+  <script src="main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = Storage.getUsuarioLogado();
+      if (!user || user.tipo !== 'paciente') {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      // Aplica tema
+      const config = Storage.getConfiguracoes();
+      document.documentElement.setAttribute('data-theme', config.tema);
+
+      // Inicializa o agendamento
+      inicializarAgendamento();
+
+      // Logout
+      document.getElementById('logoutBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        Storage.logout();
+        window.location.href = 'login.html';
+      });
+    });
+
+    let passoAtual = 1;
+    let dadosAgendamento = {
+      medicoId: null,
+      especialidade: null,
+      data: null,
+      hora: null
+    };
+
+    function inicializarAgendamento() {
+      carregarEspecialidades();
+      configurarNavegacao();
+      
+      // Define data mínima como hoje
+      const hoje = new Date().toISOString().split('T')[0];
+      document.getElementById('selectData').min = hoje;
+    }
+
+    function carregarEspecialidades() {
+      const medicos = Storage.getMedicos();
+      const especialidades = [...new Set(medicos.map(m => m.especialidade).filter(Boolean))];
+      const select = document.getElementById('selectEspecialidade');
+      
+      especialidades.forEach(esp => {
+        const option = document.createElement('option');
+        option.value = esp;
+        option.textContent = esp;
+        select.appendChild(option);
+      });
+      
+      select.addEventListener('change', function() {
+        const especialidade = this.value;
+        carregarMedicosPorEspecialidade(especialidade);
+        document.getElementById('infoMedico').style.display = 'none';
+      });
+    }
+
+    function carregarMedicosPorEspecialidade(especialidade) {
+      const medicos = Storage.getMedicos();
+      const selectMedico = document.getElementById('selectMedico');
+      
+      selectMedico.innerHTML = '<option value="">Selecione um médico</option>';
+      selectMedico.disabled = !especialidade;
+      
+      if (especialidade) {
+        const medicosFiltrados = medicos.filter(m => m.especialidade === especialidade);
+        
+        medicosFiltrados.forEach(medico => {
+          const option = document.createElement('option');
+          option.value = medico.id;
+          option.textContent = `${medico.nome} ${medico.crm ? `- CRM: ${medico.crm}` : ''}`;
+          selectMedico.appendChild(option);
+        });
+        
+        selectMedico.addEventListener('change', function() {
+          const medicoId = this.value;
+          if (medicoId) {
+            mostrarDetalhesMedico(medicoId);
+            dadosAgendamento.medicoId = parseInt(medicoId);
+            dadosAgendamento.especialidade = especialidade;
+          }
+        });
+      }
+    }
+
+    function mostrarDetalhesMedico(medicoId) {
+      const medico = Storage.getMedicos().find(m => m.id == medicoId);
+      const infoDiv = document.getElementById('infoMedico');
+      const detalhesDiv = document.getElementById('detalhesMedico');
+      
+      if (medico) {
+        detalhesDiv.innerHTML = `
+          <p><strong>Nome:</strong> ${medico.nome}</p>
+          <p><strong>Especialidade:</strong> ${medico.especialidade}</p>
+          ${medico.crm ? `<p><strong>CRM:</strong> ${medico.crm}</p>` : ''}
+          ${medico.telefone ? `<p><strong>Telefone:</strong> ${medico.telefone}</p>` : ''}
+          ${medico.email ? `<p><strong>Email:</strong> ${medico.email}</p>` : ''}
+        `;
+        infoDiv.style.display = 'block';
+      }
+    }
+
+    function configurarNavegacao() {
+      const btnVoltar = document.getElementById('btnVoltar');
+      const btnAvancar = document.getElementById('btnAvancar');
+      
+      btnVoltar.addEventListener('click', voltarPasso);
+      btnAvancar.addEventListener('click', avancarPasso);
+    }
+
+    function avancarPasso() {
+      if (!validarPassoAtual()) return;
+      
+      if (passoAtual === 4) {
+        confirmarAgendamento();
+        return;
+      }
+      
+      passoAtual++;
+      atualizarInterface();
+      
+      // Ações específicas ao avançar
+      if (passoAtual === 3) {
+        carregarHorariosDisponiveis();
+      } else if (passoAtual === 4) {
+        atualizarResumo();
+      }
+    }
+
+    function voltarPasso() {
+      passoAtual--;
+      atualizarInterface();
+    }
+
+    function atualizarInterface() {
+      // Atualiza indicadores
+      document.querySelectorAll('.passo').forEach((passo, index) => {
+        const numeroPasso = index + 1;
+        passo.classList.remove('ativo', 'concluido');
+        
+        if (numeroPasso === passoAtual) {
+          passo.classList.add('ativo');
+        } else if (numeroPasso < passoAtual) {
+          passo.classList.add('concluido');
+        }
+      });
+      
+      // Atualiza conteúdos
+      document.querySelectorAll('.passo-conteudo').forEach((conteudo, index) => {
+        const numeroPasso = index + 1;
+        conteudo.classList.remove('ativo');
+        if (numeroPasso === passoAtual) {
+          conteudo.classList.add('ativo');
+        }
+      });
+      
+      // Atualiza botões
+      const btnVoltar = document.getElementById('btnVoltar');
+      const btnAvancar = document.getElementById('btnAvancar');
+      
+      btnVoltar.style.display = passoAtual > 1 ? 'inline-block' : 'none';
+      btnAvancar.textContent = passoAtual === 4 ? '✅ Confirmar Agendamento' : 'Avançar →';
+    }
+
+    function validarPassoAtual() {
+      switch (passoAtual) {
+        case 1:
+          if (!dadosAgendamento.medicoId) {
+            alert('Por favor, selecione um médico.');
+            return false;
+          }
+          break;
+          
+        case 2:
+          const data = document.getElementById('selectData').value;
+          if (!data) {
+            alert('Por favor, selecione uma data.');
+            return false;
+          }
+          
+          // Verifica se é fim de semana
+          const dataObj = new Date(data);
+          const diaSemana = dataObj.getDay();
+          if (diaSemana === 0 || diaSemana === 6) {
+            alert('Atendimento apenas de segunda a sábado. Por favor, selecione outra data.');
+            return false;
+          }
+          
+          dadosAgendamento.data = data;
+          break;
+          
+        case 3:
+          if (!dadosAgendamento.hora) {
+            alert('Por favor, selecione um horário.');
+            return false;
+          }
+          break;
+      }
+      return true;
+    }
+
+    function carregarHorariosDisponiveis() {
+      const loading = document.getElementById('loadingHorarios');
+      const container = document.getElementById('horariosContainer');
+      const semHorarios = document.getElementById('semHorarios');
+      
+      loading.style.display = 'block';
+      container.style.display = 'none';
+      semHorarios.style.display = 'none';
+      
+      // Simula carregamento
+      setTimeout(() => {
+        const horarios = gerarHorariosDisponiveis();
+        renderizarHorarios(horarios);
+        
+        loading.style.display = 'none';
+        if (horarios.length > 0) {
+          container.style.display = 'block';
+        } else {
+          semHorarios.style.display = 'block';
+        }
+      }, 1000);
+    }
+
+    function gerarHorariosDisponiveis() {
+      const agendamentos = Storage.getAgendamentos();
+      const horariosOcupados = agendamentos
+        .filter(a => a.medicoId == dadosAgendamento.medicoId && a.data === dadosAgendamento.data && a.status !== 'cancelado')
+        .map(a => a.hora);
+      
+      const todosHorarios = [
+        '08:00', '09:00', '10:00', '11:00', 
+        '14:00', '15:00', '16:00', '17:00'
+      ];
+      
+      return todosHorarios.map(horario => ({
+        horario,
+        disponivel: !horariosOcupados.includes(horario)
+      }));
+    }
+
+    function renderizarHorarios(horarios) {
+      const grid = document.getElementById('gridHorarios');
+      grid.innerHTML = '';
+      
+      horarios.forEach(({ horario, disponivel }) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `horario-btn ${disponivel ? '' : 'ocupado'}`;
+        btn.textContent = horario;
+        btn.disabled = !disponivel;
+        
+        if (disponivel) {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.horario-btn').forEach(b => b.classList.remove('selecionado'));
+            btn.classList.add('selecionado');
+            dadosAgendamento.hora = horario;
+          });
+        }
+        
+        grid.appendChild(btn);
+      });
+    }
+
+    function atualizarResumo() {
+      const medico = Storage.getMedicos().find(m => m.id == dadosAgendamento.medicoId);
+      const dataObj = new Date(dadosAgendamento.data);
+      
+      document.getElementById('resumoMedico').textContent = medico?.nome || 'Não informado';
+      document.getElementById('resumoEspecialidade').textContent = dadosAgendamento.especialidade;
+      document.getElementById('resumoData').textContent = dataObj.toLocaleDateString('pt-BR');
+      document.getElementById('resumoHorario').textContent = dadosAgendamento.hora;
+    }
+
+    function confirmarAgendamento() {
+      const user = Storage.getUsuarioLogado();
+      const pacientes = Storage.getPacientes();
+      const paciente = pacientes.find(p => p.usuarioId == user.id) || pacientes.find(p => p.id == user.id);
+      
+      if (!paciente) {
+        alert('Erro: Perfil de paciente não encontrado.');
+        return;
+      }
+      
+      const agendamento = {
+        pacienteId: paciente.id,
+        medicoId: dadosAgendamento.medicoId,
+        data: dadosAgendamento.data,
+        hora: dadosAgendamento.hora,
+        observacoes: document.getElementById('observacoes').value,
+        status: 'agendado',
+        criadoEm: new Date().toISOString()
+      };
+      
+      Storage.salvarAgendamento(agendamento);
+      
+      alert('✅ Consulta agendada com sucesso!\n\nVocê será redirecionado para suas consultas.');
+      
+      setTimeout(() => {
+        window.location.href = 'paciente-consultas.html';
+      }, 2000);
+    }
+  </script>
+</body>
+</html>

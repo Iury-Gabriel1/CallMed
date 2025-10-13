@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#007bff">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Histórico - AgendaMed</title>
+<!-- 1. BASE primeiro -->
+<link rel="stylesheet" href="base.css">
+
+<!-- 2. THEME segundo -->
+<link rel="stylesheet" href="theme.css">
+
+<!-- 3. LAYOUT e outros depois -->
+<link rel="stylesheet" href="layout.css">
+<link rel="stylesheet" href="forms.css">
+<link rel="stylesheet" href="components.css">
+<link rel="stylesheet" href="animations.css">
+  <style>
+    .filtros {
+      background: var(--cor-card);
+      padding: var(--espaco-lg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      margin-bottom: var(--espaco-lg);
+    }
+    
+    .filtros-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--espaco-md);
+      align-items: end;
+    }
+    
+    .filtro-group {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .filtro-group label {
+      font-weight: 600;
+      margin-bottom: var(--espaco-sm);
+      color: var(--cor-principal);
+    }
+    
+    .btn-limpar {
+      background: var(--cor-secundaria);
+      color: white;
+      padding: var(--espaco-sm) var(--espaco-lg);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: background-color var(--transition-fast);
+    }
+    
+    .btn-limpar:hover {
+      background: #5a6268;
+    }
+    
+    .sem-dados {
+      text-align: center;
+      padding: var(--espaco-xl);
+      color: var(--cor-secundaria);
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="logo">
+      <img src="logo.png" alt="AgendaMed Logo">
+      <span>AgendaMed</span>
+    </div>
+    <nav class="nav">
+      <ul>
+ <li><a href="index.html">Dashboard</a></li>
+        <li><a href="pacientes.html">Pacientes</a></li>
+        <li><a href="medicos.html" >Médicos</a></li>
+        <li><a href="agendar.html">Agendar</a></li>
+        <li><a href="medico-chatbot.html">Chatbot</a></li>
+        <li><a href="historico.html" class="active">Histórico</a></li>
+        <li><a href="configuracoes.html">Configurações</a></li>
+        <li><a href="ajuda.html">Ajuda</a></li>
+        <li><a href="#" id="logoutBtn">Sair</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="page-header">
+      <h1>Histórico de Atendimentos</h1>
+      <p>Registro completo de todas as consultas realizadas</p>
+    </section>
+
+    <section class="filtros">
+      <form id="filtroForm" class="filtros-form">
+        <div class="filtro-group">
+          <label for="filtroPaciente">Paciente</label>
+          <input type="text" id="filtroPaciente" placeholder="Filtrar por paciente...">
+        </div>
+        
+        <div class="filtro-group">
+          <label for="filtroMedico">Médico</label>
+          <input type="text" id="filtroMedico" placeholder="Filtrar por médico...">
+        </div>
+        
+        <div class="filtro-group">
+          <label for="filtroData">Data</label>
+          <input type="date" id="filtroData">
+        </div>
+        
+        <div class="filtro-group">
+          <button type="submit" class="btn-primary">Aplicar Filtros</button>
+          <button type="button" class="btn-limpar" id="btnLimparFiltros">Limpar</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="tabela-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Paciente</th>
+            <th>Médico</th>
+            <th>Data</th>
+            <th>Hora</th>
+            <th>Status</th>
+            <th>Diagnóstico</th>
+          </tr>
+        </thead>
+        <tbody id="historicoTableBody">
+          <!-- Linhas geradas pelo JS -->
+        </tbody>
+      </table>
+      <div id="semDados" class="sem-dados" style="display: none;">
+        Nenhum atendimento encontrado nos filtros aplicados.
+      </div>
+    </section>
+  </main>
+
+  <script src="storage.js"></script>
+  <script src="historico.js"></script>
+  <script src="main.js"></script>
+
+  <footer class="footer">
+  <div class="footer-content">
+    <span class="footer-creator">Criado por Iury Gabriel Barreto</span>
+    <span class="footer-version">v1.0</span>
+  </div>
+</footer>
+
+<script>
+// SISTEMA DE TEMA GLOBAL UNIVERSAL - AGENDAMED
+document.addEventListener('DOMContentLoaded', function() {
+  // Carrega configurações
+  const config = JSON.parse(localStorage.getItem('AgendaMed_config') || '{"tema":"light","notificacoes":true}');
+  
+  console.log('🌙 Aplicando tema AgendaMed em:', window.location.pathname, 'Tema:', config.tema);
+  
+  // 1. Aplica tema no HTML
+  document.documentElement.setAttribute('data-theme', config.tema);
+  
+  // 2. Força cores no body
+  document.body.style.backgroundColor = 'var(--cor-fundo)';
+  document.body.style.color = 'var(--cor-texto)';
+  document.body.style.transition = 'background-color 0.3s ease, color 0.3s ease';
+  
+  // 3. Aplica tema em elementos específicos baseado na página
+  setTimeout(() => {
+    // Para todas as páginas
+    const elementos = document.querySelectorAll('.card, .modal-content, table, .login-container, .config-section, .perfil-section, .ajuda-container, .tabela-container, .filtros');
+    elementos.forEach(el => {
+      if (el) {
+        el.style.backgroundColor = 'var(--cor-card)';
+        el.style.color = 'var(--cor-texto)';
+      }
+    });
+    
+    // Para inputs
+    document.querySelectorAll('input, select, textarea').forEach(input => {
+      input.style.backgroundColor = 'var(--cor-card)';
+      input.style.color = 'var(--cor-texto)';
+      input.style.borderColor = 'var(--cor-borda)';
+    });
+    
+    // Para header
+    const header = document.querySelector('.header');
+    if (header) {
+      header.style.backgroundColor = 'var(--cor-principal)';
+    }
+  }, 100);
+  
+  // 4. Escuta mudanças de tema em tempo real
+  window.addEventListener('temaAlterado', function(e) {
+    console.log('🔄 Tema alterado para:', e.detail);
+    
+    // Atualiza tema
+    document.documentElement.setAttribute('data-theme', e.detail);
+    
+    // Força atualização visual
+    document.body.style.backgroundColor = 'var(--cor-fundo)';
+    document.body.style.color = 'var(--cor-texto)';
+    
+    // Recarrega elementos específicos
+    setTimeout(() => {
+      document.querySelectorAll('.card, .modal-content, table, .login-container').forEach(el => {
+        if (el) {
+          el.style.backgroundColor = 'var(--cor-card)';
+          el.style.color = 'var(--cor-texto)';
+        }
+      });
+    }, 50);
+  });
+  
+  // 5. Escuta mudanças no storage entre abas
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'AgendaMed_config') {
+      console.log('📦 Storage alterado, atualizando tema...');
+      const newConfig = JSON.parse(e.newValue || '{"tema":"light"}');
+      document.documentElement.setAttribute('data-theme', newConfig.tema);
+      document.body.style.backgroundColor = 'var(--cor-fundo)';
+      document.body.style.color = 'var(--cor-texto)';
+    }
+  });
+});
+</script>
+
+</body>
+</html>

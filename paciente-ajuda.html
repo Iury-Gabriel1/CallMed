@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#007bff">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ajuda - AgendaMed Paciente</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="base.css">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="layout.css">
+  <link rel="stylesheet" href="forms.css">
+  <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="animations.css">
+
+  <style>
+    .contato-suporte {
+      background: linear-gradient(135deg, var(--cor-principal), #0056b3);
+      color: white;
+      padding: var(--espaco-xl);
+      border-radius: var(--radius-lg);
+      margin-top: var(--espaco-xl);
+      text-align: center;
+    }
+    
+    .contato-suporte h3 {
+      color: white;
+      margin-bottom: var(--espaco-md);
+    }
+    
+    .contato-email {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: var(--espaco-md) 0;
+      color: white;
+    }
+    
+    .btn-contato {
+      background: white;
+      color: var(--cor-principal);
+      padding: var(--espaco-sm) var(--espaco-lg);
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+      transition: transform var(--transition-fast);
+      margin: 0 var(--espaco-sm);
+    }
+    
+    .btn-contato:hover {
+      transform: translateY(-2px);
+    }
+
+    .video-tutorial {
+      background: var(--cor-card);
+      padding: var(--espaco-lg);
+      border-radius: var(--radius-lg);
+      margin: var(--espaco-lg) 0;
+      text-align: center;
+    }
+    
+    .video-container {
+      width: 100%;
+      max-width: 600px;
+      margin: var(--espaco-md) auto;
+    }
+    
+    .video-container video {
+      width: 100%;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .atalhos-rapidos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--espaco-md);
+      margin: var(--espaco-lg) 0;
+    }
+    
+    .atalho-card {
+      background: var(--cor-card);
+      padding: var(--espaco-lg);
+      border-radius: var(--radius-lg);
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      border: 2px solid transparent;
+    }
+    
+    .atalho-card:hover {
+      border-color: var(--cor-principal);
+      transform: translateY(-2px);
+    }
+    
+    .atalho-icon {
+      font-size: 2rem;
+      margin-bottom: var(--espaco-sm);
+    }
+
+    .suporte-texto {
+      color: white;
+      margin-bottom: var(--espaco-md);
+    }
+
+    .botoes-suporte {
+      margin-top: var(--espaco-lg);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="logo">
+      <img src="img/logo.png" alt="AgendaMed Logo">
+      <span>AgendaMed - Paciente</span>
+    </div>
+    <nav class="nav">
+      <ul>
+        <li><a href="paciente-dashboard.html">Início</a></li>
+        <li><a href="paciente-consultas.html">Minhas Consultas</a></li>
+        <li><a href="paciente-medicos.html">Médicos</a></li>
+        <li><a href="paciente-agendar.html">Agendar</a></li>
+        <li><a href="paciente-chatbot.html">Assistente</a></li>
+        <li><a href="paciente-configuracoes.html">Configurações</a></li>
+        <li><a href="paciente-ajuda.html" class="active">Ajuda</a></li>
+        <li><a href="#" id="logoutBtn">Sair</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="page-header">
+      <h1>Central de Ajuda</h1>
+      <p>Encontre respostas rápidas para suas dúvidas</p>
+    </section>
+
+    <section class="ajuda-container">
+      <h3>👋 Bem-vindo à AgendaMed!</h3>
+      <p>Nosso sistema foi desenvolvido para simplificar o agendamento e acompanhamento das suas consultas médicas. Aqui estão as respostas para as dúvidas mais frequentes:</p>
+
+      <!-- Atalhos Rápidos -->
+      <div class="atalhos-rapidos">
+        <div class="atalho-card" onclick="window.location.href='paciente-agendar.html'">
+          <div class="atalho-icon">📅</div>
+          <h4>Agendar Consulta</h4>
+          <p>Marque uma nova consulta</p>
+        </div>
+        
+        <div class="atalho-card" onclick="window.location.href='paciente-consultas.html'">
+          <div class="atalho-icon">📋</div>
+          <h4>Minhas Consultas</h4>
+          <p>Veja seu histórico</p>
+        </div>
+        
+        <div class="atalho-card" onclick="window.location.href='paciente-medicos.html'">
+          <div class="atalho-icon">🩺</div>
+          <h4>Encontrar Médicos</h4>
+          <p>Busque especialistas</p>
+        </div>
+        
+        <div class="atalho-card" onclick="window.location.href='paciente-chatbot.html'">
+          <div class="atalho-icon">🤖</div>
+          <h4>Assistente Virtual</h4>
+          <p>Tire dúvidas rápidas</p>
+        </div>
+      </div>
+
+      <!-- FAQ para Pacientes -->
+      <div class="faq-item">
+        <h4>📅 Como agendar uma consulta?</h4>
+        <p>Acesse a aba "Agendar" no menu, escolha o médico desejado, selecione data e horário disponíveis, e confirme o agendamento. Você receberá uma confirmação por e-mail.</p>
+      </div>
+
+      <div class="faq-item">
+        <h4>📋 Como ver minhas consultas agendadas?</h4>
+        <p>Na página "Minhas Consultas" você encontra todas as consultas futuras e pode filtrar por data, médico ou status.</p>
+      </div>
+
+      <div class="faq-item">
+        <h4>❌ Como cancelar uma consulta?</h4>
+        <p>Vá em "Minhas Consultas", encontre a consulta desejada e clique em "Cancelar". Lembre-se de cancelar com pelo menos 24h de antecedência.</p>
+      </div>
+
+      <div class="faq-item">
+        <h4>🩺 Como encontrar um médico?</h4>
+        <p>Na página "Médicos" você pode buscar por especialidade, nome ou ver todos os profissionais disponíveis com suas informações.</p>
+      </div>
+
+      <div class="faq-item">
+        <h4>🔔 Recebo lembretes das consultas?</h4>
+        <p>Sim! O sistema envia lembretes automáticos 24 horas antes de cada consulta, tanto por e-mail quanto por notificação no sistema.</p>
+      </div>
+
+      <div class="faq-item">
+        <h4>📱 O sistema funciona no celular?</h4>
+        <p>Sim! O AgendaMed é totalmente responsivo e funciona perfeitamente em smartphones, tablets e computadores.</p>
+      </div>
+
+      <div class="faq-item">
+        <h4>🎨 Posso personalizar o sistema?</h4>
+        <p>Sim! Em "Configurações" você pode alterar o tema visual, gerenciar notificações e fazer backup dos seus dados.</p>
+      </div>
+
+      <div class="faq-item">
+        <h4>🤖 Para que serve o assistente virtual?</h4>
+        <p>O assistente pode tirar dúvidas rápidas, ajudar no agendamento, mostrar suas próximas consultas e explicar funcionalidades do sistema.</p>
+      </div>
+
+      <div class="faq-item">
+        <h4>🔐 Meus dados estão seguros?</h4>
+        <p>Sim! Utilizamos criptografia e seguimos a LGPD para proteger suas informações. Seus dados médicos são confidenciais.</p>
+      </div>
+
+      <div class="faq-item">
+        <h4>📊 Posso ver meu histórico completo?</h4>
+        <p>Sim! Na página "Minhas Consultas" você tem acesso ao histórico completo de todas as consultas realizadas.</p>
+      </div>
+
+      <!-- Tutorial em Vídeo -->
+      <div class="video-tutorial">
+        <h3>🎥 Tutorial Rápido</h3>
+        <p>Assista ao vídeo para aprender a usar as principais funcionalidades:</p>
+        <div class="video-container">
+          <video controls poster="img/thumbnail.jpg">
+            <source src="tutorial.mp4" type="video/mp4">
+            Seu navegador não suporta o elemento de vídeo.
+          </video>
+        </div>
+        <div style="margin-top: var(--espaco-md);">
+          <small>📹 Tutorial completo do sistema AgendaMed</small>
+        </div>
+      </div>
+
+      <!-- Contato do Suporte -->
+      <div class="contato-suporte">
+        <h3>📞 Precisa de mais ajuda?</h3>
+        <p class="suporte-texto">Nossa equipe de suporte está sempre disponível para atendê-lo</p>
+        
+        <div class="contato-email">agendamedog@gmail.com</div>
+        
+        <div class="botoes-suporte">
+          <a href="mailto:agendamedog@gmail.com" class="btn-contato">Enviar E-mail</a>
+          <button class="btn-contato" onclick="window.location.href='paciente-chatbot.html'">
+            Falar com Assistente
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+  <div class="footer-content">
+    <span class="footer-creator">Criado por Iury Gabriel Barreto</span>
+    <span class="footer-version">v1.0</span>
+  </div>
+</footer>
+
+  <script src="main.js"></script>
+  <script>
+    // SISTEMA DE TEMA GLOBAL UNIVERSAL - AGENDAMED
+    document.addEventListener('DOMContentLoaded', function() {
+      const user = Storage.getUsuarioLogado();
+      if (!user || user.tipo !== 'paciente') {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      // Carrega configurações
+      const config = Storage.getConfiguracoes();
+      
+      console.log('🌙 Aplicando tema AgendaMed em:', window.location.pathname, 'Tema:', config.tema);
+      
+      // 1. Aplica tema no HTML
+      document.documentElement.setAttribute('data-theme', config.tema);
+      
+      // 2. Força cores no body
+      document.body.style.backgroundColor = 'var(--cor-fundo)';
+      document.body.style.color = 'var(--cor-texto)';
+      document.body.style.transition = 'background-color 0.3s ease, color 0.3s ease';
+      
+      // 3. Aplica tema em elementos específicos baseado na página
+      setTimeout(() => {
+        // Para todas as páginas
+        const elementos = document.querySelectorAll('.card, .modal-content, table, .login-container, .config-section, .perfil-section, .ajuda-container, .tabela-container, .filtros');
+        elementos.forEach(el => {
+          if (el) {
+            el.style.backgroundColor = 'var(--cor-card)';
+            el.style.color = 'var(--cor-texto)';
+          }
+        });
+        
+        // Para inputs
+        document.querySelectorAll('input, select, textarea').forEach(input => {
+          input.style.backgroundColor = 'var(--cor-card)';
+          input.style.color = 'var(--cor-texto)';
+          input.style.borderColor = 'var(--cor-borda)';
+        });
+        
+        // Para header
+        const header = document.querySelector('.header');
+        if (header) {
+          header.style.backgroundColor = 'var(--cor-principal)';
+        }
+      }, 100);
+      
+      // 4. Escuta mudanças de tema em tempo real
+      window.addEventListener('temaAlterado', function(e) {
+        console.log('🔄 Tema alterado para:', e.detail);
+        
+        // Atualiza tema
+        document.documentElement.setAttribute('data-theme', e.detail);
+        
+        // Força atualização visual
+        document.body.style.backgroundColor = 'var(--cor-fundo)';
+        document.body.style.color = 'var(--cor-texto)';
+        
+        // Recarrega elementos específicos
+        setTimeout(() => {
+          document.querySelectorAll('.card, .modal-content, table, .login-container').forEach(el => {
+            if (el) {
+              el.style.backgroundColor = 'var(--cor-card)';
+              el.style.color = 'var(--cor-texto)';
+            }
+          });
+        }, 50);
+      });
+      
+      // 5. Escuta mudanças no storage entre abas
+      window.addEventListener('storage', function(e) {
+        if (e.key === 'AgendaMed_config') {
+          console.log('📦 Storage alterado, atualizando tema...');
+          const newConfig = JSON.parse(e.newValue || '{"tema":"light"}');
+          document.documentElement.setAttribute('data-theme', newConfig.tema);
+          document.body.style.backgroundColor = 'var(--cor-fundo)';
+          document.body.style.color = 'var(--cor-texto)';
+        }
+      });
+
+      // Logout
+      document.getElementById('logoutBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        Storage.logout();
+        window.location.href = 'login.html';
+      });
+    });
+  </script>
+</body>
+</html>

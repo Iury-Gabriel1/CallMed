@@ -1,0 +1,473 @@
+/* ======================================================
+   AgendaMed - base.css
+   Reset + Variáveis Globais (Atualizado para visual moderno)
+   ====================================================== */
+
+/* -------------------------
+   1. Reset de estilos
+   ------------------------- */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-base, 'Arial', sans-serif);
+  line-height: 1.5;
+  background-color: var(--cor-fundo, #f0f2f5);
+  color: var(--cor-texto, #333);
+}
+
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+
+button, input, select, textarea {
+  font: inherit;
+  border: none;
+  outline: none;
+  background: none;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+textarea {
+  resize: none;
+}
+
+/* -------------------------
+   2. Variáveis Globais
+   ------------------------- */
+:root {
+  /* Cores principais */
+  --cor-principal: #007bff;
+  --cor-secundaria: #6c757d;
+  --cor-sucesso: #28a745;
+  --cor-erro: #dc3545;
+  --cor-aviso: #ffc107;
+  --cor-fundo: #f0f2f5;
+  --cor-texto: #333;
+  --cor-card: #fff;
+  --cor-sombra: rgba(0, 0, 0, 0.08);
+
+  /* Fontes */
+  --font-base: 'Arial', sans-serif;
+  --font-titulo: 'Segoe UI', sans-serif;
+
+  /* Espaçamentos */
+  --espaco-xs: 4px;
+  --espaco-sm: 8px;
+  --espaco-md: 16px;
+  --espaco-lg: 24px;
+  --espaco-xl: 32px;
+  --espaco-xxl: 48px;
+
+  /* Bordas e radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  /* Sombras */
+  --shadow-sm: 0 4px 8px var(--cor-sombra);
+  --shadow-md: 0 8px 16px var(--cor-sombra);
+  --shadow-lg: 0 12px 24px var(--cor-sombra);
+
+  /* Transições */
+  --transition-fast: 0.2s ease-in-out;
+  --transition-medium: 0.4s ease-in-out;
+  --transition-slow: 0.6s ease-in-out;
+}
+
+/* -------------------------
+   3. Reset de títulos e textos
+   ------------------------- */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-titulo);
+  color: var(--cor-texto);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+p {
+  margin-bottom: var(--espaco-md);
+  color: var(--cor-secundaria);
+}
+
+small {
+  font-size: 0.85rem;
+  color: var(--cor-secundaria);
+}
+
+/* -------------------------
+   4. Links
+   ------------------------- */
+a {
+  color: var(--cor-principal);
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: #0056b3;
+}
+
+/* -------------------------
+   5. Imagens e figuras
+   ------------------------- */
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+}
+
+/* -------------------------
+   6. Botões padrão
+   ------------------------- */
+button {
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  padding: var(--espaco-sm) var(--espaco-lg);
+  background-color: var(--cor-principal);
+  color: #fff;
+  font-weight: 600;
+  transition: transform var(--transition-fast), background-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+button:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+/* -------------------------
+   7. Inputs e formulários
+   ------------------------- */
+input, select, textarea {
+  padding: var(--espaco-sm);
+  border-radius: var(--radius-md);
+  border: 1px solid #ccc;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--cor-principal);
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+  outline: none;
+}
+
+/* -------------------------
+   8. Layout global / containers
+   ------------------------- */
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 2rem auto;
+}
+
+/* -------------------------
+   9. Cards (para dashboards)
+   ------------------------- */
+.card {
+  background-color: var(--cor-card);
+  padding: var(--espaco-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-medium), box-shadow var(--transition-medium);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.card h3 {
+  font-size: 1.2rem;
+  margin-bottom: var(--espaco-sm);
+  color: var(--cor-principal);
+}
+
+.card p {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--cor-texto);
+}
+
+/* -------------------------
+   10. Layout dashboard grid
+   ------------------------- */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--espaco-lg);
+  margin-top: var(--espaco-lg);
+}
+
+/* -------------------------
+   11. Responsividade
+   ------------------------- */
+@media (max-width: 1024px) {
+  .container {
+    width: 95%;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ======================================================
+   Configurações, Histórico e Ajuda
+   ====================================================== */
+
+/* Configurações */
+.config-section {
+  background: var(--cor-card);
+  padding: var(--espaco-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.config-item {
+  margin-bottom: var(--espaco-xl);
+  padding-bottom: var(--espaco-lg);
+  border-bottom: 1px solid #eee;
+}
+
+.config-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.config-item h3 {
+  color: var(--cor-principal);
+  margin-bottom: var(--espaco-md);
+  font-size: 1.2rem;
+}
+
+.config-item label {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-sm);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.config-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+.config-item select {
+  width: 100%;
+  max-width: 300px;
+}
+
+/* Histórico */
+.tabela-container {
+  background: var(--cor-card);
+  padding: var(--espaco-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow-x: auto;
+}
+
+.tabela-container table {
+  width: 100%;
+  min-width: 800px;
+}
+
+/* Ajuda */
+.ajuda-container {
+  background: var(--cor-card);
+  padding: var(--espaco-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.ajuda-container h3 {
+  color: var(--cor-principal);
+  margin-bottom: var(--espaco-md);
+  font-size: 1.5rem;
+}
+
+.ajuda-container > p {
+  color: var(--cor-secundaria);
+  margin-bottom: var(--espaco-xl);
+  font-size: 1.1rem;
+}
+
+.faq-item {
+  margin-bottom: var(--espaco-xl);
+  padding: var(--espaco-lg);
+  background: #f8f9fa;
+  border-radius: var(--radius-md);
+  border-left: 4px solid var(--cor-principal);
+  transition: transform var(--transition-fast);
+}
+
+.faq-item:hover {
+  transform: translateX(5px);
+}
+
+.faq-item h4 {
+  color: var(--cor-principal);
+  margin-bottom: var(--espaco-sm);
+  font-size: 1.1rem;
+}
+
+.faq-item p {
+  color: var(--cor-texto);
+  margin-bottom: 0;
+  line-height: 1.6;
+}
+
+.faq-item a {
+  color: var(--cor-principal);
+  font-weight: 500;
+}
+
+.faq-item a:hover {
+  text-decoration: underline;
+}
+
+/* Page Header consistente */
+.page-header {
+  text-align: center;
+  margin-bottom: var(--espaco-xl);
+  padding: var(--espaco-lg) 0;
+}
+
+.page-header h1 {
+  color: var(--cor-principal);
+  font-size: 2.5rem;
+  margin-bottom: var(--espaco-sm);
+}
+
+/* Navbar consistente */
+.navbar {
+  width: 100%;
+  background-color: var(--cor-principal);
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--espaco-md) var(--espaco-lg);
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar .logo {
+  height: 40px;
+  width: auto;
+  border-radius: 5px;
+}
+
+.navbar ul {
+  display: flex;
+  gap: var(--espaco-lg);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar ul li a {
+  color: #fff;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.navbar ul li a:hover,
+.navbar ul li a.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+/* Botões */
+.btn-primary {
+  background-color: var(--cor-principal);
+  color: white;
+  padding: var(--espaco-sm) var(--espaco-lg);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform var(--transition-fast), background-color var(--transition-fast);
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .config-section,
+  .ajuda-container {
+    padding: var(--espaco-lg);
+    margin: 0 var(--espaco-md);
+  }
+  
+  .navbar {
+    flex-direction: column;
+    gap: var(--espaco-md);
+  }
+  
+  .navbar ul {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--espaco-md);
+  }
+  
+  .page-header h1 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .config-section,
+  .ajuda-container {
+    padding: var(--espaco-md);
+  }
+  
+  .faq-item {
+    padding: var(--espaco-md);
+  }
+  
+  .page-header h1 {
+    font-size: 1.8rem;
+  }
+}

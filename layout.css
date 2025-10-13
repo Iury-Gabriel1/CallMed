@@ -1,0 +1,222 @@
+/* ======================================================
+   AgendaMed - layout.css
+   Header, nav, grids, dashboard, responsividade
+   ====================================================== */
+
+/* -------------------------
+   1. Header / Navbar
+   ------------------------- */
+.header {
+  width: 100%;
+  background-color: var(--cor-principal);
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--espaco-md) var(--espaco-lg);
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header .logo {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-sm);
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.header .logo img {
+  height: 40px;
+  width: auto;
+  border-radius: 5px;
+  box-shadow: var(--shadow-sm);
+}
+
+.header .nav ul {
+  display: flex;
+  gap: var(--espaco-lg);
+  list-style: none;
+}
+
+.header .nav ul li a {
+  color: #fff;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.header .nav ul li a:hover,
+.header .nav ul li a.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+/* -------------------------
+   2. Container principal
+   ------------------------- */
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 2rem auto;
+}
+
+/* -------------------------
+   3. Dashboard Grid
+   ------------------------- */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--espaco-lg);
+  margin-top: var(--espaco-lg);
+}
+
+/* -------------------------
+   4. Cards
+   ------------------------- */
+.card {
+  background-color: var(--cor-card);
+  padding: var(--espaco-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  text-align: center;
+  transition: transform var(--transition-medium), box-shadow var(--transition-medium);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.card h3 {
+  font-size: 1.2rem;
+  margin-bottom: var(--espaco-sm);
+  color: var(--cor-principal);
+}
+
+.card p {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--cor-texto);
+}
+
+/* -------------------------
+   5. Welcome section
+   ------------------------- */
+.welcome h1 {
+  font-size: 2rem;
+  color: var(--cor-principal);
+  margin-bottom: var(--espaco-sm);
+}
+
+.welcome p {
+  font-size: 1rem;
+  color: var(--cor-secundaria);
+}
+
+/* -------------------------
+   6. Responsividade
+   ------------------------- */
+@media (max-width: 1024px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--espaco-sm);
+  }
+  .header .nav ul {
+    flex-wrap: wrap;
+    gap: var(--espaco-md);
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .header .logo {
+    font-size: 1.2rem;
+  }
+  .card h3 {
+    font-size: 1rem;
+  }
+  .card p {
+    font-size: 1.5rem;
+  }
+}
+
+/* Welcome section com avatar */
+.user-welcome {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-lg);
+  margin-bottom: var(--espaco-xl);
+}
+
+.welcome-text h1 {
+  color: var(--cor-principal);
+  margin-bottom: var(--espaco-sm);
+}
+
+.welcome-text p {
+  color: var(--cor-secundaria);
+  margin: 0;
+}
+
+/* Lista de próximas consultas */
+.proximas-consultas {
+  margin-top: var(--espaco-xl);
+}
+
+.proximas-consultas h2 {
+  color: var(--cor-principal);
+  margin-bottom: var(--espaco-lg);
+}
+
+.consultas-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-md);
+}
+
+.consulta-item {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-md);
+  padding: var(--espaco-md);
+  background: var(--cor-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast);
+}
+
+.consulta-item:hover {
+  transform: translateX(5px);
+}
+
+.consulta-info {
+  flex: 1;
+}
+
+.consulta-info strong {
+  display: block;
+  color: var(--cor-texto);
+  margin-bottom: 4px;
+}
+
+.consulta-info span {
+  color: var(--cor-secundaria);
+  font-size: 0.9rem;
+}
+
+.sem-dados {
+  text-align: center;
+  padding: var(--espaco-xl);
+  color: var(--cor-secundaria);
+  font-style: italic;
+}

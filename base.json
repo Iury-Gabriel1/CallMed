@@ -1,0 +1,62 @@
+{
+  "usuarios": [
+    {
+      "id": 1,
+      "nome": "Administrador Demo",
+      "email": "admin@AgendaMed.com",
+      "senha": "123456",
+      "tipo": "admin"
+    },
+    {
+      "id": 2,
+      "nome": "Dra. Ana Souza",
+      "email": "ana@AgendaMed.com",
+      "senha": "123456",
+      "tipo": "medico"
+    },
+    {
+      "id": 3,
+      "nome": "João da Silva",
+      "email": "joao@AgendaMed.com",
+      "senha": "123456",
+      "tipo": "paciente"
+    }
+  ],
+  "medicos": [
+    {
+      "id": 2,
+      "nome": "Dra. Ana Souza",
+      "especialidade": "Clínica Geral",
+      "crm": "123456-SP",
+      "telefone": "(11) 99999-9999"
+    }
+  ],
+  "pacientes": [
+    {
+      "id": 3,
+      "nome": "João da Silva",
+      "data_nascimento": "1990-04-12",
+      "telefone": "(11) 98888-8888",
+      "email": "joao@AgendaMed.com"
+    }
+  ],
+  "agendamentos": [
+    {
+      "id": 1,
+      "paciente_id": 3,
+      "medico_id": 2,
+      "data": "2025-10-15",
+      "hora": "14:00",
+      "status": "Confirmado"
+    }
+  ],
+  "historico": [
+    {
+      "id": 1,
+      "paciente_id": 3,
+      "medico_id": 2,
+      "data": "2025-09-20",
+      "descricao": "Consulta de rotina. Pressão normal. Exames solicitados."
+    }
+  ]
+}

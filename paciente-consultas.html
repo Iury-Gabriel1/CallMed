@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#007bff">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minhas Consultas - AgendaMed</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="base.css">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="layout.css">
+  <link rel="stylesheet" href="forms.css">
+  <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="animations.css">
+
+  <style>
+    .filtros-consultas {
+      background: var(--cor-card);
+      padding: var(--espaco-lg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      margin-bottom: var(--espaco-lg);
+    }
+    
+    .filtros-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--espaco-md);
+      align-items: end;
+    }
+    
+    .status-filters {
+      display: flex;
+      gap: var(--espaco-sm);
+      flex-wrap: wrap;
+      margin-top: var(--espaco-md);
+    }
+    
+    .status-filter {
+      padding: var(--espaco-xs) var(--espaco-sm);
+      border: 1px solid var(--cor-borda);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-size: 0.9rem;
+    }
+    
+    .status-filter.active {
+      background: var(--cor-principal);
+      color: white;
+      border-color: var(--cor-principal);
+    }
+    
+    .consulta-card {
+      background: var(--cor-card);
+      padding: var(--espaco-lg);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--espaco-md);
+      border-left: 4px solid var(--cor-principal);
+      transition: transform var(--transition-fast);
+    }
+    
+    .consulta-card:hover {
+      transform: translateX(5px);
+    }
+    
+    .consulta-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--espaco-sm);
+      flex-wrap: wrap;
+      gap: var(--espaco-sm);
+    }
+    
+    .consulta-info {
+      flex: 1;
+    }
+    
+    .consulta-actions {
+      display: flex;
+      gap: var(--espaco-sm);
+    }
+    
+    .consulta-status {
+      padding: var(--espaco-xs) var(--espaco-sm);
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-left: var(--espaco-sm);
+    }
+    
+    .status-agendado { background: #d4edda; color: #155724; }
+    .status-concluido { background: #d1ecf1; color: #0c5460; }
+    .status-cancelado { background: #f8d7da; color: #721c24; }
+    .status-pendente { background: #fff3cd; color: #856404; }
+    
+    .consulta-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--espaco-md);
+      margin-top: var(--espaco-md);
+      padding-top: var(--espaco-md);
+      border-top: 1px solid var(--cor-borda);
+    }
+    
+    .detail-item {
+      display: flex;
+      align-items: center;
+      gap: var(--espaco-sm);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: var(--espaco-xxl);
+      color: var(--cor-secundaria);
+    }
+    
+    .empty-state img {
+      width: 100px;
+      height: 100px;
+      margin-bottom: var(--espaco-md);
+      opacity: 0.5;
+    }
+    
+    @media (max-width: 768px) {
+      .consulta-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .consulta-actions {
+        justify-content: flex-start;
+        margin-top: var(--espaco-sm);
+      }
+      
+      .filtros-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="logo">
+      <img src="logo.png" alt="AgendaMed Logo">
+      <span>AgendaMed - Paciente</span>
+    </div>
+    <nav class="nav">
+  <ul>
+    <li><a href="paciente-dashboard.html">Início</a></li>
+    <li><a href="paciente-consultas.html" class="active">Minhas Consultas</a></li>
+    <li><a href="paciente-medicos.html">Médicos</a></li>
+    <li><a href="paciente-agendar.html">Agendar</a></li>
+    <li><a href="paciente-chatbot.html">Assistente</a></li>
+    <li><a href="paciente-configuracoes.html">Configurações</a></li>
+    <li><a href="paciente-ajuda.html">Ajuda</a></li>
+    <li><a href="#" id="logoutBtn">Sair</a></li>
+  </ul>
+</nav>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Minhas Consultas</h1>
+      <p>Gerencie todas as suas consultas agendadas</p>
+    </div>
+
+    <!-- Filtros -->
+    <section class="filtros-consultas">
+      <div class="filtros-grid">
+        <div class="form-group">
+          <label for="filtroData">Filtrar por Data</label>
+          <input type="date" id="filtroData">
+        </div>
+        
+        <div class="form-group">
+          <label for="filtroMedico">Filtrar por Médico</label>
+          <select id="filtroMedico">
+            <option value="">Todos os médicos</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="filtroStatus">Filtrar por Status</label>
+          <select id="filtroStatus">
+            <option value="">Todos os status</option>
+            <option value="agendado">Agendadas</option>
+            <option value="concluido">Concluídas</option>
+            <option value="cancelado">Canceladas</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <button type="button" class="btn-primary" id="btnAplicarFiltros">Aplicar Filtros</button>
+          <button type="button" class="btn-limpar" id="btnLimparFiltros">Limpar</button>
+        </div>
+      </div>
+      
+      <div class="status-filters">
+        <div class="status-filter active" data-status="">Todas</div>
+        <div class="status-filter" data-status="agendado">Agendadas</div>
+        <div class="status-filter" data-status="concluido">Concluídas</div>
+        <div class="status-filter" data-status="cancelado">Canceladas</div>
+      </div>
+    </section>
+
+    <!-- Lista de Consultas -->
+    <section class="consultas-lista">
+      <div id="consultasContainer">
+        <!-- Consultas serão carregadas via JavaScript -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal de Cancelamento -->
+  <div class="modal" id="modalCancelar">
+    <div class="modal-content">
+      <h3>Cancelar Consulta</h3>
+      <p id="cancelarTexto">Tem certeza que deseja cancelar esta consulta?</p>
+      <div class="form-actions">
+        <button class="btn-delete" id="btnConfirmarCancelar">Sim, Cancelar</button>
+        <button class="btn-secondary" id="btnCancelarAcao">Manter Consulta</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+  <div class="footer-content">
+    <span class="footer-creator">Criado por Iury Gabriel Barreto</span>
+    <span class="footer-version">v1.0</span>
+  </div>
+</footer>
+
+  <script src="storage.js"></script>
+  <script src="main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = Storage.getUsuarioLogado();
+      if (!user || user.tipo !== 'paciente') {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      // Aplica tema
+      const config = Storage.getConfiguracoes();
+      document.documentElement.setAttribute('data-theme', config.tema);
+
+      // Carrega consultas do paciente
+      carregarConsultasPaciente(user.id);
+
+      // Configura filtros
+      configurarFiltros(user.id);
+
+      // Configura modal de cancelamento
+      configurarModalCancelamento();
+
+      // Logout
+      document.getElementById('logoutBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        Storage.logout();
+        window.location.href = 'login.html';
+      });
+    });
+
+    function carregarConsultasPaciente(usuarioId, filtros = {}) {
+      const pacientes = Storage.getPacientes();
+      const paciente = pacientes.find(p => p.usuarioId == usuarioId) || pacientes.find(p => p.id == usuarioId);
+      const pacienteId = paciente ? paciente.id : usuarioId;
+      
+      const agendamentos = Storage.getAgendamentos();
+      const medicos = Storage.getMedicos();
+      
+      // Filtra consultas do paciente
+      let consultasPaciente = agendamentos.filter(a => a.pacienteId == pacienteId);
+      
+      // Aplica filtros
+      if (filtros.data) {
+        consultasPaciente = consultasPaciente.filter(c => c.data === filtros.data);
+      }
+      
+      if (filtros.medico) {
+        consultasPaciente = consultasPaciente.filter(c => c.medicoId == filtros.medico);
+      }
+      
+      if (filtros.status) {
+        consultasPaciente = consultasPaciente.filter(c => c.status === filtros.status);
+      }
+      
+      // Ordena por data (mais recentes primeiro)
+      consultasPaciente.sort((a, b) => new Date(b.data) - new Date(a.data));
+
+      renderizarConsultas(consultasPaciente, medicos);
+    }
+
+    function renderizarConsultas(consultas, medicos) {
+      const container = document.getElementById('consultasContainer');
+      
+      if (consultas.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <img src="calendar-empty.png" alt="Nenhuma consulta" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHg9IjEwIiB5PSIxMCIgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiByeD0iOCIgZmlsbD0iI0YwRjJGNSIgc3Ryb2tlPSIjRDBFMUY2IiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTMwIDM1SDUwTTMwIDUwSDcwTTMwIDY1SDUwIiBzdHJva2U9IiM2Qzc1N0QiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+Cjwvc3ZnPgo='">
+            <h3>Nenhuma consulta encontrada</h3>
+            <p>${Object.keys(filtrosAtivos).length > 0 ? 'Tente ajustar os filtros ou' : ''} 
+               <a href="paciente-agendar.html" style="color: var(--cor-principal);">agende sua primeira consulta</a></p>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      
+      consultas.forEach(consulta => {
+        const medico = medicos.find(m => m.id == consulta.medicoId);
+        const data = new Date(consulta.data);
+        const hoje = new Date();
+        const dataConsulta = new Date(consulta.data);
+        const podeCancelar = dataConsulta > hoje && consulta.status !== 'cancelado';
+        
+        html += `
+          <div class="consulta-card" data-consulta-id="${consulta.id}">
+            <div class="consulta-header">
+              <div class="consulta-info">
+                <h3>${medico?.nome || 'Médico não encontrado'}</h3>
+                <p>${medico?.especialidade || 'Especialidade não informada'}</p>
+              </div>
+              <div>
+                <span class="consulta-status status-${consulta.status || 'agendado'}">
+                  ${getStatusText(consulta.status)}
+                </span>
+              </div>
+            </div>
+            
+            <div class="consulta-details">
+              <div class="detail-item">
+                <span>📅</span>
+                <div>
+                  <strong>Data:</strong>
+                  <div>${data.toLocaleDateString('pt-BR')}</div>
+                </div>
+              </div>
+              
+              <div class="detail-item">
+                <span>⏰</span>
+                <div>
+                  <strong>Horário:</strong>
+                  <div>${consulta.hora}</div>
+                </div>
+              </div>
+              
+              <div class="detail-item">
+                <span>🆔</span>
+                <div>
+                  <strong>ID da Consulta:</strong>
+                  <div>#${consulta.id.toString().padStart(4, '0')}</div>
+                </div>
+              </div>
+            </div>
+            
+            ${consulta.diagnostico ? `
+              <div class="diagnostico-info" style="margin-top: var(--espaco-md); padding: var(--espaco-sm); background: var(--cor-fundo); border-radius: var(--radius-md);">
+                <strong>📝 Diagnóstico:</strong>
+                <p style="margin: var(--espaco-xs) 0 0 0;">${consulta.diagnostico}</p>
+              </div>
+            ` : ''}
+            
+            <div class="consulta-actions" style="margin-top: var(--espaco-md);">
+              ${podeCancelar ? `
+                <button class="btn-delete" onclick="solicitarCancelamento(${consulta.id})">
+                  ❌ Cancelar Consulta
+                </button>
+              ` : ''}
+              
+              <button class="btn-edit" onclick="verDetalhesConsulta(${consulta.id})">
+                📋 Ver Detalhes
+              </button>
+            </div>
+          </div>
+        `;
+      });
+      
+      container.innerHTML = html;
+    }
+
+    function configurarFiltros(usuarioId) {
+      const filtroData = document.getElementById('filtroData');
+      const filtroMedico = document.getElementById('filtroMedico');
+      const filtroStatus = document.getElementById('filtroStatus');
+      const btnAplicar = document.getElementById('btnAplicarFiltros');
+      const btnLimpar = document.getElementById('btnLimparFiltros');
+      const statusFilters = document.querySelectorAll('.status-filter');
+      
+      // Carrega médicos no filtro
+      const medicos = Storage.getMedicos();
+      medicos.forEach(medico => {
+        const option = document.createElement('option');
+        option.value = medico.id;
+        option.textContent = medico.nome;
+        filtroMedico.appendChild(option);
+      });
+      
+      // Filtros de status rápidos
+      statusFilters.forEach(filter => {
+        filter.addEventListener('click', function() {
+          statusFilters.forEach(f => f.classList.remove('active'));
+          this.classList.add('active');
+          
+          const status = this.dataset.status;
+          filtroStatus.value = status;
+          aplicarFiltros(usuarioId);
+        });
+      });
+      
+      // Aplicar filtros
+      btnAplicar.addEventListener('click', () => aplicarFiltros(usuarioId));
+      
+      // Limpar filtros
+      btnLimpar.addEventListener('click', () => {
+        filtroData.value = '';
+        filtroMedico.value = '';
+        filtroStatus.value = '';
+        statusFilters.forEach(f => f.classList.remove('active'));
+        statusFilters[0].classList.add('active');
+        carregarConsultasPaciente(usuarioId);
+      });
+      
+      // Enter nos filtros
+      [filtroData, filtroMedico, filtroStatus].forEach(input => {
+        input.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') aplicarFiltros(usuarioId);
+        });
+      });
+    }
+
+    function aplicarFiltros(usuarioId) {
+      const filtros = {
+        data: document.getElementById('filtroData').value,
+        medico: document.getElementById('filtroMedico').value,
+        status: document.getElementById('filtroStatus').value
+      };
+      
+      carregarConsultasPaciente(usuarioId, filtros);
+    }
+
+    let consultaParaCancelar = null;
+
+    function configurarModalCancelamento() {
+      const modal = document.getElementById('modalCancelar');
+      const btnConfirmar = document.getElementById('btnConfirmarCancelar');
+      const btnCancelar = document.getElementById('btnCancelarAcao');
+      
+      btnConfirmar.addEventListener('click', () => {
+        if (consultaParaCancelar) {
+          cancelarConsulta(consultaParaCancelar);
+        }
+        modal.classList.remove('active');
+      });
+      
+      btnCancelar.addEventListener('click', () => {
+        modal.classList.remove('active');
+        consultaParaCancelar = null;
+      });
+      
+      window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('active');
+          consultaParaCancelar = null;
+        }
+      });
+    }
+
+    function solicitarCancelamento(consultaId) {
+      const consulta = Storage.getAgendamentos().find(a => a.id == consultaId);
+      if (!consulta) return;
+      
+      const medico = Storage.getMedicos().find(m => m.id == consulta.medicoId);
+      const data = new Date(consulta.data);
+      
+      document.getElementById('cancelarTexto').innerHTML = `
+        Tem certeza que deseja cancelar a consulta com <strong>${medico?.nome || 'o médico'}</strong>
+        marcada para <strong>${data.toLocaleDateString('pt-BR')} às ${consulta.hora}</strong>?
+        <br><br>
+        <small style="color: var(--cor-secundaria);">
+          ⚠️ Cancelamentos devem ser feitos com pelo menos 24h de antecedência.
+        </small>
+      `;
+      
+      consultaParaCancelar = consultaId;
+      document.getElementById('modalCancelar').classList.add('active');
+    }
+
+    function cancelarConsulta(consultaId) {
+      const agendamentos = Storage.getAgendamentos();
+      const consultaIndex = agendamentos.findIndex(a => a.id == consultaId);
+      
+      if (consultaIndex !== -1) {
+        agendamentos[consultaIndex].status = 'cancelado';
+        agendamentos[consultaIndex].canceladoEm = new Date().toISOString();
+        localStorage.setItem('AgendaMed_agendamentos', JSON.stringify(agendamentos));
+        
+        // Recarrega a lista
+        const user = Storage.getUsuarioLogado();
+        carregarConsultasPaciente(user.id, getFiltrosAtivos());
+        
+        alert('Consulta cancelada com sucesso!');
+      }
+    }
+
+    function verDetalhesConsulta(consultaId) {
+      const consulta = Storage.getAgendamentos().find(a => a.id == consultaId);
+      const medico = Storage.getMedicos().find(m => m.id == consulta.medicoId);
+      const paciente = Storage.getPacientes().find(p => p.id == consulta.pacienteId);
+      const data = new Date(consulta.data);
+      
+      const detalhes = `
+        Consulta #${consulta.id.toString().padStart(4, '0')}
+        
+        📋 Informações:
+        • Médico: ${medico?.nome || 'Não informado'}
+        • Especialidade: ${medico?.especialidade || 'Não informada'}
+        • CRM: ${medico?.crm || 'Não informado'}
+        
+        📅 Data e Horário:
+        • Data: ${data.toLocaleDateString('pt-BR')}
+        • Horário: ${consulta.hora}
+        
+        👤 Paciente:
+        • Nome: ${paciente?.nome || 'Não informado'}
+        • Telefone: ${paciente?.telefone || 'Não informado'}
+        
+        📊 Status: ${getStatusText(consulta.status)}
+        ${consulta.criadoEm ? `• Agendada em: ${new Date(consulta.criadoEm).toLocaleString('pt-BR')}` : ''}
+        ${consulta.canceladoEm ? `• Cancelada em: ${new Date(consulta.canceladoEm).toLocaleString('pt-BR')}` : ''}
+        
+        ${consulta.diagnostico ? `\n📝 Diagnóstico:\n${consulta.diagnostico}` : ''}
+        ${consulta.observacoes ? `\n📋 Observações:\n${consulta.observacoes}` : ''}
+      `;
+      
+      alert(detalhes);
+    }
+
+    function getStatusText(status) {
+      const statusMap = {
+        'agendado': 'Agendado',
+        'concluido': 'Concluído',
+        'cancelado': 'Cancelado',
+        'pendente': 'Pendente'
+      };
+      return statusMap[status] || 'Agendado';
+    }
+
+    function getFiltrosAtivos() {
+      return {
+        data: document.getElementById('filtroData').value,
+        medico: document.getElementById('filtroMedico').value,
+        status: document.getElementById('filtroStatus').value
+      };
+    }
+  </script>
+</body>
+</html>

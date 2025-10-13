@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#007bff">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgendaMed - Login</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="base.css">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="layout.css">
+  <link rel="stylesheet" href="forms.css">
+  <link rel="stylesheet" href="components.css">
+  <link rel="stylesheet" href="animations.css">
+  
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #e0f0ff, #f0f2f5);
+      font-family: var(--font-base, Arial, sans-serif);
+      padding: var(--espaco-md);
+    }
+
+    .login-container {
+      background: var(--cor-card, #fff);
+      padding: var(--espaco-xl);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 450px;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: var(--espaco-lg);
+    }
+
+    .login-header h2 {
+      color: var(--cor-principal);
+      margin-bottom: var(--espaco-sm);
+      font-size: 2rem;
+    }
+
+    .tipo-login {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--espaco-sm);
+      margin-bottom: var(--espaco-lg);
+      background: var(--cor-fundo);
+      padding: var(--espaco-sm);
+      border-radius: var(--radius-md);
+    }
+
+    .tipo-btn {
+      padding: var(--espaco-sm);
+      border: 2px solid transparent;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--cor-texto);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .tipo-btn.active {
+      background: var(--cor-principal);
+      color: white;
+      border-color: var(--cor-principal);
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--espaco-md);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      font-weight: 500;
+      margin-bottom: var(--espaco-xs);
+      color: var(--cor-texto);
+    }
+
+    .login-error {
+      color: var(--cor-erro);
+      font-size: 0.9rem;
+      text-align: center;
+      margin-top: 0.5rem;
+      display: none;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    .login-footer {
+      margin-top: var(--espaco-lg);
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--cor-secundaria);
+    }
+
+    .login-footer a {
+      color: var(--cor-principal);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color var(--transition-fast);
+    }
+
+    .login-footer a:hover {
+      color: #0056b3;
+    }
+
+    .demo-info {
+      background: #e7f3ff;
+      border: 1px solid #b3d9ff;
+      border-radius: var(--radius-md);
+      padding: var(--espaco-md);
+      margin-top: var(--espaco-lg);
+      font-size: 0.9rem;
+    }
+
+    .demo-info h4 {
+      color: var(--cor-principal);
+      margin-bottom: var(--espaco-xs);
+    }
+
+    @media (max-width: 480px) {
+      .login-container {
+        padding: var(--espaco-lg);
+      }
+      
+      .tipo-login {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <div class="login-header">
+      <h2>AgendaMed</h2>
+      <p>Faça login na sua conta</p>
+    </div>
+
+   <div class="tipo-login">
+    <button class="tipo-btn active" data-tipo="clinica">
+        🏥 Clínica
+    </button>
+    <button class="tipo-btn" data-tipo="paciente">
+        👤 Paciente
+    </button>
+</div>
+
+    <!-- Formulário de Login -->
+    <form id="loginForm" class="login-form">
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" placeholder="Digite seu e-mail" required>
+      </div>
+
+      <div class="form-group">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" placeholder="Digite sua senha" required>
+      </div>
+
+      <label class="remember-label">
+        <input type="checkbox" id="rememberMe"> 
+        Lembrar-me
+      </label>
+
+      <button type="submit" class="btn-primary">Entrar</button>
+      <div class="login-error" id="loginError">E-mail ou senha incorretos!</div>
+    </form>
+
+    <div class="login-footer">
+      <p>Não tem conta? <a href="#" id="abrirModalCadastro">Criar conta</a></p>
+    </div>
+
+    <!-- Informações de Demo -->
+    <div class="demo-info">
+      <h4>💡 Contas de Demonstração:</h4>
+      <p><strong>Médico:</strong> medico@AgendaMed.com / senha123</p>
+      <p><strong>Paciente:</strong> paciente@AgendaMed.com / senha123</p>
+    </div>
+  </div>
+
+  <!-- Modal de Cadastro -->
+  <div class="modal" id="modalCadastro">
+    <div class="modal-content">
+      <span class="modal-close" id="fecharModalCadastro">&times;</span>
+      <h3>Criar Conta</h3>
+      
+<!-- E no modal de cadastro: -->
+<div class="tipo-login" style="margin-bottom: var(--espaco-md);">
+    <button class="tipo-btn active" data-tipo-cadastro="clinica">
+        🏥 Clínica
+    </button>
+    <button class="tipo-btn" data-tipo-cadastro="paciente">
+        👤 Paciente
+    </button>
+</div>
+      <form id="cadastroForm">
+        <div class="form-group">
+          <label for="novoNome">Nome Completo</label>
+          <input type="text" id="novoNome" required>
+        </div>
+
+        <div class="form-group">
+          <label for="novoEmail">E-mail</label>
+          <input type="email" id="novoEmail" required>
+        </div>
+
+        <div class="form-group">
+          <label for="novaSenha">Senha</label>
+          <input type="password" id="novaSenha" required>
+        </div>
+
+        <button type="submit" class="btn-primary">Cadastrar</button>
+        <div class="login-error" id="cadastroError"></div>
+      </form>
+    </div>
+  </div>
+
+<script src="storage.js"></script>
+<script>
+    let tipoUsuario = 'clinica'; // Padrão agora é clínica
+
+    // === SISTEMA DE TEMA ===
+    const config = Storage.getConfiguracoes();
+    document.documentElement.setAttribute('data-theme', config.tema);
+
+    // === CONTROLE DE TIPO DE USUÁRIO ===
+    document.querySelectorAll('.tipo-btn[data-tipo]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.tipo-btn[data-tipo]').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            tipoUsuario = this.dataset.tipo;
+            
+            console.log('Tipo selecionado:', tipoUsuario);
+        });
+    });
+
+    // Controle de tipo no cadastro
+    document.querySelectorAll('.tipo-btn[data-tipo-cadastro]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.tipo-btn[data-tipo-cadastro]').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+
+    // === MODAL ===
+    const modalCadastro = document.getElementById('modalCadastro');
+    const abrirModalCadastro = document.getElementById('abrirModalCadastro');
+    const fecharModalCadastro = document.getElementById('fecharModalCadastro');
+
+    abrirModalCadastro.addEventListener('click', e => {
+        e.preventDefault();
+        modalCadastro.classList.add('active');
+    });
+
+    fecharModalCadastro.addEventListener('click', () => {
+        modalCadastro.classList.remove('active');
+    });
+
+    window.addEventListener('click', e => {
+        if (e.target === modalCadastro) modalCadastro.classList.remove('active');
+    });
+
+// === LOGIN ===
+document.getElementById('loginForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const senha = document.getElementById('senha').value.trim();
+    const loginError = document.getElementById('loginError');
+
+    console.log('🔐 Tentando login... Email:', email);
+
+    const user = Storage.login(email, senha);
+
+    if (user) {
+        console.log('✅ USUÁRIO ENCONTRADO:', user);
+        console.log('📊 DETALHES:', {
+            nome: user.nome,
+            tipo: user.tipo,
+            tipoClinica: user.tipoClinica,
+            email: user.email
+        });
+        
+        // Se for clínica, mostra modal de seleção de tipo
+        if (user.tipo === 'clinica') {
+            console.log('🏥 Usuário é CLÍNICA - mostrando modal de seleção');
+            mostrarModalTipoClinica(user);
+        } else {
+            console.log('👤 Usuário é PACIENTE - redirecionando diretamente');
+            processarLogin(user, user.tipo);
+        }
+        
+    } else {
+        console.log('❌ Login falhou - usuário não encontrado');
+        loginError.textContent = 'E-mail ou senha incorretos!';
+        loginError.style.display = 'block';
+    }
+});
+
+    // === MODAL DE SELEÇÃO DE TIPO PARA CLÍNICA ===
+    function mostrarModalTipoClinica(user) {
+        // Cria modal de seleção de tipo
+        const modalHTML = `
+            <div class="modal active" id="modalTipoClinica">
+                <div class="modal-content" style="max-width: 400px;">
+                    <h3>👨‍⚕️ Selecione seu Perfil</h3>
+                    <p>Como você atua na clínica?</p>
+                    
+                    <div class="tipo-clinica-options" style="display: flex; flex-direction: column; gap: 10px; margin: 20px 0;">
+                        <button class="tipo-clinica-btn" data-tipo-clinica="medico" style="padding: 15px; border: 2px solid var(--cor-borda); border-radius: 10px; background: var(--cor-fundo); cursor: pointer; text-align: left;">
+                            <strong>👨‍⚕️ Médico</strong>
+                            <div style="font-size: 0.9rem; color: var(--cor-secundaria); margin-top: 5px;">
+                                Acesso à agenda, pacientes e consultas
+                            </div>
+                        </button>
+                        
+                        <button class="tipo-clinica-btn" data-tipo-clinica="secretario" style="padding: 15px; border: 2px solid var(--cor-borda); border-radius: 10px; background: var(--cor-fundo); cursor: pointer; text-align: left;">
+                            <strong>📋 Secretário(a)</strong>
+                            <div style="font-size: 0.9rem; color: var(--cor-secundaria); margin-top: 5px;">
+                                Agendamentos, cadastros e atendimento
+                            </div>
+                        </button>
+                        
+                        <button class="tipo-clinica-btn" data-tipo-clinica="admin" style="padding: 15px; border: 2px solid var(--cor-borda); border-radius: 10px; background: var(--cor-fundo); cursor: pointer; text-align: left;">
+                            <strong>⚙️ Administrador</strong>
+                            <div style="font-size: 0.9rem; color: var(--cor-secundaria); margin-top: 5px;">
+                                Acesso completo ao sistema
+                            </div>
+                        </button>
+                    </div>
+                    
+                    <button id="confirmarTipoClinica" class="btn-primary" style="width: 100%; margin-top: 15px;" disabled>
+                        Confirmar e Entrar
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Adiciona o modal ao body
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        
+        let tipoSelecionado = null;
+        
+        // Configura os botões de tipo
+        document.querySelectorAll('.tipo-clinica-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove seleção anterior
+                document.querySelectorAll('.tipo-clinica-btn').forEach(b => {
+                    b.style.borderColor = 'var(--cor-borda)';
+                    b.style.background = 'var(--cor-fundo)';
+                });
+                
+                // Adiciona seleção atual
+                this.style.borderColor = 'var(--cor-principal)';
+                this.style.background = 'var(--cor-destaque)';
+                
+                tipoSelecionado = this.dataset.tipoClinica;
+                document.getElementById('confirmarTipoClinica').disabled = false;
+            });
+        });
+        
+        // Configura botão de confirmar
+        document.getElementById('confirmarTipoClinica').addEventListener('click', () => {
+            if (tipoSelecionado) {
+                // Atualiza o tipo do usuário
+                user.tipoClinica = tipoSelecionado;
+                localStorage.setItem('usuarioLogado', JSON.stringify(user));
+                
+                // Processa o login com o tipo selecionado
+                processarLogin(user, 'clinica');
+                
+                // Remove o modal
+                document.getElementById('modalTipoClinica').remove();
+            }
+        });
+        
+        // Fecha modal ao clicar fora
+        document.getElementById('modalTipoClinica').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.remove();
+            }
+        });
+    }
+
+// === PROCESSAR LOGIN ===
+function processarLogin(user, tipo) {
+    console.log('🚀 Processando login para:', user.nome, 'Tipo REAL:', user.tipo);
+    
+    // ✅ Usa o tipo REAL do usuário do storage
+    const tipoReal = user.tipo;
+    localStorage.setItem('usuarioLogado', JSON.stringify(user));
+    
+    // SISTEMA AUTOMÁTICO: Se for médico, garante que está na lista de médicos
+    if (tipoReal === 'clinica' && user.tipoClinica === 'medico') {
+        Storage.verificarMedicoAutomatico(user);
+    }
+    
+    // SISTEMA AUTOMÁTICO: Se for paciente, garante que está na lista de pacientes
+    if (tipoReal === 'paciente') {
+        Storage.adicionarPacienteAutomaticamente(user);
+    }
+    
+    console.log('📍 Redirecionando para tipo REAL:', tipoReal);
+    
+    // ✅ REDIRECIONAMENTO CORRETO: Pacientes vão para paciente-dashboard.html
+    if (tipoReal === 'paciente') {
+        console.log('🎯 PACIENTE detectado - redirecionando para paciente-dashboard.html');
+        window.location.href = 'paciente-dashboard.html';
+    } else {
+        console.log('🎯 CLÍNICA detectada - redirecionando para index.html');
+        window.location.href = 'index.html';
+    }
+}
+
+// === CADASTRO CORRIGIDO - VERSÃO DEFINITIVA ===
+document.getElementById('cadastroForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const nome = document.getElementById('novoNome').value.trim();
+    const email = document.getElementById('novoEmail').value.trim();
+    const senha = document.getElementById('novaSenha').value.trim();
+    const tipoCadastro = document.querySelector('.tipo-btn[data-tipo-cadastro].active').dataset.tipoCadastro;
+    const erro = document.getElementById('cadastroError');
+
+    console.log('📝 INICIANDO CADASTRO:', { nome, email, tipoCadastro });
+
+    // Primeiro cria o usuário básico
+    const novoUsuario = Storage.criarUsuario(nome, email, senha);
+    if (!novoUsuario) {
+        erro.textContent = 'Este e-mail já está cadastrado.';
+        erro.style.display = 'block';
+        return;
+    }
+
+    console.log('✅ Usuário básico criado:', novoUsuario);
+
+    // ATUALIZAÇÃO CRÍTICA: Atualiza o tipo do usuário no storage
+    const usuarios = Storage.getUsuarios();
+    const usuarioIndex = usuarios.findIndex(u => u.id === novoUsuario.id);
+    
+    if (usuarioIndex !== -1) {
+        console.log('🔧 Atualizando tipo do usuário...');
+        
+        // CORREÇÃO: Define o tipo CORRETAMENTE
+        usuarios[usuarioIndex].tipo = tipoCadastro;
+        
+        // CORREÇÃO: Se for paciente, NÃO define tipoClinica
+        if (tipoCadastro === 'clinica') {
+            usuarios[usuarioIndex].tipoClinica = 'admin'; // Clínica vira admin por padrão
+            console.log('🏥 Usuário definido como CLÍNICA (admin)');
+        } else if (tipoCadastro === 'paciente') {
+            // PACIENTE não tem tipoClinica - REMOVE se existir
+            delete usuarios[usuarioIndex].tipoClinica;
+            console.log('👤 Usuário definido como PACIENTE');
+        }
+        
+        // SALVA NO STORAGE
+        localStorage.setItem('AgendaMed_usuarios', JSON.stringify(usuarios));
+        
+        console.log('💾 Usuário salvo com tipo:', usuarios[usuarioIndex]);
+
+        // SISTEMA AUTOMÁTICO: Adiciona à lista correspondente
+        if (tipoCadastro === 'paciente') {
+            console.log('👤 Adicionando paciente automaticamente...');
+            Storage.adicionarPacienteAutomaticamente(usuarios[usuarioIndex]);
+        } else if (tipoCadastro === 'clinica') {
+            console.log('🏥 Usuário é clínica - tipoClinica:', usuarios[usuarioIndex].tipoClinica);
+            // Para clínicas, se for médico, adiciona automaticamente
+            if (usuarios[usuarioIndex].tipoClinica === 'medico') {
+                console.log('🩺 Adicionando médico automaticamente...');
+                Storage.adicionarMedicoAutomaticamente(usuarios[usuarioIndex]);
+            }
+        }
+        
+        // DEBUG: Verifica se salvou corretamente
+        console.log('🔍 VERIFICAÇÃO FINAL - Usuário salvo:', usuarios[usuarioIndex]);
+    }
+
+    alert('Conta criada com sucesso! Agora você pode fazer login.');
+    modalCadastro.classList.remove('active');
+    
+    // Limpa formulário
+    document.getElementById('cadastroForm').reset();
+    
+    // Atualiza debug
+    debugUsuarios();
+});
+
+    // === CONTAS DEMO ===
+    function criarContasDemo() {
+        // Conta demo clínica (admin)
+        if (!Storage.getUsuarios().find(u => u.email === 'clinica@AgendaMed.com')) {
+            const clinicaDemo = Storage.criarUsuario('Clínica Saúde Total', 'clinica@AgendaMed.com', 'senha123');
+            if (clinicaDemo) {
+                const usuarios = Storage.getUsuarios();
+                const usuarioIndex = usuarios.findIndex(u => u.id === clinicaDemo.id);
+                if (usuarioIndex !== -1) {
+                    usuarios[usuarioIndex].tipo = 'clinica';
+                    usuarios[usuarioIndex].tipoClinica = 'admin';
+                    localStorage.setItem('AgendaMed_usuarios', JSON.stringify(usuarios));
+                }
+            }
+        }
+        
+        // Conta demo médico
+        if (!Storage.getUsuarios().find(u => u.email === 'medico@AgendaMed.com')) {
+            const medicoDemo = Storage.criarUsuario('Dr. Carlos Silva', 'medico@AgendaMed.com', 'senha123');
+            if (medicoDemo) {
+                const usuarios = Storage.getUsuarios();
+                const usuarioIndex = usuarios.findIndex(u => u.id === medicoDemo.id);
+                if (usuarioIndex !== -1) {
+                    usuarios[usuarioIndex].tipo = 'clinica';
+                    usuarios[usuarioIndex].tipoClinica = 'medico';
+                    localStorage.setItem('AgendaMed_usuarios', JSON.stringify(usuarios));
+                    
+                    // Adiciona automaticamente como médico
+                    Storage.adicionarMedicoAutomaticamente(usuarios[usuarioIndex]);
+                }
+            }
+        }
+
+        // Conta demo secretário
+        if (!Storage.getUsuarios().find(u => u.email === 'secretario@AgendaMed.com')) {
+            const secretarioDemo = Storage.criarUsuario('Ana Secretária', 'secretario@AgendaMed.com', 'senha123');
+            if (secretarioDemo) {
+                const usuarios = Storage.getUsuarios();
+                const usuarioIndex = usuarios.findIndex(u => u.id === secretarioDemo.id);
+                if (usuarioIndex !== -1) {
+                    usuarios[usuarioIndex].tipo = 'clinica';
+                    usuarios[usuarioIndex].tipoClinica = 'secretario';
+                    localStorage.setItem('AgendaMed_usuarios', JSON.stringify(usuarios));
+                }
+            }
+        }
+        
+        // Conta demo paciente
+        if (!Storage.getUsuarios().find(u => u.email === 'paciente@AgendaMed.com')) {
+            const pacienteDemo = Storage.criarUsuario('João Paciente', 'paciente@AgendaMed.com', 'senha123');
+            if (pacienteDemo) {
+                const usuarios = Storage.getUsuarios();
+                const usuarioIndex = usuarios.findIndex(u => u.id === pacienteDemo.id);
+                if (usuarioIndex !== -1) {
+                    usuarios[usuarioIndex].tipo = 'paciente';
+                    localStorage.setItem('AgendaMed_usuarios', JSON.stringify(usuarios));
+                    
+                    // Adiciona também como paciente automaticamente
+                    Storage.adicionarPacienteAutomaticamente(usuarios[usuarioIndex]);
+                }
+            }
+        }
+    }
+
+    // Cria contas demo ao carregar a página
+    criarContasDemo();
+
+    // DEBUG: Verifica se os botões estão funcionando
+    console.log('Botões de tipo:', document.querySelectorAll('.tipo-btn[data-tipo]').length);
+    document.querySelectorAll('.tipo-btn[data-tipo]').forEach(btn => {
+        console.log('Botão:', btn.dataset.tipo, 'ativo:', btn.classList.contains('active'));
+    });
+</script>
+</body>
+</html>
