@@ -67,7 +67,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 600px;
+      min-width: 700px;
     }
 
     table th, table td {
@@ -117,56 +117,17 @@
       color: white;
     }
 
-   /* CORREÇÃO PARA BOTÕES - CORES CORRETAS */
-.btn-ver-agenda {
-  background-color: var(--cor-info) !important;
-  color: rgb(0, 0, 0) !important;
-  border: none !important;
-}
+    .btn-ver-agenda {
+      background-color: var(--cor-info);
+      color: rgb(0, 0, 0);
+    }
 
-.btn-editar {
-  background-color: var(--cor-aviso) !important;
-  color: rgb(0, 0, 0) !important;
-  border: none !important;
-}
-
-.btn-excluir {
-  background-color: var(--cor-erro) !important;
-  color: white !important;
-  border: none !important;
-}
-
-/* Garantir que os botões tenham contraste */
-.btn-acao {
-  padding: var(--espaco-xs) var(--espaco-sm) !important;
-  margin: 0 2px !important;
-  border: none !important;
-  border-radius: var(--radius-sm) !important;
-  cursor: pointer !important;
-  font-size: 0.8rem !important;
-  transition: all var(--transition-fast) !important;
-  color: rgb(0, 0, 0) !important;
-  font-weight: 600 !important;
-}
-
-.btn-acao:hover {
-  transform: translateY(-1px) !important;
-  opacity: 0.9 !important;
-}
+    .btn-acao:hover {
+      transform: translateY(-1px);
+      opacity: 0.9;
+    }
 
     /* Cards para mobile */
-
-    /* Indicadores de tipo de médico */
-.medico-auto {
-    background: rgba(76, 175, 80, 0.1);
-    border-left: 3px solid var(--cor-sucesso);
-}
-
-.medico-manual {
-    background: rgba(33, 150, 243, 0.1);
-    border-left: 3px solid var(--cor-info);
-}
-
     .medicos-cards {
       display: none;
       flex-direction: column;
@@ -210,6 +171,12 @@
       margin-bottom: var(--espaco-xs);
     }
 
+    .medico-clinica {
+      color: var(--cor-secundaria);
+      font-size: 0.8rem;
+      margin-bottom: var(--espaco-xs);
+    }
+
     .medico-contato {
       color: var(--cor-secundaria);
       font-size: 0.9rem;
@@ -229,10 +196,11 @@
       border-top: 1px solid var(--cor-borda);
       padding-top: var(--espaco-sm);
       margin-top: var(--espaco-sm);
+      flex-wrap: wrap;
     }
 
     /* Modal de cadastro */
-  .modal {
+    .modal {
       position: fixed;
       top: 0;
       left: 0;
@@ -289,65 +257,6 @@
 
     .modal-close:hover {
       color: var(--cor-erro);
-    }
-
-       #modalAgenda .modal-content {
-      max-width: 800px !important;
-      max-height: 90vh !important;
-    }
-
-    .agenda-controls {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-
-    .view-btn {
-      padding: 10px 15px;
-      border: 1px solid var(--cor-borda);
-      background: var(--cor-fundo);
-      color: var(--cor-texto);
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      transition: all var(--transition-fast);
-    }
-
-    .view-btn.active {
-      background: var(--cor-principal);
-      color: white;
-      border-color: var(--cor-principal);
-    }
-
-    .agenda-stats {
-      background: var(--cor-fundo);
-      padding: 15px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-    }
-
-    .appointment-card {
-      background: var(--cor-card);
-      border: 1px solid var(--cor-borda);
-      border-radius: 10px;
-      padding: 15px;
-      margin-bottom: 10px;
-    }
-
-    .btn-action {
-      padding: 5px 10px;
-      background: var(--cor-info);
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 0.7rem;
-      cursor: pointer;
-      transition: all var(--transition-fast);
-    }
-
-    .btn-action:hover {
-      opacity: 0.9;
-      transform: translateY(-1px);
     }
 
     /* Formulário no modal */
@@ -462,6 +371,16 @@
       color: white;
     }
 
+    /* Badge de clínica */
+    .clinica-badge {
+      background: var(--cor-principal);
+      color: white;
+      padding: 1px 8px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      display: inline-block;
+    }
+
     /* Responsividade */
     @media (max-width: 768px) {
       .page-header {
@@ -505,12 +424,6 @@
       }
 
       .medico-acoes {
-        flex-wrap: wrap;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .medico-acoes {
         flex-direction: column;
       }
 
@@ -518,7 +431,9 @@
         width: 100%;
         text-align: center;
       }
+    }
 
+    @media (max-width: 480px) {
       .modal-content {
         padding: var(--espaco-md);
       }
@@ -551,6 +466,7 @@
     <nav class="nav">
       <ul>
         <li><a href="index.html">Dashboard</a></li>
+        <li><a href="clinicas.html">Clínicas</a></li>
         <li><a href="pacientes.html">Pacientes</a></li>
         <li><a href="medicos.html" class="active">Médicos</a></li>
         <li><a href="agendar.html">Agendar</a></li>
@@ -576,67 +492,16 @@
         <input type="text" id="searchInput" placeholder="🔍 Buscar médico...">
       </div>
       <div class="filter-select">
-<div class="form-group">
-  <label for="especialidade">Especialidade</label>
-  <select id="especialidade" required>
-    <option value="">Selecione uma especialidade</option>
-    <option value="Acupuntura">Acupuntura</option>
-    <option value="Alergologia e Imunologia">Alergologia e Imunologia</option>
-    <option value="Anestesiologia">Anestesiologia</option>
-    <option value="Angiologia">Angiologia</option>
-    <option value="Cancerologia">Cancerologia</option>
-    <option value="Cardiologia">Cardiologia</option>
-    <option value="Cirurgia Cardiovascular">Cirurgia Cardiovascular</option>
-    <option value="Cirurgia da Mão">Cirurgia da Mão</option>
-    <option value="Cirurgia de Cabeça e Pescoço">Cirurgia de Cabeça e Pescoço</option>
-    <option value="Cirurgia do Aparelho Digestivo">Cirurgia do Aparelho Digestivo</option>
-    <option value="Cirurgia Geral">Cirurgia Geral</option>
-    <option value="Cirurgia Pediátrica">Cirurgia Pediátrica</option>
-    <option value="Cirurgia Plástica">Cirurgia Plástica</option>
-    <option value="Cirurgia Torácica">Cirurgia Torácica</option>
-    <option value="Cirurgia Vascular">Cirurgia Vascular</option>
-    <option value="Clínica Médica">Clínica Médica</option>
-    <option value="Coloproctologia">Coloproctologia</option>
-    <option value="Dermatologia">Dermatologia</option>
-    <option value="Endocrinologia e Metabologia">Endocrinologia e Metabologia</option>
-    <option value="Endoscopia">Endoscopia</option>
-    <option value="Gastroenterologia">Gastroenterologia</option>
-    <option value="Genética Médica">Genética Médica</option>
-    <option value="Geriatria">Geriatria</option>
-    <option value="Ginecologia e Obstetrícia">Ginecologia e Obstetrícia</option>
-    <option value="Hematologia e Hemoterapia">Hematologia e Hemoterapia</option>
-    <option value="Homeopatia">Homeopatia</option>
-    <option value="Infectologia">Infectologia</option>
-    <option value="Mastologia">Mastologia</option>
-    <option value="Medicina de Emergência">Medicina de Emergência</option>
-    <option value="Medicina do Trabalho">Medicina do Trabalho</option>
-    <option value="Medicina de Família e Comunidade">Medicina de Família e Comunidade</option>
-    <option value="Medicina Esportiva">Medicina Esportiva</option>
-    <option value="Medicina Física e Reabilitação">Medicina Física e Reabilitação</option>
-    <option value="Medicina Intensiva">Medicina Intensiva</option>
-    <option value="Medicina Legal e Perícia Médica">Medicina Legal e Perícia Médica</option>
-    <option value="Medicina Nuclear">Medicina Nuclear</option>
-    <option value="Medicina Preventiva e Social">Medicina Preventiva e Social</option>
-    <option value="Nefrologia">Nefrologia</option>
-    <option value="Neurocirurgia">Neurocirurgia</option>
-    <option value="Neurologia">Neurologia</option>
-    <option value="Nutrologia">Nutrologia</option>
-    <option value="Oftalmologia">Oftalmologia</option>
-    <option value="Oncologia Clínica">Oncologia Clínica</option>
-    <option value="Ortopedia e Traumatologia">Ortopedia e Traumatologia</option>
-    <option value="Otorrinolaringologia">Otorrinolaringologia</option>
-    <option value="Patologia">Patologia</option>
-    <option value="Patologia Clínica/Medicina Laboratorial">Patologia Clínica/Medicina Laboratorial</option>
-    <option value="Pediatria">Pediatria</option>
-    <option value="Pneumologia">Pneumologia</option>
-    <option value="Psiquiatria">Psiquiatria</option>
-    <option value="Radiologia e Diagnóstico por Imagem">Radiologia e Diagnóstico por Imagem</option>
-    <option value="Radioterapia">Radioterapia</option>
-    <option value="Reumatologia">Reumatologia</option>
-    <option value="Urologia">Urologia</option>
-    <option value="Outra">Outra</option>
-  </select>
-</div>
+        <select id="especialidadeFilter">
+          <option value="">Todas especialidades</option>
+          <!-- Carregado via JS -->
+        </select>
+      </div>
+      <div class="filter-select">
+        <select id="clinicaFilter">
+          <option value="">Todas clínicas</option>
+          <!-- Carregado via JS -->
+        </select>
       </div>
       <div class="filter-select">
         <select id="statusFilter">
@@ -654,6 +519,7 @@
           <tr>
             <th>Nome</th>
             <th>Especialidade</th>
+            <th>Clínica</th>
             <th>Telefone</th>
             <th>E-mail</th>
             <th>Status</th>
@@ -683,7 +549,7 @@
   <div class="modal" id="modalMedico">
     <div class="modal-content">
       <button class="modal-close" id="closeModalBtn">&times;</button>
-      <h2>Novo Médico</h2>
+      <h2 id="modalTitle">Novo Médico</h2>
       <form id="medicoForm">
         <div class="form-group">
           <label for="nome">Nome completo</label>
@@ -696,66 +562,19 @@
         </div>
 
         <div class="form-group">
-<div class="form-group">
-  <label for="especialidade">Especialidade</label>
-  <select id="especialidade" required>
-    <option value="">Selecione uma especialidade</option>
-    <option value="Acupuntura">Acupuntura</option>
-    <option value="Alergologia e Imunologia">Alergologia e Imunologia</option>
-    <option value="Anestesiologia">Anestesiologia</option>
-    <option value="Angiologia">Angiologia</option>
-    <option value="Cancerologia">Cancerologia</option>
-    <option value="Cardiologia">Cardiologia</option>
-    <option value="Cirurgia Cardiovascular">Cirurgia Cardiovascular</option>
-    <option value="Cirurgia da Mão">Cirurgia da Mão</option>
-    <option value="Cirurgia de Cabeça e Pescoço">Cirurgia de Cabeça e Pescoço</option>
-    <option value="Cirurgia do Aparelho Digestivo">Cirurgia do Aparelho Digestivo</option>
-    <option value="Cirurgia Geral">Cirurgia Geral</option>
-    <option value="Cirurgia Pediátrica">Cirurgia Pediátrica</option>
-    <option value="Cirurgia Plástica">Cirurgia Plástica</option>
-    <option value="Cirurgia Torácica">Cirurgia Torácica</option>
-    <option value="Cirurgia Vascular">Cirurgia Vascular</option>
-    <option value="Clínica Médica">Clínica Médica</option>
-    <option value="Coloproctologia">Coloproctologia</option>
-    <option value="Dermatologia">Dermatologia</option>
-    <option value="Endocrinologia e Metabologia">Endocrinologia e Metabologia</option>
-    <option value="Endoscopia">Endoscopia</option>
-    <option value="Gastroenterologia">Gastroenterologia</option>
-    <option value="Genética Médica">Genética Médica</option>
-    <option value="Geriatria">Geriatria</option>
-    <option value="Ginecologia e Obstetrícia">Ginecologia e Obstetrícia</option>
-    <option value="Hematologia e Hemoterapia">Hematologia e Hemoterapia</option>
-    <option value="Homeopatia">Homeopatia</option>
-    <option value="Infectologia">Infectologia</option>
-    <option value="Mastologia">Mastologia</option>
-    <option value="Medicina de Emergência">Medicina de Emergência</option>
-    <option value="Medicina do Trabalho">Medicina do Trabalho</option>
-    <option value="Medicina de Família e Comunidade">Medicina de Família e Comunidade</option>
-    <option value="Medicina Esportiva">Medicina Esportiva</option>
-    <option value="Medicina Física e Reabilitação">Medicina Física e Reabilitação</option>
-    <option value="Medicina Intensiva">Medicina Intensiva</option>
-    <option value="Medicina Legal e Perícia Médica">Medicina Legal e Perícia Médica</option>
-    <option value="Medicina Nuclear">Medicina Nuclear</option>
-    <option value="Medicina Preventiva e Social">Medicina Preventiva e Social</option>
-    <option value="Nefrologia">Nefrologia</option>
-    <option value="Neurocirurgia">Neurocirurgia</option>
-    <option value="Neurologia">Neurologia</option>
-    <option value="Nutrologia">Nutrologia</option>
-    <option value="Oftalmologia">Oftalmologia</option>
-    <option value="Oncologia Clínica">Oncologia Clínica</option>
-    <option value="Ortopedia e Traumatologia">Ortopedia e Traumatologia</option>
-    <option value="Otorrinolaringologia">Otorrinolaringologia</option>
-    <option value="Patologia">Patologia</option>
-    <option value="Patologia Clínica/Medicina Laboratorial">Patologia Clínica/Medicina Laboratorial</option>
-    <option value="Pediatria">Pediatria</option>
-    <option value="Pneumologia">Pneumologia</option>
-    <option value="Psiquiatria">Psiquiatria</option>
-    <option value="Radiologia e Diagnóstico por Imagem">Radiologia e Diagnóstico por Imagem</option>
-    <option value="Radioterapia">Radioterapia</option>
-    <option value="Reumatologia">Reumatologia</option>
-    <option value="Urologia">Urologia</option>
-    <option value="Outra">Outra</option>
-  </select>
+          <label for="especialidade">Especialidade</label>
+          <select id="especialidade" required>
+            <option value="">Selecione uma especialidade</option>
+            <!-- Carregado via JS -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="clinica">Clínica Vinculada</label>
+          <select id="clinica">
+            <option value="">Selecione uma clínica</option>
+            <!-- Carregado via JS -->
+          </select>
         </div>
 
         <div class="form-group">
@@ -774,67 +593,67 @@
   </div>
 
   <footer class="footer">
-  <div class="footer-content">
-    <span class="footer-creator">Criado por Iury Gabriel Barreto</span>
-    <span class="footer-version">v1.0</span>
-  </div>
-</footer>
+    <div class="footer-content">
+      <span class="footer-creator">Criado por Iury Gabriel Barreto</span>
+      <span class="footer-version">v1.0</span>
+    </div>
+  </footer>
 
   <!-- JS -->
   <script src="storage.js"></script>
   <script src="medico.js"></script>
   <script src="main.js"></script>
 
-<script>
-    // SISTEMA SIMPLIFICADO - APENAS INICIALIZAÇÃO
+  <script>
+    // SISTEMA DE TEMA E INICIALIZAÇÃO
     document.addEventListener('DOMContentLoaded', function() {
-        // Carrega configurações do tema
-        const config = JSON.parse(localStorage.getItem('AgendaMed_config') || '{"tema":"light","notificacoes":true}');
+      // Carrega configurações do tema
+      const config = JSON.parse(localStorage.getItem('AgendaMed_config') || '{"tema":"light","notificacoes":true}');
+      
+      console.log('🌙 Aplicando tema AgendaMed em:', window.location.pathname, 'Tema:', config.tema);
+      
+      // Aplica tema no HTML
+      document.documentElement.setAttribute('data-theme', config.tema);
+      
+      // Força cores no body
+      document.body.style.backgroundColor = 'var(--cor-fundo)';
+      document.body.style.color = 'var(--cor-texto)';
+      
+      // VERIFICAÇÃO DE TELEFONE PARA ADMIN
+      function verificarTelefoneObrigatorio() {
+        const usuario = Storage.getUsuarioLogado();
         
-        console.log('🌙 Aplicando tema AgendaMed em:', window.location.pathname, 'Tema:', config.tema);
-        
-        // Aplica tema no HTML
-        document.documentElement.setAttribute('data-theme', config.tema);
-        
-        // Força cores no body
-        document.body.style.backgroundColor = 'var(--cor-fundo)';
-        document.body.style.color = 'var(--cor-texto)';
-        
-        // VERIFICAÇÃO DE TELEFONE PARA ADMIN
-        function verificarTelefoneObrigatorio() {
-            const usuario = Storage.getUsuarioLogado();
-            
-            if (usuario && usuario.tipo === 'clinica' && usuario.tipoClinica === 'admin') {
-                if (!usuario.telefone || usuario.telefone.trim() === '') {
-                    alert('📞 Para gerenciar médicos, primeiro cadastre seu telefone nas Configurações.');
-                    setTimeout(() => {
-                        window.location.href = 'configuracoes.html';
-                    }, 2000);
-                    return false;
-                }
-            }
-            return true;
+        if (usuario && usuario.tipo === 'clinica' && usuario.tipoClinica === 'admin') {
+          if (!usuario.telefone || usuario.telefone.trim() === '') {
+            alert('📞 Para gerenciar médicos, primeiro cadastre seu telefone nas Configurações.');
+            setTimeout(() => {
+              window.location.href = 'configuracoes.html';
+            }, 2000);
+            return false;
+          }
         }
+        return true;
+      }
 
-        // Verifica telefone antes de continuar
-        if (!verificarTelefoneObrigatorio()) {
-            return;
-        }
+      // Verifica telefone antes de continuar
+      if (!verificarTelefoneObrigatorio()) {
+        return;
+      }
 
-        // Sistema de tema
-        window.addEventListener('temaAlterado', function(e) {
-            document.documentElement.setAttribute('data-theme', e.detail);
-        });
+      // Sistema de tema
+      window.addEventListener('temaAlterado', function(e) {
+        document.documentElement.setAttribute('data-theme', e.detail);
+      });
 
-        // Logout
-        document.getElementById('logoutBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            Storage.logout();
-            window.location.href = 'login.html';
-        });
+      // Logout
+      document.getElementById('logoutBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        Storage.logout();
+        window.location.href = 'login.html';
+      });
 
-        console.log('✅ Sistema de médicos inicializado');
+      console.log('✅ Sistema de médicos inicializado');
     });
-</script>
+  </script>
 </body>
 </html>

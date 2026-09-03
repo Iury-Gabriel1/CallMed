@@ -1,7 +1,10 @@
-// medico.js (SISTEMA COMPLETO COM MINHA AGENDA FUNCIONAL)
+// medico.js (SISTEMA COMPLETO COM MINHA AGENDA E VÍNCULO COM CLÍNICAS)
 // Gerenciamento de médicos usando Storage unificado
 
 const Medico = {
+  // =============================================
+  // INICIALIZAÇÃO E CRUD
+  // =============================================
   getAll: () => {
     const medicos = Storage.getMedicos();
     console.log('📋 Médicos carregados:', medicos);
@@ -32,8 +35,6 @@ const Medico = {
       return;
     }
 
-    
-
     // Verifica se está tentando excluir a si mesmo
     if (usuarioLogado && medico.usuarioId && medico.usuarioId.toString() === usuarioLogado.id.toString()) {
       alert("❌ Você não pode excluir seu próprio perfil.");
@@ -56,7 +57,120 @@ const Medico = {
     alert("✅ Médico excluído com sucesso!");
   },
 
-   getEspecialidades: () => {
+  update: (id, dados) => {
+    console.log('✏️ Atualizando médico ID:', id, 'Dados:', dados);
+    
+    const medicoExistente = Medico.getAll().find(m => m.id == id);
+    if (!medicoExistente) {
+      alert("❌ Médico não encontrado!");
+      return null;
+    }
+
+    // Preserva dados importantes
+    const medicoAtualizado = {
+      ...medicoExistente,
+      ...dados,
+      id: medicoExistente.id,
+      usuarioId: medicoExistente.usuarioId,
+      dataCadastro: medicoExistente.dataCadastro
+    };
+
+    const resultado = Storage.salvarMedico(medicoAtualizado);
+    Medico.renderTable();
+    
+    if (resultado) {
+      alert("✅ Médico atualizado com sucesso!");
+    } else {
+      alert("❌ Erro ao atualizar médico!");
+    }
+    return resultado;
+  },
+
+  // =============================================
+  // VERIFICAÇÃO DE MÉDICO LOGADO
+  // =============================================
+  isMedicoLogado: (medico) => {
+    const usuarioLogado = Storage.getUsuarioLogado();
+    return usuarioLogado && medico.usuarioId && medico.usuarioId.toString() === usuarioLogado.id.toString();
+  },
+
+  // =============================================
+  // CARREGAR CLÍNICAS NO SELECT
+  // =============================================
+  carregarClinicasNoSelect: () => {
+    const select = document.getElementById('clinica');
+    if (!select) return;
+    
+    const clinicas = Storage.getClinicas() || [];
+    select.innerHTML = '<option value="">Selecione uma clínica</option>';
+    
+    clinicas.forEach(clinica => {
+      const option = document.createElement('option');
+      option.value = clinica.id;
+      option.textContent = `${clinica.nome} ${clinica.status === 'inativo' ? '(Inativa)' : ''}`;
+      select.appendChild(option);
+    });
+    
+    console.log('🏥 Clínicas carregadas no select:', clinicas.length);
+  },
+
+  // =============================================
+  // CARREGAR ESPECIALIDADES NO SELECT
+  // =============================================
+  carregarEspecialidadesNoSelect: () => {
+    const especialidades = Medico.getEspecialidades();
+    
+    // Select do formulário
+    const selectForm = document.getElementById('especialidade');
+    if (selectForm) {
+      selectForm.innerHTML = '<option value="">Selecione uma especialidade</option>';
+      especialidades.forEach(esp => {
+        const option = document.createElement('option');
+        option.value = esp;
+        option.textContent = esp;
+        selectForm.appendChild(option);
+      });
+    }
+    
+    // Select do filtro
+    const selectFilter = document.getElementById('especialidadeFilter');
+    if (selectFilter) {
+      selectFilter.innerHTML = '<option value="">Todas especialidades</option>';
+      especialidades.forEach(esp => {
+        const option = document.createElement('option');
+        option.value = esp;
+        option.textContent = esp;
+        selectFilter.appendChild(option);
+      });
+    }
+    
+    console.log('📋 Especialidades carregadas:', especialidades.length);
+  },
+
+  // =============================================
+  // CARREGAR CLÍNICAS NO FILTRO
+  // =============================================
+  carregarClinicasNoFiltro: () => {
+    const select = document.getElementById('clinicaFilter');
+    if (!select) return;
+    
+    const clinicas = Storage.getClinicas() || [];
+    select.innerHTML = '<option value="">Todas clínicas</option>';
+    
+    clinicas.forEach(clinica => {
+      const option = document.createElement('option');
+      option.value = clinica.id;
+      option.textContent = clinica.nome;
+      select.appendChild(option);
+    });
+    
+    console.log('🏥 Clínicas carregadas no filtro:', clinicas.length);
+  },
+
+  // =============================================
+  // LISTA DE ESPECIALIDADES
+  // =============================================
+  getEspecialidades: () => {
     return [
       "Acupuntura",
       "Alergologia e Imunologia", 
@@ -115,103 +229,10 @@ const Medico = {
       "Outra"
     ];
   },
-  
-  // Adicione esta função ao objeto Medico para debug
-debugAgendamentosMedico: function(medicoId) {
-    const agendamentos = Storage.getAgendamentos();
-    const medicos = Storage.getMedicos();
-    
-    console.log('🐛 DEBUG AGENDAMENTOS MÉDICO:');
-    console.log('📋 Total agendamentos no sistema:', agendamentos.length);
-    console.log('🩺 Médico ID:', medicoId);
-    console.log('👨‍⚕️ Médico encontrado:', medicos.find(m => m.id == medicoId));
-    
-    const agendamentosMedico = agendamentos.filter(ag => parseInt(ag.medicoId) === parseInt(medicoId));
-    console.log('📅 Agendamentos deste médico:', agendamentosMedico.length);
-    
-    agendamentosMedico.forEach((ag, index) => {
-        console.log(`Consulta ${index + 1}:`, {
-            id: ag.id,
-            pacienteId: ag.pacienteId,
-            medicoId: ag.medicoId,
-            data: ag.data,
-            horario: ag.horario || ag.hora,
-            status: ag.status,
-            pacienteNome: ag.pacienteNome,
-            medicoNome: ag.medicoNome
-        });
-    });
-    
-    return agendamentosMedico;
-},
 
-// Adicione esta função para testar rapidamente
-testarAgendamentos: function() {
-    const usuarioLogado = Storage.getUsuarioLogado();
-    if (!usuarioLogado) {
-        alert('❌ Faça login primeiro');
-        return;
-    }
-    
-    const medicoLogado = Storage.getMedicoPorUsuarioId(usuarioLogado.id);
-    if (!medicoLogado) {
-        alert('❌ Você não é um médico');
-        return;
-    }
-    
-    console.log('🧪 TESTANDO AGENDAMENTOS PARA:', medicoLogado.nome);
-    console.log('Médico ID:', medicoLogado.id);
-    
-    // Buscar agendamentos
-    const agendamentos = Storage.getAgendamentos();
-    const agendamentosMedico = agendamentos.filter(ag => parseInt(ag.medicoId) === parseInt(medicoLogado.id));
-    
-    console.log('Agendamentos encontrados:', agendamentosMedico);
-    
-    if (agendamentosMedico.length === 0) {
-        alert('ℹ️ Nenhum agendamento encontrado para você. Crie uma consulta primeiro.');
-    } else {
-        alert(`✅ Encontrados ${agendamentosMedico.length} agendamentos. Verifique o console.`);
-    }
-    
-    return agendamentosMedico;
-},
-
-  update: (id, dados) => {
-    console.log('✏️ Atualizando médico ID:', id, 'Dados:', dados);
-    
-    const medicoExistente = Medico.getAll().find(m => m.id == id);
-    if (!medicoExistente) {
-      alert("❌ Médico não encontrado!");
-      return null;
-    }
-
-    // Preserva dados importantes
-    const medicoAtualizado = {
-      ...medicoExistente,
-      ...dados,
-      id: medicoExistente.id,
-      usuarioId: medicoExistente.usuarioId, // Mantém o vínculo
-      dataCadastro: medicoExistente.dataCadastro
-    };
-
-    const resultado = Storage.salvarMedico(medicoAtualizado);
-    Medico.renderTable();
-    
-    if (resultado) {
-      alert("✅ Médico atualizado com sucesso!");
-    } else {
-      alert("❌ Erro ao atualizar médico!");
-    }
-    return resultado;
-  },
-
-  // Verificar se é o médico logado
-  isMedicoLogado: (medico) => {
-    const usuarioLogado = Storage.getUsuarioLogado();
-    return usuarioLogado && medico.usuarioId && medico.usuarioId.toString() === usuarioLogado.id.toString();
-  },
-
+  // =============================================
+  // RENDERIZAÇÃO DA TABELA
+  // =============================================
   renderTable: () => {
     const tbody = document.querySelector("#medicosTable tbody");
     const cardsContainer = document.getElementById("medicosCards");
@@ -228,6 +249,7 @@ testarAgendamentos: function() {
     if (cardsContainer) cardsContainer.innerHTML = "";
     
     const medicos = Medico.getAll();
+    const clinicas = Storage.getClinicas() || [];
     const usuarioLogado = Storage.getUsuarioLogado();
 
     if (medicos.length === 0) {
@@ -245,6 +267,10 @@ testarAgendamentos: function() {
       const tr = document.createElement("tr");
       const isMedicoLogado = Medico.isMedicoLogado(m);
       
+      // Busca o nome da clínica
+      const clinica = clinicas.find(c => c.id == m.clinicaId);
+      const clinicaNome = clinica ? clinica.nome : 'Não vinculado';
+      
       // Destaca o médico logado
       if (isMedicoLogado) {
         tr.style.backgroundColor = 'var(--cor-destaque)';
@@ -255,9 +281,14 @@ testarAgendamentos: function() {
         <td>
           ${m.nome || 'Nome não informado'}
           ${isMedicoLogado ? ' <span style="color: var(--cor-principal);">(Você)</span>' : ''}
-          ${m.usuarioId ? '<br><small style="color: var(--cor-secundaria);">👤 Automático</small>' : '<br><small style="color: var(--cor-secundaria);">📝 Manual</small>'}
+          ${m.usuarioId ? '<br><small style="color: var(--cor-secundaria);">👤 Automático</small>' : ''}
         </td>
         <td>${m.especialidade || 'Não informada'}</td>
+        <td>
+          ${clinicaNome !== 'Não vinculado' 
+            ? `<span class="clinica-badge">${clinicaNome}</span>` 
+            : '<span style="color: var(--cor-secundaria); font-size: 0.8rem;">Não vinculado</span>'}
+        </td>
         <td>${m.telefone || 'Não informado'}</td>
         <td>${m.email || 'Email não informado'}</td>
         <td>
@@ -296,11 +327,17 @@ testarAgendamentos: function() {
     console.log('✅ Tabela renderizada com', medicos.length, 'médicos');
   },
 
+  // =============================================
+  // CRIAÇÃO DE CARD PARA MOBILE
+  // =============================================
   criarCardMedico: (medico) => {
     const card = document.createElement("div");
     card.className = "medico-card";
     
     const isMedicoLogado = Medico.isMedicoLogado(medico);
+    const clinicas = Storage.getClinicas() || [];
+    const clinica = clinicas.find(c => c.id == medico.clinicaId);
+    const clinicaNome = clinica ? clinica.nome : 'Não vinculado';
     
     if (isMedicoLogado) {
       card.style.border = "2px solid var(--cor-principal)";
@@ -315,6 +352,7 @@ testarAgendamentos: function() {
             ${isMedicoLogado ? ' <span style="color: var(--cor-principal);">(Você)</span>' : ''}
           </div>
           <div class="medico-especialidade">${medico.especialidade || 'Não informada'}</div>
+          <div class="medico-clinica">🏥 ${clinicaNome}</div>
           <div style="font-size: 0.7rem; color: var(--cor-secundaria); margin-bottom: 4px;">
             ${medico.usuarioId ? '👤 Automático' : '📝 Manual'}
           </div>
@@ -329,7 +367,7 @@ testarAgendamentos: function() {
       </div>
       <div class="medico-acoes">
         ${isMedicoLogado ? 
-          `<button class="btn-acao btn-ver-agenda" onclick="Medico.verMinhaAgenda()" style="flex: 1;">
+          `<button class="btn-acao btn-ver-agenda" onclick="Medico.verMinhaAgenda()">
               📅 Minha Agenda
           </button>` :
           `<button class="btn-acao btn-editar" onclick="Medico.edit(${medico.id})">
@@ -348,6 +386,9 @@ testarAgendamentos: function() {
     return card;
   },
 
+  // =============================================
+  // EDIÇÃO DE MÉDICO
+  // =============================================
   edit: (id) => {
     console.log('✏️ Editando médico ID:', id);
     
@@ -364,11 +405,18 @@ testarAgendamentos: function() {
     }
 
     // Preenche o formulário
+    document.getElementById("modalTitle").textContent = "Editar Médico";
     document.getElementById("nome").value = medico.nome || '';
     document.getElementById("email").value = medico.email || '';
     document.getElementById("telefone").value = medico.telefone || '';
     document.getElementById("especialidade").value = medico.especialidade || '';
     document.getElementById("crm").value = medico.crm || '';
+    
+    // Seleciona a clínica
+    const clinicaSelect = document.getElementById("clinica");
+    if (clinicaSelect && medico.clinicaId) {
+      clinicaSelect.value = medico.clinicaId;
+    }
 
     const form = document.getElementById("medicoForm");
     form.dataset.editId = id;
@@ -378,9 +426,115 @@ testarAgendamentos: function() {
   },
 
   // =============================================
+  // FILTRAR MÉDICOS
+  // =============================================
+  filtrarMedicos: () => {
+    const searchInput = document.getElementById("searchInput");
+    const especialidadeFilter = document.getElementById("especialidadeFilter");
+    const clinicaFilter = document.getElementById("clinicaFilter");
+    const statusFilter = document.getElementById("statusFilter");
+    
+    if (!searchInput) return;
+    
+    const searchTerm = searchInput.value.toLowerCase();
+    const especialidade = especialidadeFilter ? especialidadeFilter.value : '';
+    const clinicaId = clinicaFilter ? clinicaFilter.value : '';
+    const status = statusFilter ? statusFilter.value : '';
+    
+    const medicos = Medico.getAll();
+    const clinicas = Storage.getClinicas() || [];
+    
+    const medicosFiltrados = medicos.filter(medico => {
+      const matchSearch = !searchTerm || 
+        (medico.nome && medico.nome.toLowerCase().includes(searchTerm)) ||
+        (medico.email && medico.email.toLowerCase().includes(searchTerm)) ||
+        (medico.telefone && medico.telefone.includes(searchTerm));
+      
+      const matchEspecialidade = !especialidade || medico.especialidade === especialidade;
+      const matchClinica = !clinicaId || medico.clinicaId == clinicaId;
+      const matchStatus = !status || medico.status === status;
+      
+      return matchSearch && matchEspecialidade && matchClinica && matchStatus;
+    });
+
+    // Atualiza a exibição
+    const tbody = document.querySelector("#medicosTable tbody");
+    const cardsContainer = document.getElementById("medicosCards");
+    const emptyState = document.getElementById("emptyState");
+    
+    if (!tbody) return;
+    
+    tbody.innerHTML = "";
+    if (cardsContainer) cardsContainer.innerHTML = "";
+    
+    if (medicosFiltrados.length === 0) {
+      if (emptyState) emptyState.style.display = 'block';
+      return;
+    }
+    
+    if (emptyState) emptyState.style.display = 'none';
+    
+    medicosFiltrados.forEach(m => {
+      const tr = document.createElement("tr");
+      const isMedicoLogado = Medico.isMedicoLogado(m);
+      const clinica = clinicas.find(c => c.id == m.clinicaId);
+      const clinicaNome = clinica ? clinica.nome : 'Não vinculado';
+      
+      if (isMedicoLogado) {
+        tr.style.backgroundColor = 'var(--cor-destaque)';
+        tr.style.fontWeight = '600';
+      }
+
+      tr.innerHTML = `
+        <td>
+          ${m.nome || 'Nome não informado'}
+          ${isMedicoLogado ? ' <span style="color: var(--cor-principal);">(Você)</span>' : ''}
+          ${m.usuarioId ? '<br><small style="color: var(--cor-secundaria);">👤 Automático</small>' : ''}
+        </td>
+        <td>${m.especialidade || 'Não informada'}</td>
+        <td>
+          ${clinicaNome !== 'Não vinculado' 
+            ? `<span class="clinica-badge">${clinicaNome}</span>` 
+            : '<span style="color: var(--cor-secundaria); font-size: 0.8rem;">Não vinculado</span>'}
+        </td>
+        <td>${m.telefone || 'Não informado'}</td>
+        <td>${m.email || 'Email não informado'}</td>
+        <td>
+          <span class="status-badge ${m.status === 'ativo' ? 'status-ativo' : 'status-inativo'}">
+            ${m.status === 'ativo' ? 'Ativo' : 'Inativo'}
+          </span>
+        </td>
+        <td class="acoes-cell">
+          ${isMedicoLogado ? 
+            `<button class="btn-acao btn-ver-agenda" onclick="Medico.verMinhaAgenda()">
+                📅 Minha Agenda
+            </button>` : 
+            `<button class="btn-acao btn-editar" onclick="Medico.edit(${m.id})">
+                ✏️ Editar
+            </button>
+            <button class="btn-acao btn-excluir" onclick="Medico.remove(${m.id})">
+                🗑️ Excluir
+            </button>
+            <button class="btn-acao btn-ver-agenda" onclick="Medico.verAgenda(${m.id})">
+                📅 Agenda
+            </button>`
+          }
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+    
+    if (cardsContainer) {
+      medicosFiltrados.forEach(m => {
+        const card = Medico.criarCardMedico(m);
+        cardsContainer.appendChild(card);
+      });
+    }
+  },
+
+  // =============================================
   // MINHA AGENDA - SISTEMA FUNCIONAL
   // =============================================
-
   verMinhaAgenda: () => {
     console.log('📅 Abrindo Minha Agenda...');
     
@@ -390,7 +544,6 @@ testarAgendamentos: function() {
       return;
     }
 
-    // Encontrar o médico logado
     const medicoLogado = Storage.getMedicoPorUsuarioId(usuarioLogado.id);
     if (!medicoLogado) {
       alert('❌ Perfil médico não encontrado para este usuário.');
@@ -413,7 +566,6 @@ testarAgendamentos: function() {
   },
 
   abrirModalAgenda: (medico) => {
-    // Criar modal de agenda
     const modalHTML = `
       <div class="modal active" id="modalAgenda">
         <div class="modal-content" style="max-width: 800px; max-height: 90vh;">
@@ -461,10 +613,7 @@ testarAgendamentos: function() {
       </div>
     `;
 
-    // Adicionar modal ao body
     document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    // Carregar agenda inicial
     Medico.carregarAgenda(medico.id, 'hoje');
   },
 
@@ -475,42 +624,14 @@ testarAgendamentos: function() {
     }
   },
 
-carregarAgenda: (medicoId, periodo = 'hoje') => {
+  carregarAgenda: (medicoId, periodo = 'hoje') => {
     console.log(`📋 Carregando agenda para médico ${medicoId}, período: ${periodo}`);
     
     const agendamentos = Storage.getAgendamentos();
     const hoje = new Date();
     
-    console.log('📊 Total de agendamentos no sistema:', agendamentos.length);
+    let consultas = agendamentos.filter(ag => parseInt(ag.medicoId) === parseInt(medicoId));
     
-    // DEBUG: Mostrar todos os agendamentos
-    agendamentos.forEach((ag, index) => {
-        console.log(`Agendamento ${index}:`, {
-            id: ag.id,
-            medicoId: ag.medicoId,
-            tipo: typeof ag.medicoId,
-            pacienteNome: ag.pacienteNome,
-            data: ag.data
-        });
-    });
-    
-    // Filtrar agendamentos do médico - CORREÇÃO MELHORADA
-    let consultas = agendamentos.filter(ag => {
-        const agMedicoId = parseInt(ag.medicoId);
-        const buscaMedicoId = parseInt(medicoId);
-        console.log(`Comparando: ${agMedicoId} === ${buscaMedicoId} -> ${agMedicoId === buscaMedicoId}`);
-        return agMedicoId === buscaMedicoId;
-    });
-    
-    console.log(`📊 Consultas encontradas para médico ${medicoId}:`, consultas.length);
-    
-    if (consultas.length === 0) {
-        console.log('❌ Nenhuma consulta encontrada para este médico. Verificando IDs...');
-        console.log('Médico ID buscado:', medicoId);
-        console.log('IDs de médicos nos agendamentos:', agendamentos.map(a => a.medicoId));
-    }
-    
-    // Aplicar filtro de período
     switch(periodo) {
       case 'hoje':
         consultas = consultas.filter(ag => {
@@ -518,21 +639,17 @@ carregarAgenda: (medicoId, periodo = 'hoje') => {
             const dataAgendamento = new Date(ag.data);
             return dataAgendamento.toDateString() === hoje.toDateString();
           } catch (e) {
-            console.error('Erro ao processar data:', ag.data, e);
             return false;
           }
         });
         break;
-        
       case 'semana':
         const inicioSemana = new Date(hoje);
         inicioSemana.setDate(hoje.getDate() - hoje.getDay());
         inicioSemana.setHours(0, 0, 0, 0);
-        
         const fimSemana = new Date(inicioSemana);
         fimSemana.setDate(inicioSemana.getDate() + 6);
         fimSemana.setHours(23, 59, 59, 999);
-        
         consultas = consultas.filter(ag => {
           try {
             const dataAgendamento = new Date(ag.data);
@@ -542,11 +659,9 @@ carregarAgenda: (medicoId, periodo = 'hoje') => {
           }
         });
         break;
-        
       case 'mes':
         const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
         const fimMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0, 23, 59, 59, 999);
-        
         consultas = consultas.filter(ag => {
           try {
             const dataAgendamento = new Date(ag.data);
@@ -556,12 +671,8 @@ carregarAgenda: (medicoId, periodo = 'hoje') => {
           }
         });
         break;
-      // 'todos' não aplica filtro
     }
     
-    console.log(`📊 Consultas após filtro ${periodo}:`, consultas.length);
-    
-    // Ordenar por data e horário
     consultas.sort((a, b) => {
       try {
         const dataA = new Date(a.data + ' ' + (a.horario || a.hora || '00:00'));
@@ -572,31 +683,22 @@ carregarAgenda: (medicoId, periodo = 'hoje') => {
       }
     });
     
-    // Atualizar estatísticas
     Medico.atualizarEstatisticasAgenda(consultas, medicoId);
-    
-    // Renderizar consultas
     Medico.renderizarConsultasAgenda(consultas);
   },
-  
+
   atualizarEstatisticasAgenda: (consultas, medicoId) => {
     const total = consultas.length;
     const confirmadas = consultas.filter(c => c.status === 'confirmado' || c.status === 'agendado').length;
     const pendentes = consultas.filter(c => c.status === 'pendente').length;
     const canceladas = consultas.filter(c => c.status === 'cancelado').length;
     
-    // Buscar total de consultas do médico (sem filtro de período)
-    const todosAgendamentos = Storage.getAgendamentos();
-    const totalGeral = todosAgendamentos.filter(ag => parseInt(ag.medicoId) === parseInt(medicoId)).length;
-    
     document.getElementById('totalConsultas').textContent = total;
     document.getElementById('consultasConfirmadas').textContent = confirmadas;
     document.getElementById('consultasPendentes').textContent = pendentes;
     document.getElementById('consultasCanceladas').textContent = canceladas;
-    
-    console.log(`📈 Estatísticas - Total: ${total}, Confirmadas: ${confirmadas}, Pendentes: ${pendentes}, Canceladas: ${canceladas}`);
-    console.log(`📊 Total geral do médico: ${totalGeral} consultas`);
   },
+
   renderizarConsultasAgenda: (consultas) => {
     const agendaContent = document.getElementById('agendaContent');
     
@@ -612,12 +714,11 @@ carregarAgenda: (medicoId, periodo = 'hoje') => {
     }
     
     let html = '';
-    
     consultas.forEach(consulta => {
       const data = new Date(consulta.data);
       const statusClass = {
         'confirmado': 'status-confirmado',
-        'agendado': 'status-confirmado', // Trata "agendado" como confirmado
+        'agendado': 'status-confirmado',
         'pendente': 'status-pendente',
         'cancelado': 'status-cancelado'
       }[consulta.status] || 'status-pendente';
@@ -630,7 +731,7 @@ carregarAgenda: (medicoId, periodo = 'hoje') => {
       }[consulta.status] || 'Pendente';
       
       html += `
-        <div class="appointment-card" style="background: var(--cor-card); border: 1px solid var(--cor-borda); border-radius: 10px; padding: 15px; margin-bottom: 10px;">
+        <div class="appointment-card">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
             <div style="flex: 1;">
               <div style="font-weight: bold; color: var(--cor-principal);">
@@ -639,26 +740,10 @@ carregarAgenda: (medicoId, periodo = 'hoje') => {
               <div style="font-size: 0.9rem; color: var(--cor-texto); margin-top: 5px;">
                 <strong>Paciente:</strong> ${consulta.pacienteNome || 'N/A'}
               </div>
-              ${consulta.especialidade ? `
-              <div style="font-size: 0.8rem; color: var(--cor-secundaria); margin-top: 2px;">
-                <strong>Especialidade:</strong> ${consulta.especialidade}
-              </div>
-              ` : ''}
             </div>
             <span class="status-badge ${statusClass}" style="padding: 4px 8px; border-radius: 5px; font-size: 0.7rem; white-space: nowrap;">
               ${statusText}
             </span>
-          </div>
-          
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.8rem; margin-bottom: 10px;">
-            <div>
-              <strong>Valor:</strong><br>
-              R$ ${consulta.valor || '0,00'}
-            </div>
-            <div>
-              <strong>Pagamento:</strong><br>
-              ${consulta.formaPagamento || 'Não informado'}
-            </div>
           </div>
           
           ${consulta.observacoes ? `
@@ -689,13 +774,11 @@ carregarAgenda: (medicoId, periodo = 'hoje') => {
   },
 
   mudarVisualizacaoAgenda: (periodo) => {
-    // Atualizar botões ativos
     document.querySelectorAll('.view-btn').forEach(btn => {
       btn.classList.remove('active');
     });
     event.target.classList.add('active');
     
-    // Encontrar médico atual
     const titulo = document.querySelector('#modalAgenda h2').textContent;
     const medicoNome = titulo.replace('📅 Agenda - ', '');
     const medico = Medico.getAll().find(m => m.nome === medicoNome);
@@ -713,7 +796,6 @@ carregarAgenda: (medicoId, periodo = 'hoje') => {
       agendamentos[consultaIndex].status = novoStatus;
       localStorage.setItem('AgendaMed_agendamentos', JSON.stringify(agendamentos));
       
-      // Recarregar agenda
       const modal = document.getElementById('modalAgenda');
       if (modal) {
         const titulo = modal.querySelector('h2').textContent;
@@ -730,78 +812,68 @@ carregarAgenda: (medicoId, periodo = 'hoje') => {
     }
   },
 
- verDetalhesConsulta: (consultaId) => {
+  verDetalhesConsulta: (consultaId) => {
     const agendamentos = Storage.getAgendamentos();
     const consulta = agendamentos.find(a => a.id == consultaId);
     
     if (!consulta) {
-        alert('❌ Consulta não encontrada.');
-        return;
+      alert('❌ Consulta não encontrada.');
+      return;
     }
     
-    // Criar modal de detalhes
     const detalhesHTML = `
-        <div class="modal active" id="modalDetalhesConsulta" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1001; padding: 20px;">
-            <div class="modal-content" style="background: var(--cor-card); padding: 30px; border-radius: 15px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative;">
-                <button class="modal-close" onclick="document.getElementById('modalDetalhesConsulta').remove()" style="position: absolute; top: 15px; right: 15px; cursor: pointer; font-size: 1.5rem; font-weight: bold; color: var(--cor-secundaria); background: none; border: none; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">&times;</button>
-                <h2 style="margin-bottom: 20px; color: var(--cor-principal);">📋 Detalhes da Consulta</h2>
-                
-                <div style="line-height: 1.6;">
-                    <div style="background: var(--cor-fundo); padding: 15px; border-radius: 10px; margin: 10px 0;">
-                        <strong>Data:</strong> ${new Date(consulta.data).toLocaleDateString('pt-BR')}<br>
-                        <strong>Horário:</strong> ${consulta.horario}<br>
-                        <strong>Status:</strong> <span class="status-badge status-${consulta.status}" style="padding: 4px 8px; border-radius: 5px; font-size: 0.7rem; background: ${consulta.status === 'confirmado' ? 'var(--cor-sucesso)' : consulta.status === 'pendente' ? 'var(--cor-aviso)' : 'var(--cor-erro)'}; color: white;">${consulta.status}</span>
-                    </div>
-                    
-                    <div style="background: var(--cor-fundo); padding: 15px; border-radius: 10px; margin: 10px 0;">
-                        <strong>Paciente:</strong> ${consulta.pacienteNome || 'N/A'}<br>
-                        <strong>Médico:</strong> ${consulta.medicoNome || 'N/A'}<br>
-                        <strong>Especialidade:</strong> ${consulta.especialidade || 'N/A'}
-                    </div>
-                    
-                    <div style="background: var(--cor-fundo); padding: 15px; border-radius: 10px; margin: 10px 0;">
-                        <strong>Valor:</strong> R$ ${consulta.valor || '0,00'}<br>
-                        <strong>Forma de Pagamento:</strong> ${consulta.formaPagamento || 'N/A'}<br>
-                        <strong>Observações:</strong> ${consulta.observacoes || 'Nenhuma'}
-                    </div>
-                </div>
-                
-                <div style="margin-top: 20px; display: flex; gap: 10px;">
-                    <button onclick="Medico.alterarStatusConsulta(${consulta.id}, 'confirmado'); document.getElementById('modalDetalhesConsulta').remove();" style="flex: 1; padding: 10px; background: var(--cor-sucesso); color: white; border: none; border-radius: 8px; cursor: pointer;">
-                        ✅ Confirmar
-                    </button>
-                    <button onclick="Medico.alterarStatusConsulta(${consulta.id}, 'cancelado'); document.getElementById('modalDetalhesConsulta').remove();" style="flex: 1; padding: 10px; background: var(--cor-erro); color: white; border: none; border-radius: 8px; cursor: pointer;">
-                        ❌ Cancelar
-                    </button>
-                </div>
-            </div>
+      <div class="modal active" id="modalDetalhesConsulta">
+        <div class="modal-content" style="max-width: 500px;">
+          <button class="modal-close" onclick="document.getElementById('modalDetalhesConsulta').remove()">&times;</button>
+          <h2 style="color: var(--cor-principal);">📋 Detalhes da Consulta</h2>
+          
+          <div style="background: var(--cor-fundo); padding: 15px; border-radius: 10px; margin: 10px 0;">
+            <strong>Data:</strong> ${new Date(consulta.data).toLocaleDateString('pt-BR')}<br>
+            <strong>Horário:</strong> ${consulta.horario || consulta.hora}<br>
+            <strong>Status:</strong> ${consulta.status}
+          </div>
+          
+          <div style="background: var(--cor-fundo); padding: 15px; border-radius: 10px; margin: 10px 0;">
+            <strong>Paciente:</strong> ${consulta.pacienteNome || 'N/A'}<br>
+            <strong>Médico:</strong> ${consulta.medicoNome || 'N/A'}
+          </div>
+          
+          ${consulta.observacoes ? `
+          <div style="background: var(--cor-fundo); padding: 15px; border-radius: 10px; margin: 10px 0;">
+            <strong>Observações:</strong> ${consulta.observacoes}
+          </div>
+          ` : ''}
+          
+          <div style="margin-top: 20px; display: flex; gap: 10px;">
+            <button onclick="Medico.alterarStatusConsulta(${consulta.id}, 'confirmado'); document.getElementById('modalDetalhesConsulta').remove();" 
+                    style="flex: 1; padding: 10px; background: var(--cor-sucesso); color: white; border: none; border-radius: 8px; cursor: pointer;">
+              ✅ Confirmar
+            </button>
+            <button onclick="Medico.alterarStatusConsulta(${consulta.id}, 'cancelado'); document.getElementById('modalDetalhesConsulta').remove();" 
+                    style="flex: 1; padding: 10px; background: var(--cor-erro); color: white; border: none; border-radius: 8px; cursor: pointer;">
+              ❌ Cancelar
+            </button>
+          </div>
         </div>
+      </div>
     `;
     
     document.body.insertAdjacentHTML('beforeend', detalhesHTML);
-},
+  },
 
-// No medico.js, atualize a função novaConsulta:
-
-novaConsulta: (medicoId) => {
+  novaConsulta: (medicoId) => {
     console.log('➕ Redirecionando para nova consulta - Médico ID:', medicoId);
-    
-    // Fechar o modal da agenda
     Medico.fecharModalAgenda();
-    
-    // CORREÇÃO: Salvar como número e garantir compatibilidade
     localStorage.setItem('medicoSelecionadoAgendamento', medicoId.toString());
-    
-    console.log('💾 Médico selecionado salvo:', medicoId.toString());
-    
-    // Redirecionar para a página de agendamento
     setTimeout(() => {
-        window.location.href = 'agendar.html';
+      window.location.href = 'agendar.html';
     }, 300);
-},
+  },
 
-// ADICIONE esta função para debug
-debugAgendamentos: function() {
+  // =============================================
+  // DEBUG
+  // =============================================
+  debugAgendamentos: function() {
     const agendamentos = Storage.getAgendamentos();
     const medicos = Storage.getMedicos();
     const pacientes = Storage.getPacientes();
@@ -812,154 +884,65 @@ debugAgendamentos: function() {
     console.log('🩺 Total médicos:', medicos.length);
     
     agendamentos.forEach((ag, index) => {
-        console.log(`Agendamento ${index + 1}:`, {
-            id: ag.id,
-            pacienteId: ag.pacienteId,
-            medicoId: ag.medicoId,
-            pacienteEncontrado: pacientes.find(p => p.id == ag.pacienteId),
-            medicoEncontrado: medicos.find(m => m.id == ag.medicoId),
-            data: ag.data
-        });
-    });
-},
-
-  filtrarMedicos: () => {
-  const searchInput = document.getElementById("searchInput");
-  const especialidadeFilter = document.getElementById("especialidadeFilter");
-  const statusFilter = document.getElementById("statusFilter");
-  
-  if (!searchInput || !especialidadeFilter) return;
-  
-  const searchTerm = searchInput.value.toLowerCase();
-  const especialidade = especialidadeFilter.value;
-  const status = statusFilter ? statusFilter.value : '';
-  
-  const medicos = Medico.getAll();
-  const medicosFiltrados = medicos.filter(medico => {
-    const matchSearch = !searchTerm || 
-      (medico.nome && medico.nome.toLowerCase().includes(searchTerm)) ||
-      (medico.email && medico.email.toLowerCase().includes(searchTerm)) ||
-      (medico.telefone && medico.telefone.includes(searchTerm));
-    
-    const matchEspecialidade = !especialidade || medico.especialidade === especialidade;
-    const matchStatus = !status || medico.status === status;
-    
-    return matchSearch && matchEspecialidade && matchStatus;
-  });
-
-    
-    // Atualiza a exibição
-    const tbody = document.querySelector("#medicosTable tbody");
-    const cardsContainer = document.getElementById("medicosCards");
-    const emptyState = document.getElementById("emptyState");
-    
-    if (!tbody) return;
-    
-    tbody.innerHTML = "";
-    if (cardsContainer) cardsContainer.innerHTML = "";
-    
-    if (medicosFiltrados.length === 0) {
-      if (emptyState) emptyState.style.display = 'block';
-      return;
-    }
-    
-    if (emptyState) emptyState.style.display = 'none';
-    
-    // Preenche tabela com médicos filtrados
-    medicosFiltrados.forEach(m => {
-      const tr = document.createElement("tr");
-      const isMedicoLogado = Medico.isMedicoLogado(m);
-      
-      if (isMedicoLogado) {
-        tr.style.backgroundColor = 'var(--cor-destaque)';
-        tr.style.fontWeight = '600';
-      }
-
-      tr.innerHTML = `
-        <td>
-          ${m.nome || 'Nome não informado'}
-          ${isMedicoLogado ? ' <span style="color: var(--cor-principal);">(Você)</span>' : ''}
-          ${m.usuarioId ? '<br><small style="color: var(--cor-secundaria);">👤 Automático</small>' : '<br><small style="color: var(--cor-secundaria);">📝 Manual</small>'}
-        </td>
-        <td>${m.especialidade || 'Não informada'}</td>
-        <td>${m.telefone || 'Não informado'}</td>
-        <td>${m.email || 'Email não informado'}</td>
-        <td>
-          <span class="status-badge ${m.status === 'ativo' ? 'status-ativo' : 'status-inativo'}">
-            ${m.status === 'ativo' ? 'Ativo' : 'Inativo'}
-          </span>
-        </td>
-        <td class="acoes-cell">
-          ${isMedicoLogado ? 
-            `<button class="btn-acao btn-ver-agenda" onclick="Medico.verMinhaAgenda()">
-                📅 Minha Agenda
-            </button>` : 
-            `<button class="btn-acao btn-editar" onclick="Medico.edit(${m.id})">
-                ✏️ Editar
-            </button>
-            <button class="btn-acao btn-excluir" onclick="Medico.remove(${m.id})">
-                🗑️ Excluir
-            </button>
-            <button class="btn-acao btn-ver-agenda" onclick="Medico.verAgenda(${m.id})">
-                📅 Agenda
-            </button>`
-          }
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
-    
-    // Preenche cards com médicos filtrados
-    if (cardsContainer) {
-      medicosFiltrados.forEach(m => {
-        const card = Medico.criarCardMedico(m);
-        cardsContainer.appendChild(card);
+      console.log(`Agendamento ${index + 1}:`, {
+        id: ag.id,
+        pacienteId: ag.pacienteId,
+        medicoId: ag.medicoId,
+        pacienteEncontrado: pacientes.find(p => p.id == ag.pacienteId),
+        medicoEncontrado: medicos.find(m => m.id == ag.medicoId),
+        data: ag.data
       });
-    }
+    });
   }
 };
 
-// Inicialização
+// =============================================
+// INICIALIZAÇÃO
+// =============================================
 document.addEventListener("DOMContentLoaded", () => {
   console.log('🚀 Inicializando sistema de médicos...');
   
-  // Verifica se está na página de médicos
   if (window.location.pathname.includes('medicos.html')) {
+    // Carrega especialidades nos selects
+    Medico.carregarEspecialidadesNoSelect();
+    
+    // Carrega clínicas nos selects
+    Medico.carregarClinicasNoSelect();
+    Medico.carregarClinicasNoFiltro();
     
     // Renderiza a tabela inicial
     Medico.renderTable();
 
     // Configura formulário
-  // Configura formulário
-const form = document.getElementById("medicoForm");
-if (form) {
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    console.log('📝 Submetendo formulário de médico...');
+    const form = document.getElementById("medicoForm");
+    if (form) {
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        console.log('📝 Submetendo formulário de médico...');
 
-    const medicoData = {
-      nome: document.getElementById("nome").value,
-      email: document.getElementById("email").value,
-      telefone: document.getElementById("telefone").value,
-      especialidade: document.getElementById("especialidade").value,
-      crm: document.getElementById("crm").value
-    };
+        const medicoData = {
+          nome: document.getElementById("nome").value,
+          email: document.getElementById("email").value,
+          telefone: document.getElementById("telefone").value,
+          especialidade: document.getElementById("especialidade").value,
+          crm: document.getElementById("crm").value,
+          clinicaId: document.getElementById("clinica").value || null // NOVO
+        };
 
-    console.log('Dados do médico:', medicoData);
+        console.log('Dados do médico:', medicoData);
 
-    if (form.dataset.editId) {
-      // EDIÇÃO
-      Medico.update(parseInt(form.dataset.editId), medicoData);
-      delete form.dataset.editId;
-    } else {
-      // NOVO MÉDICO
-      Medico.add(medicoData);
+        if (form.dataset.editId) {
+          Medico.update(parseInt(form.dataset.editId), medicoData);
+          delete form.dataset.editId;
+        } else {
+          Medico.add(medicoData);
+        }
+
+        form.reset();
+        document.getElementById("modalTitle").textContent = "Novo Médico";
+        document.getElementById("modalMedico").classList.remove("active");
+      });
     }
-
-    form.reset();
-    document.getElementById("modalMedico").classList.remove("active");
-  });
-}
 
     // Configura modal
     const modal = document.getElementById('modalMedico');
@@ -973,6 +956,7 @@ if (form) {
         if (form) {
           delete form.dataset.editId;
           form.reset();
+          document.getElementById("modalTitle").textContent = "Novo Médico";
         }
         modal.classList.add('active');
       });
@@ -997,6 +981,7 @@ if (form) {
     // Configura filtros
     const searchInput = document.getElementById("searchInput");
     const especialidadeFilter = document.getElementById("especialidadeFilter");
+    const clinicaFilter = document.getElementById("clinicaFilter");
     const statusFilter = document.getElementById("statusFilter");
 
     if (searchInput) {
@@ -1007,12 +992,14 @@ if (form) {
       especialidadeFilter.addEventListener('change', Medico.filtrarMedicos);
     }
 
+    if (clinicaFilter) {
+      clinicaFilter.addEventListener('change', Medico.filtrarMedicos);
+    }
+
     if (statusFilter) {
       statusFilter.addEventListener('change', Medico.filtrarMedicos);
     }
 
     console.log('✅ Sistema de médicos inicializado com sucesso');
   }
-  
 });
-
