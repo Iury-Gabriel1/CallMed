@@ -1,5 +1,5 @@
 // sw.js - Service Worker básico
-const CACHE_NAME = 'agendamed-v1';
+const CACHE_NAME = 'CallMed-v1';
 const urlsToCache = [
   '/',
   '/index.html',

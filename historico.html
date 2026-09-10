@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#007bff">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Histórico - AgendaMed</title>
+  <title>Histórico - CallMed</title>
 <!-- 1. BASE primeiro -->
 <link rel="stylesheet" href="base.css">
 
@@ -69,8 +69,8 @@
 
   <header class="header">
     <div class="logo">
-      <img src="logo.png" alt="AgendaMed Logo">
-      <span>AgendaMed</span>
+      <img src="logo.png" alt="CallMed Logo">
+      <span>CallMed</span>
     </div>
     <nav class="nav">
       <ul>
@@ -153,12 +153,12 @@
 </footer>
 
 <script>
-// SISTEMA DE TEMA GLOBAL UNIVERSAL - AGENDAMED
+// SISTEMA DE TEMA GLOBAL UNIVERSAL - CallMed
 document.addEventListener('DOMContentLoaded', function() {
   // Carrega configurações
-  const config = JSON.parse(localStorage.getItem('AgendaMed_config') || '{"tema":"light","notificacoes":true}');
+  const config = JSON.parse(localStorage.getItem('CallMed_config') || '{"tema":"light","notificacoes":true}');
   
-  console.log('🌙 Aplicando tema AgendaMed em:', window.location.pathname, 'Tema:', config.tema);
+  console.log('🌙 Aplicando tema CallMed em:', window.location.pathname, 'Tema:', config.tema);
   
   // 1. Aplica tema no HTML
   document.documentElement.setAttribute('data-theme', config.tema);
@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 5. Escuta mudanças no storage entre abas
   window.addEventListener('storage', function(e) {
-    if (e.key === 'AgendaMed_config') {
+    if (e.key === 'CallMed_config') {
       console.log('📦 Storage alterado, atualizando tema...');
       const newConfig = JSON.parse(e.newValue || '{"tema":"light"}');
       document.documentElement.setAttribute('data-theme', newConfig.tema);

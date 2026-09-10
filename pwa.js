@@ -12,7 +12,7 @@ if ("serviceWorker" in navigator) {
 // Exemplo de service-worker.js (arquivo separado):
 // self.addEventListener('install', event => {
 //   event.waitUntil(
-//     caches.open('AgendaMed-cache-v1').then(cache => {
+//     caches.open('CallMed-cache-v1').then(cache => {
 //       return cache.addAll([
 //         '/',
 //         '/index.html',

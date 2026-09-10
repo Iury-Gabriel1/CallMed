@@ -5,7 +5,7 @@
   <meta name="theme-color" content="#007bff">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Minhas Consultas - AgendaMed</title>
+  <title>Minhas Consultas - CallMed</title>
 
   <!-- CSS -->
   <link rel="stylesheet" href="base.css">
@@ -146,8 +146,8 @@
 
   <header class="header">
     <div class="logo">
-      <img src="logo.png" alt="AgendaMed Logo">
-      <span>AgendaMed - Paciente</span>
+      <img src="logo.png" alt="CallMed Logo">
+      <span>CallMed - Paciente</span>
     </div>
     <nav class="nav">
   <ul>
@@ -500,7 +500,7 @@
       if (consultaIndex !== -1) {
         agendamentos[consultaIndex].status = 'cancelado';
         agendamentos[consultaIndex].canceladoEm = new Date().toISOString();
-        localStorage.setItem('AgendaMed_agendamentos', JSON.stringify(agendamentos));
+        localStorage.setItem('CallMed_agendamentos', JSON.stringify(agendamentos));
         
         // Recarrega a lista
         const user = Storage.getUsuarioLogado();

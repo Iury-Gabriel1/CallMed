@@ -1,4 +1,4 @@
-// configuracoes.js (CORRIGIDO PARA AGENDAMED - VERSÃO ATUALIZADA)
+// configuracoes.js (CORRIGIDO PARA CallMed - VERSÃO ATUALIZADA)
 // Gerenciamento de configurações e perfil do usuário
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -153,7 +153,7 @@ function exportarBackup() {
     medicos: Storage.getMedicos(),
     agendamentos: Storage.getAgendamentos(),
     usuarios: Storage.getUsuarios(),
-    fotos: JSON.parse(localStorage.getItem('AgendaMed_user_photos') || '{}'), // CORRIGIDO: AgendaMed
+    fotos: JSON.parse(localStorage.getItem('CallMed_user_photos') || '{}'), // CORRIGIDO: CallMed
     config: Storage.getConfiguracoes(),
     exportadoEm: new Date().toISOString(),
     versao: '1.0'
@@ -163,7 +163,7 @@ function exportarBackup() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `AgendaMed-backup-${new Date().toISOString().split('T')[0]}.json`;
+  a.download = `CallMed-backup-${new Date().toISOString().split('T')[0]}.json`;
   a.click();
   URL.revokeObjectURL(url);
   
@@ -183,13 +183,13 @@ function importarBackup(e) {
     try {
       const data = JSON.parse(event.target.result);
       
-      // CORREÇÃO: Usando chaves AgendaMed
-      if (data.pacientes) localStorage.setItem('AgendaMed_pacientes', JSON.stringify(data.pacientes));
-      if (data.medicos) localStorage.setItem('AgendaMed_medicos', JSON.stringify(data.medicos));
-      if (data.agendamentos) localStorage.setItem('AgendaMed_agendamentos', JSON.stringify(data.agendamentos));
-      if (data.usuarios) localStorage.setItem('AgendaMed_usuarios', JSON.stringify(data.usuarios));
-      if (data.fotos) localStorage.setItem('AgendaMed_user_photos', JSON.stringify(data.fotos));
-      if (data.config) localStorage.setItem('AgendaMed_config', JSON.stringify(data.config));
+      // CORREÇÃO: Usando chaves CallMed
+      if (data.pacientes) localStorage.setItem('CallMed_pacientes', JSON.stringify(data.pacientes));
+      if (data.medicos) localStorage.setItem('CallMed_medicos', JSON.stringify(data.medicos));
+      if (data.agendamentos) localStorage.setItem('CallMed_agendamentos', JSON.stringify(data.agendamentos));
+      if (data.usuarios) localStorage.setItem('CallMed_usuarios', JSON.stringify(data.usuarios));
+      if (data.fotos) localStorage.setItem('CallMed_user_photos', JSON.stringify(data.fotos));
+      if (data.config) localStorage.setItem('CallMed_config', JSON.stringify(data.config));
       
       if (typeof Notificacao !== "undefined") {
         Notificacao.show("Backup importado com sucesso!", "success");
@@ -379,7 +379,7 @@ function buscarMedicosPorPlano(plano) {
         usuarios[usuarioIndex].email = document.getElementById('userEmail').value;
         usuarios[usuarioIndex].telefone = document.getElementById('userTelefone').value;
         
-        localStorage.setItem('AgendaMed_usuarios', JSON.stringify(usuarios)); // CORRIGIDO: AgendaMed
+        localStorage.setItem('CallMed_usuarios', JSON.stringify(usuarios)); // CORRIGIDO: CallMed
         
         // Atualiza usuário logado
         const usuarioAtualizado = usuarios[usuarioIndex];

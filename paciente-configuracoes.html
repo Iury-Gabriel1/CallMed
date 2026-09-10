@@ -5,7 +5,7 @@
   <meta name="theme-color" content="#007bff">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Configurações - AgendaMed Paciente</title>
+  <title>Configurações - CallMed Paciente</title>
 
   <!-- CSS -->
   <link rel="stylesheet" href="base.css">
@@ -297,8 +297,8 @@
 
   <header class="header">
     <div class="logo">
-      <img src="logo.png" alt="AgendaMed Logo">
-      <span>AgendaMed - Paciente</span>
+      <img src="logo.png" alt="CallMed Logo">
+      <span>CallMed - Paciente</span>
     </div>
     <nav class="nav">
       <ul>
@@ -318,7 +318,7 @@
   <main class="container">
     <section class="page-header">
       <h1>Configurações da Conta</h1>
-      <p>Personalize sua experiência no AgendaMed</p>
+      <p>Personalize sua experiência no CallMed</p>
     </section>
 
     <!-- Seção Perfil -->
@@ -709,7 +709,7 @@
         usuario: user,
         agendamentos: Storage.getAgendamentosPorPaciente(paciente?.id || user.id),
         config: Storage.getConfiguracoes(),
-        fotos: JSON.parse(localStorage.getItem('AgendaMed_user_photos') || '{}'),
+        fotos: JSON.parse(localStorage.getItem('CallMed_user_photos') || '{}'),
         exportadoEm: new Date().toISOString(),
         tipo: 'backup_paciente'
       };
@@ -718,7 +718,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `AgendaMed-paciente-${user.nome}-backup-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `CallMed-paciente-${user.nome}-backup-${new Date().toISOString().split('T')[0]}.json`;
       a.click();
       URL.revokeObjectURL(url);
       
@@ -732,7 +732,7 @@
         medicos: Storage.getMedicos(),
         agendamentos: Storage.getAgendamentos(),
         usuarios: Storage.getUsuarios(),
-        fotos: JSON.parse(localStorage.getItem('AgendaMed_user_photos') || '{}'),
+        fotos: JSON.parse(localStorage.getItem('CallMed_user_photos') || '{}'),
         config: Storage.getConfiguracoes(),
         exportadoEm: new Date().toISOString(),
         versao: '1.0'
@@ -742,7 +742,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `AgendaMed-completo-backup-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `CallMed-completo-backup-${new Date().toISOString().split('T')[0]}.json`;
       a.click();
       URL.revokeObjectURL(url);
       
@@ -759,12 +759,12 @@
           const data = JSON.parse(event.target.result);
           
           if (confirm('Deseja importar os dados do backup? Isso substituirá seus dados atuais.')) {
-            if (data.pacientes) localStorage.setItem('AgendaMed_pacientes', JSON.stringify(data.pacientes));
-            if (data.medicos) localStorage.setItem('AgendaMed_medicos', JSON.stringify(data.medicos));
-            if (data.agendamentos) localStorage.setItem('AgendaMed_agendamentos', JSON.stringify(data.agendamentos));
-            if (data.usuarios) localStorage.setItem('AgendaMed_usuarios', JSON.stringify(data.usuarios));
-            if (data.fotos) localStorage.setItem('AgendaMed_user_photos', JSON.stringify(data.fotos));
-            if (data.config) localStorage.setItem('AgendaMed_config', JSON.stringify(data.config));
+            if (data.pacientes) localStorage.setItem('CallMed_pacientes', JSON.stringify(data.pacientes));
+            if (data.medicos) localStorage.setItem('CallMed_medicos', JSON.stringify(data.medicos));
+            if (data.agendamentos) localStorage.setItem('CallMed_agendamentos', JSON.stringify(data.agendamentos));
+            if (data.usuarios) localStorage.setItem('CallMed_usuarios', JSON.stringify(data.usuarios));
+            if (data.fotos) localStorage.setItem('CallMed_user_photos', JSON.stringify(data.fotos));
+            if (data.config) localStorage.setItem('CallMed_config', JSON.stringify(data.config));
             
             alert("Backup importado com sucesso! A página será recarregada.");
             setTimeout(() => location.reload(), 1000);
@@ -819,7 +819,7 @@
       if (usuario && usuario.senha === senhaAtual) {
         // Atualiza senha
         usuario.senha = novaSenha;
-        localStorage.setItem('AgendaMed_usuarios', JSON.stringify(usuarios));
+        localStorage.setItem('CallMed_usuarios', JSON.stringify(usuarios));
         
         // Limpa campos
         document.getElementById("senhaAtual").value = "";
@@ -839,7 +839,7 @@
           
           // Remove usuário
           const usuarios = Storage.getUsuarios().filter(u => u.id !== user.id);
-          localStorage.setItem('AgendaMed_usuarios', JSON.stringify(usuarios));
+          localStorage.setItem('CallMed_usuarios', JSON.stringify(usuarios));
           
           // Remove foto
           Storage.removerFotoUsuario(user.id);
@@ -940,7 +940,7 @@
             usuarios[usuarioIndex].email = document.getElementById('userEmail').value;
             usuarios[usuarioIndex].telefone = document.getElementById('userTelefone').value;
             
-            localStorage.setItem('AgendaMed_usuarios', JSON.stringify(usuarios));
+            localStorage.setItem('CallMed_usuarios', JSON.stringify(usuarios));
             
             // Atualiza usuário logado
             const usuarioAtualizado = usuarios[usuarioIndex];

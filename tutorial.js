@@ -1,13 +1,13 @@
 // tutorial.js
-// Guia inicial do AgendaMed
+// Guia inicial do CallMed
 
 const Tutorial = {
   steps: [
-    "Bem-vindo ao AgendaMed! Aqui você pode gerenciar pacientes e médicos.",
+    "Bem-vindo ao CallMed! Aqui você pode gerenciar pacientes e médicos.",
     "Use a aba 'Agendar' para marcar consultas rapidamente.",
     "Visualize o histórico completo no menu 'Histórico'.",
     "Não esqueça de explorar as configurações e temas personalizados!",
-    "Tudo pronto! Aproveite o AgendaMed."
+    "Tudo pronto! Aproveite o CallMed."
   ],
   currentStep: 0,
   container: null,

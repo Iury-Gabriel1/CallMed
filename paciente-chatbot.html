@@ -5,7 +5,7 @@
   <meta name="theme-color" content="#007bff">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Assistente Virtual - AgendaMed</title>
+  <title>Assistente Virtual - CallMed</title>
 
   <!-- CSS -->
   <link rel="stylesheet" href="base.css">
@@ -485,8 +485,8 @@
 
   <header class="header">
     <div class="logo">
-      <img src="logo.png" alt="AgendaMed Logo">
-      <span>AgendaMed - Assistente</span>
+      <img src="logo.png" alt="CallMed Logo">
+      <span>CallMed - Assistente</span>
     </div>
     <nav class="nav">
       <ul>
@@ -1055,7 +1055,7 @@ const knowledgeBase = {
 
   'funcionalidades': {
     patterns: ['funcionalidade', 'recurso', 'o que faz', 'para que serve', 'sistema'],
-    response: () => `⚙️ **FUNCIONALIDADES DO SISTEMA**\n\n**Principais recursos do AgendaMed:**\n\n📅 **Agendamento Inteligente**\n• Marcação online 24/7\n• Lembretes automáticos\n• Confirmação de consultas\n\n🧠 **Matchmaking Inteligente**\n• Recomendações personalizadas\n• Análise de compatibilidade\n• Melhores horários disponíveis\n\n👨‍⚕️ **Gestão Médica**\n• Prontuário eletrônico\n• Prescrição digital\n• Agenda compartilhada\n\n💡 **Experimente nosso matchmaking** para encontrar o médico ideal!`
+    response: () => `⚙️ **FUNCIONALIDADES DO SISTEMA**\n\n**Principais recursos do CallMed:**\n\n📅 **Agendamento Inteligente**\n• Marcação online 24/7\n• Lembretes automáticos\n• Confirmação de consultas\n\n🧠 **Matchmaking Inteligente**\n• Recomendações personalizadas\n• Análise de compatibilidade\n• Melhores horários disponíveis\n\n👨‍⚕️ **Gestão Médica**\n• Prontuário eletrônico\n• Prescrição digital\n• Agenda compartilhada\n\n💡 **Experimente nosso matchmaking** para encontrar o médico ideal!`
   },
 
   'default': {
@@ -2017,7 +2017,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.documentElement.setAttribute('data-theme', config.tema);
 
     // Mensagem de boas-vindas
-    addBotMessage(`Olá, ${user.nome}! 👋\n\nSou seu assistente virtual do AgendaMed. Posso ajudar você com:\n\n📅 **Agendamento e consultas**\n👨‍⚕️ **Informações sobre médicos**\n🧠 **MATCHMAKING INTELIGENTE** - Encontre o médico perfeito!\n👩‍⚕️ **Dúvidas de pacientes**\n⚙️ **Funcionalidades do sistema**\n\n💡 **Experimente nosso matchmaking inteligente** para encontrar médicos baseados em suas necessidades específicas!`);
+    addBotMessage(`Olá, ${user.nome}! 👋\n\nSou seu assistente virtual do CallMed. Posso ajudar você com:\n\n📅 **Agendamento e consultas**\n👨‍⚕️ **Informações sobre médicos**\n🧠 **MATCHMAKING INTELIGENTE** - Encontre o médico perfeito!\n👩‍⚕️ **Dúvidas de pacientes**\n⚙️ **Funcionalidades do sistema**\n\n💡 **Experimente nosso matchmaking inteligente** para encontrar médicos baseados em suas necessidades específicas!`);
 
     // Verificar lembretes proativos
     setTimeout(() => {

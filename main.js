@@ -1,4 +1,4 @@
-// main.js (CORRIGIDO PARA AGENDAMED)
+// main.js (CORRIGIDO PARA CallMed)
 // Sistema de temas global e inicialização
 
 // Função para aplicar tema em TODAS as páginas
@@ -83,7 +83,7 @@ function registrarServiceWorker() {
 
 // INICIALIZAÇÃO PRINCIPAL
 document.addEventListener("DOMContentLoaded", () => {
-  console.log('=== AGENDAMED INICIANDO ===');
+  console.log('=== CallMed INICIANDO ===');
   
   // 1. Aplica tema global IMEDIATAMENTE
   aplicarTemaGlobal();
@@ -122,13 +122,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // 6. Registra Service Worker
   registrarServiceWorker();
   
-  console.log('=== AGENDAMED INICIALIZADO ===');
+  console.log('=== CallMed INICIALIZADO ===');
 });
 
-// CORREÇÃO: Escuta mudanças de tema de outras páginas (AGENDAMED)
+// CORREÇÃO: Escuta mudanças de tema de outras páginas (CallMed)
 window.addEventListener('storage', function(e) {
-  if (e.key === 'AgendaMed_config') {
-    console.log('Configurações do AgendaMed alteradas, aplicando novo tema...');
+  if (e.key === 'CallMed_config') {
+    console.log('Configurações do CallMed alteradas, aplicando novo tema...');
     aplicarTemaGlobal();
   }
 });

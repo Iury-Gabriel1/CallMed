@@ -5,7 +5,7 @@
   <meta name="theme-color" content="#007bff">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AgendaMed - Pacientes</title>
+  <title>CallMed - Pacientes</title>
 
   <!-- 1. BASE primeiro -->
   <link rel="stylesheet" href="base.css">
@@ -365,8 +365,8 @@
   <!-- Header / Nav -->
   <header class="header">
     <div class="logo">
-      <img src="logo.png" alt="AgendaMed Logo">
-      <span>AgendaMed</span>
+      <img src="logo.png" alt="CallMed Logo">
+      <span>CallMed</span>
     </div>
     <nav class="nav">
       <ul>
@@ -475,12 +475,12 @@
     // SISTEMA DE PACIENTES CORRIGIDO
     document.addEventListener('DOMContentLoaded', function() {
       // 1. Aplica tema
-      const config = JSON.parse(localStorage.getItem('AgendaMed_config') || '{"tema":"light","notificacoes":true}');
+      const config = JSON.parse(localStorage.getItem('CallMed_config') || '{"tema":"light","notificacoes":true}');
       document.documentElement.setAttribute('data-theme', config.tema);
       
       // 2. CARREGA E EXIBE PACIENTES
       function carregarPacientes() {
-        const pacientes = JSON.parse(localStorage.getItem('AgendaMed_pacientes') || '[]');
+        const pacientes = JSON.parse(localStorage.getItem('CallMed_pacientes') || '[]');
         const tbody = document.querySelector('#pacientesTable tbody');
         const cardsContainer = document.getElementById('pacientesCards');
         const emptyState = document.getElementById('emptyState');
@@ -557,7 +557,7 @@
       form.addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const pacientes = JSON.parse(localStorage.getItem('AgendaMed_pacientes') || '[]');
+        const pacientes = JSON.parse(localStorage.getItem('CallMed_pacientes') || '[]');
         const pacienteData = {
           nome: document.getElementById('nome').value,
           email: document.getElementById('email').value,
@@ -577,14 +577,14 @@
             pacienteData.usuarioId = pacientes[index].usuarioId; // Mantém o link com usuário se existir
             
             pacientes[index] = pacienteData;
-            localStorage.setItem('AgendaMed_pacientes', JSON.stringify(pacientes));
+            localStorage.setItem('CallMed_pacientes', JSON.stringify(pacientes));
             alert('✅ Paciente atualizado com sucesso!');
           }
         } else {
           // NOVO paciente
           pacienteData.id = Date.now().toString();
           pacientes.push(pacienteData);
-          localStorage.setItem('AgendaMed_pacientes', JSON.stringify(pacientes));
+          localStorage.setItem('CallMed_pacientes', JSON.stringify(pacientes));
           alert('✅ Paciente cadastrado com sucesso!');
         }
         
@@ -598,7 +598,7 @@
       const searchInput = document.getElementById('searchInput');
       searchInput.addEventListener('input', function(e) {
         const termo = e.target.value.toLowerCase();
-        const pacientes = JSON.parse(localStorage.getItem('AgendaMed_pacientes') || '[]');
+        const pacientes = JSON.parse(localStorage.getItem('CallMed_pacientes') || '[]');
         
         const pacientesFiltrados = pacientes.filter(paciente => 
           paciente.nome.toLowerCase().includes(termo) ||
@@ -661,7 +661,7 @@
       // 5. FUNÇÕES GLOBAIS CORRIGIDAS
       window.editarPaciente = function(id) {
         console.log('📝 Editando paciente ID:', id);
-        const pacientes = JSON.parse(localStorage.getItem('AgendaMed_pacientes') || '[]');
+        const pacientes = JSON.parse(localStorage.getItem('CallMed_pacientes') || '[]');
         const paciente = pacientes.find(p => p.id == id); // Usar == para compatibilidade
         
         if (paciente) {
@@ -679,10 +679,10 @@
       
       window.excluirPaciente = function(id) {
         console.log('🗑️ Tentando excluir paciente ID:', id);
-        console.log('📋 Todos os pacientes:', JSON.parse(localStorage.getItem('AgendaMed_pacientes') || '[]'));
+        console.log('📋 Todos os pacientes:', JSON.parse(localStorage.getItem('CallMed_pacientes') || '[]'));
         
         if (confirm('Tem certeza que deseja excluir este paciente?\nEsta ação não pode ser desfeita.')) {
-          const pacientes = JSON.parse(localStorage.getItem('AgendaMed_pacientes') || '[]');
+          const pacientes = JSON.parse(localStorage.getItem('CallMed_pacientes') || '[]');
           console.log('📋 Antes da exclusão:', pacientes.length, 'pacientes');
           
           // Usar == para compatibilidade entre string e number
@@ -695,7 +695,7 @@
             return;
           }
           
-          localStorage.setItem('AgendaMed_pacientes', JSON.stringify(novosPacientes));
+          localStorage.setItem('CallMed_pacientes', JSON.stringify(novosPacientes));
           carregarPacientes();
           alert('✅ Paciente excluído com sucesso!');
         }
@@ -713,7 +713,7 @@
 
       // 8. Debug: Adiciona função para ver pacientes no console
       window.debugPacientes = function() {
-        console.log('🐛 Pacientes no localStorage:', JSON.parse(localStorage.getItem('AgendaMed_pacientes') || '[]'));
+        console.log('🐛 Pacientes no localStorage:', JSON.parse(localStorage.getItem('CallMed_pacientes') || '[]'));
       };
     });
 </script>

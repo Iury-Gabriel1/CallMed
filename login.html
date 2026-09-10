@@ -5,7 +5,7 @@
   <meta name="theme-color" content="#007bff">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AgendaMed - Login</title>
+  <title>CallMed - Login</title>
 
   <!-- CSS -->
   <link rel="stylesheet" href="base.css">
@@ -148,7 +148,7 @@
 
   <div class="login-container">
     <div class="login-header">
-      <h2>AgendaMed</h2>
+      <h2>CallMed</h2>
       <p>Faça login na sua conta</p>
     </div>
 
@@ -189,8 +189,8 @@
     <!-- Informações de Demo -->
     <div class="demo-info">
       <h4>💡 Contas de Demonstração:</h4>
-      <p><strong>Médico:</strong> medico@AgendaMed.com / senha123</p>
-      <p><strong>Paciente:</strong> paciente@AgendaMed.com / senha123</p>
+      <p><strong>Médico:</strong> medico@CallMed.com / senha123</p>
+      <p><strong>Paciente:</strong> paciente@CallMed.com / senha123</p>
     </div>
   </div>
 
@@ -469,7 +469,7 @@ document.getElementById('cadastroForm').addEventListener('submit', e => {
         }
         
         // SALVA NO STORAGE
-        localStorage.setItem('AgendaMed_usuarios', JSON.stringify(usuarios));
+        localStorage.setItem('CallMed_usuarios', JSON.stringify(usuarios));
         
         console.log('💾 Usuário salvo com tipo:', usuarios[usuarioIndex]);
 
@@ -503,29 +503,29 @@ document.getElementById('cadastroForm').addEventListener('submit', e => {
     // === CONTAS DEMO ===
     function criarContasDemo() {
         // Conta demo clínica (admin)
-        if (!Storage.getUsuarios().find(u => u.email === 'clinica@AgendaMed.com')) {
-            const clinicaDemo = Storage.criarUsuario('Clínica Saúde Total', 'clinica@AgendaMed.com', 'senha123');
+        if (!Storage.getUsuarios().find(u => u.email === 'clinica@CallMed.com')) {
+            const clinicaDemo = Storage.criarUsuario('Clínica Saúde Total', 'clinica@CallMed.com', 'senha123');
             if (clinicaDemo) {
                 const usuarios = Storage.getUsuarios();
                 const usuarioIndex = usuarios.findIndex(u => u.id === clinicaDemo.id);
                 if (usuarioIndex !== -1) {
                     usuarios[usuarioIndex].tipo = 'clinica';
                     usuarios[usuarioIndex].tipoClinica = 'admin';
-                    localStorage.setItem('AgendaMed_usuarios', JSON.stringify(usuarios));
+                    localStorage.setItem('CallMed_usuarios', JSON.stringify(usuarios));
                 }
             }
         }
         
         // Conta demo médico
-        if (!Storage.getUsuarios().find(u => u.email === 'medico@AgendaMed.com')) {
-            const medicoDemo = Storage.criarUsuario('Dr. Carlos Silva', 'medico@AgendaMed.com', 'senha123');
+        if (!Storage.getUsuarios().find(u => u.email === 'medico@CallMed.com')) {
+            const medicoDemo = Storage.criarUsuario('Dr. Carlos Silva', 'medico@CallMed.com', 'senha123');
             if (medicoDemo) {
                 const usuarios = Storage.getUsuarios();
                 const usuarioIndex = usuarios.findIndex(u => u.id === medicoDemo.id);
                 if (usuarioIndex !== -1) {
                     usuarios[usuarioIndex].tipo = 'clinica';
                     usuarios[usuarioIndex].tipoClinica = 'medico';
-                    localStorage.setItem('AgendaMed_usuarios', JSON.stringify(usuarios));
+                    localStorage.setItem('CallMed_usuarios', JSON.stringify(usuarios));
                     
                     // Adiciona automaticamente como médico
                     Storage.adicionarMedicoAutomaticamente(usuarios[usuarioIndex]);
@@ -534,28 +534,28 @@ document.getElementById('cadastroForm').addEventListener('submit', e => {
         }
 
         // Conta demo secretário
-        if (!Storage.getUsuarios().find(u => u.email === 'secretario@AgendaMed.com')) {
-            const secretarioDemo = Storage.criarUsuario('Ana Secretária', 'secretario@AgendaMed.com', 'senha123');
+        if (!Storage.getUsuarios().find(u => u.email === 'secretario@CallMed.com')) {
+            const secretarioDemo = Storage.criarUsuario('Ana Secretária', 'secretario@CallMed.com', 'senha123');
             if (secretarioDemo) {
                 const usuarios = Storage.getUsuarios();
                 const usuarioIndex = usuarios.findIndex(u => u.id === secretarioDemo.id);
                 if (usuarioIndex !== -1) {
                     usuarios[usuarioIndex].tipo = 'clinica';
                     usuarios[usuarioIndex].tipoClinica = 'secretario';
-                    localStorage.setItem('AgendaMed_usuarios', JSON.stringify(usuarios));
+                    localStorage.setItem('CallMed_usuarios', JSON.stringify(usuarios));
                 }
             }
         }
         
         // Conta demo paciente
-        if (!Storage.getUsuarios().find(u => u.email === 'paciente@AgendaMed.com')) {
-            const pacienteDemo = Storage.criarUsuario('João Paciente', 'paciente@AgendaMed.com', 'senha123');
+        if (!Storage.getUsuarios().find(u => u.email === 'paciente@CallMed.com')) {
+            const pacienteDemo = Storage.criarUsuario('João Paciente', 'paciente@CallMed.com', 'senha123');
             if (pacienteDemo) {
                 const usuarios = Storage.getUsuarios();
                 const usuarioIndex = usuarios.findIndex(u => u.id === pacienteDemo.id);
                 if (usuarioIndex !== -1) {
                     usuarios[usuarioIndex].tipo = 'paciente';
-                    localStorage.setItem('AgendaMed_usuarios', JSON.stringify(usuarios));
+                    localStorage.setItem('CallMed_usuarios', JSON.stringify(usuarios));
                     
                     // Adiciona também como paciente automaticamente
                     Storage.adicionarPacienteAutomaticamente(usuarios[usuarioIndex]);

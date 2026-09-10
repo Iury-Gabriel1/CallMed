@@ -3,21 +3,21 @@
     {
       "id": 1,
       "nome": "Administrador Demo",
-      "email": "admin@AgendaMed.com",
+      "email": "admin@CallMed.com",
       "senha": "123456",
       "tipo": "admin"
     },
     {
       "id": 2,
       "nome": "Dra. Ana Souza",
-      "email": "ana@AgendaMed.com",
+      "email": "ana@CallMed.com",
       "senha": "123456",
       "tipo": "medico"
     },
     {
       "id": 3,
       "nome": "João da Silva",
-      "email": "joao@AgendaMed.com",
+      "email": "joao@CallMed.com",
       "senha": "123456",
       "tipo": "paciente"
     }
@@ -37,7 +37,7 @@
       "nome": "João da Silva",
       "data_nascimento": "1990-04-12",
       "telefone": "(11) 98888-8888",
-      "email": "joao@AgendaMed.com"
+      "email": "joao@CallMed.com"
     }
   ],
   "agendamentos": [

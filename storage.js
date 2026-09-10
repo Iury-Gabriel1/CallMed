@@ -1,5 +1,5 @@
 /* ===========================================================
-   AgendaMed - storage.js (VERSÃO COMPLETAMENTE CORRIGIDA)
+   CallMed - storage.js (VERSÃO COMPLETAMENTE CORRIGIDA)
    Sistema unificado de persistência
    =========================================================== */
 
@@ -7,24 +7,24 @@ const Storage = {
   // Chaves individuais para compatibilidade
   init() {
     // Inicializa dados se não existirem
-    if (!localStorage.getItem('AgendaMed_pacientes')) {
-      localStorage.setItem('AgendaMed_pacientes', JSON.stringify([]));
+    if (!localStorage.getItem('CallMed_pacientes')) {
+      localStorage.setItem('CallMed_pacientes', JSON.stringify([]));
     }
-    if (!localStorage.getItem('AgendaMed_medicos')) {
-      localStorage.setItem('AgendaMed_medicos', JSON.stringify([]));
+    if (!localStorage.getItem('CallMed_medicos')) {
+      localStorage.setItem('CallMed_medicos', JSON.stringify([]));
     }
-    if (!localStorage.getItem('AgendaMed_agendamentos')) {
-      localStorage.setItem('AgendaMed_agendamentos', JSON.stringify([]));
+    if (!localStorage.getItem('CallMed_agendamentos')) {
+      localStorage.setItem('CallMed_agendamentos', JSON.stringify([]));
     }
-    if (!localStorage.getItem('AgendaMed_clinicas')) {
-      localStorage.setItem('AgendaMed_clinicas', JSON.stringify([]));
+    if (!localStorage.getItem('CallMed_clinicas')) {
+      localStorage.setItem('CallMed_clinicas', JSON.stringify([]));
     }
-    if (!localStorage.getItem('AgendaMed_usuarios')) {
+    if (!localStorage.getItem('CallMed_usuarios')) {
       const usuariosDemo = [
         { 
           id: 1, 
           nome: "Admin", 
-          email: "admin@AgendaMed.com", 
+          email: "admin@CallMed.com", 
           senha: "123456",
           tipo: "clinica",
           tipoClinica: "admin"
@@ -38,11 +38,11 @@ const Storage = {
           tipoClinica: "medico"
         }
       ];
-      localStorage.setItem('AgendaMed_usuarios', JSON.stringify(usuariosDemo));
+      localStorage.setItem('CallMed_usuarios', JSON.stringify(usuariosDemo));
     }
     // Inicializa storage de fotos se não existir
-    if (!localStorage.getItem('AgendaMed_user_photos')) {
-      localStorage.setItem('AgendaMed_user_photos', JSON.stringify({}));
+    if (!localStorage.getItem('CallMed_user_photos')) {
+      localStorage.setItem('CallMed_user_photos', JSON.stringify({}));
     }
   },
 
@@ -51,15 +51,15 @@ const Storage = {
      =========================================================== */
 
   salvarFotoUsuario(userId, fotoData) {
-    const fotos = JSON.parse(localStorage.getItem('AgendaMed_user_photos') || '{}');
+    const fotos = JSON.parse(localStorage.getItem('CallMed_user_photos') || '{}');
     fotos[userId] = fotoData;
-    localStorage.setItem('AgendaMed_user_photos', JSON.stringify(fotos));
+    localStorage.setItem('CallMed_user_photos', JSON.stringify(fotos));
     
     const usuarios = this.getUsuarios();
     const usuarioIndex = usuarios.findIndex(u => u.id == userId);
     if (usuarioIndex !== -1) {
         usuarios[usuarioIndex].foto = fotoData;
-        localStorage.setItem('AgendaMed_usuarios', JSON.stringify(usuarios));
+        localStorage.setItem('CallMed_usuarios', JSON.stringify(usuarios));
         
         const usuarioLogado = this.getUsuarioLogado();
         if (usuarioLogado && usuarioLogado.id == userId) {
@@ -70,18 +70,18 @@ const Storage = {
   },
 
   getFotoUsuario(userId) {
-    const fotos = JSON.parse(localStorage.getItem('AgendaMed_user_photos') || '{}');
+    const fotos = JSON.parse(localStorage.getItem('CallMed_user_photos') || '{}');
     return fotos[userId] || null;
   },
 
   removerFotoUsuario(userId) {
-    const fotos = JSON.parse(localStorage.getItem('AgendaMed_user_photos') || '{}');
+    const fotos = JSON.parse(localStorage.getItem('CallMed_user_photos') || '{}');
     delete fotos[userId];
-    localStorage.setItem('AgendaMed_user_photos', JSON.stringify(fotos));
+    localStorage.setItem('CallMed_user_photos', JSON.stringify(fotos));
   },
 
   temFotoCustomizada(userId) {
-    const fotos = JSON.parse(localStorage.getItem('AgendaMed_user_photos') || '{}');
+    const fotos = JSON.parse(localStorage.getItem('CallMed_user_photos') || '{}');
     return !!fotos[userId];
   },
 
@@ -89,7 +89,7 @@ const Storage = {
      USUÁRIOS
      =========================================================== */
   getUsuarios() {
-    return JSON.parse(localStorage.getItem('AgendaMed_usuarios') || '[]');
+    return JSON.parse(localStorage.getItem('CallMed_usuarios') || '[]');
   },
 
   criarUsuario(nome, email, senha) {
@@ -104,7 +104,7 @@ const Storage = {
     };
     
     usuarios.push(novoUsuario);
-    localStorage.setItem('AgendaMed_usuarios', JSON.stringify(usuarios));
+    localStorage.setItem('CallMed_usuarios', JSON.stringify(usuarios));
     return novoUsuario;
   },
 
@@ -131,7 +131,7 @@ const Storage = {
      PACIENTES
      =========================================================== */
   getPacientes() {
-    return JSON.parse(localStorage.getItem('AgendaMed_pacientes') || '[]');
+    return JSON.parse(localStorage.getItem('CallMed_pacientes') || '[]');
   },
 
   salvarPaciente(paciente) {
@@ -143,13 +143,13 @@ const Storage = {
       paciente.id = Date.now();
       pacientes.push(paciente);
     }
-    localStorage.setItem('AgendaMed_pacientes', JSON.stringify(pacientes));
+    localStorage.setItem('CallMed_pacientes', JSON.stringify(pacientes));
     return paciente;
   },
 
   excluirPaciente(id) {
     const pacientes = this.getPacientes().filter(p => p.id !== id);
-    localStorage.setItem('AgendaMed_pacientes', JSON.stringify(pacientes));
+    localStorage.setItem('CallMed_pacientes', JSON.stringify(pacientes));
   },
 
   getPacientePorUsuarioId(usuarioId) {
@@ -175,7 +175,7 @@ const Storage = {
     };
     
     pacientes.push(novoPaciente);
-    localStorage.setItem('AgendaMed_pacientes', JSON.stringify(pacientes));
+    localStorage.setItem('CallMed_pacientes', JSON.stringify(pacientes));
     console.log('✅ Paciente criado automaticamente:', novoPaciente.nome);
     return novoPaciente;
   },
@@ -184,7 +184,7 @@ const Storage = {
      MÉDICOS
      =========================================================== */
   getMedicos() {
-    return JSON.parse(localStorage.getItem('AgendaMed_medicos') || '[]');
+    return JSON.parse(localStorage.getItem('CallMed_medicos') || '[]');
   },
 
   salvarMedico(medico) {
@@ -216,14 +216,14 @@ const Storage = {
       console.log('✅ Novo médico criado:', medico);
     }
     
-    localStorage.setItem('AgendaMed_medicos', JSON.stringify(medicos));
+    localStorage.setItem('CallMed_medicos', JSON.stringify(medicos));
     return medico;
   },
 
   excluirMedico(id) {
     console.log('🗑️ Excluindo médico ID:', id);
     const medicos = this.getMedicos().filter(m => m.id != id);
-    localStorage.setItem('AgendaMed_medicos', JSON.stringify(medicos));
+    localStorage.setItem('CallMed_medicos', JSON.stringify(medicos));
     console.log('✅ Médico excluído. Total restante:', medicos.length);
   },
 
@@ -254,7 +254,7 @@ const Storage = {
     };
     
     medicos.push(novoMedico);
-    localStorage.setItem('AgendaMed_medicos', JSON.stringify(medicos));
+    localStorage.setItem('CallMed_medicos', JSON.stringify(medicos));
     console.log('✅ Médico adicionado automaticamente:', novoMedico.nome);
     return novoMedico;
   },
@@ -263,7 +263,7 @@ const Storage = {
      CLÍNICAS
      =========================================================== */
   getClinicas() {
-    return JSON.parse(localStorage.getItem('AgendaMed_clinicas') || '[]');
+    return JSON.parse(localStorage.getItem('CallMed_clinicas') || '[]');
   },
 
   salvarClinica(clinica) {
@@ -294,14 +294,14 @@ const Storage = {
       console.log('✅ Nova clínica criada:', clinica);
     }
     
-    localStorage.setItem('AgendaMed_clinicas', JSON.stringify(clinicas));
+    localStorage.setItem('CallMed_clinicas', JSON.stringify(clinicas));
     return clinica;
   },
 
   excluirClinica(id) {
     console.log('🗑️ Excluindo clínica ID:', id);
     const clinicas = this.getClinicas().filter(c => c.id != id);
-    localStorage.setItem('AgendaMed_clinicas', JSON.stringify(clinicas));
+    localStorage.setItem('CallMed_clinicas', JSON.stringify(clinicas));
     console.log('✅ Clínica excluída. Total restante:', clinicas.length);
   },
 
@@ -325,7 +325,7 @@ const Storage = {
     const index = medicos.findIndex(m => m.id == medicoId);
     if (index !== -1) {
       medicos[index].clinicaId = clinicaId;
-      localStorage.setItem('AgendaMed_medicos', JSON.stringify(medicos));
+      localStorage.setItem('CallMed_medicos', JSON.stringify(medicos));
       return true;
     }
     return false;
@@ -335,7 +335,7 @@ const Storage = {
      AGENDAMENTOS
      =========================================================== */
   getAgendamentos() {
-    return JSON.parse(localStorage.getItem('AgendaMed_agendamentos') || '[]');
+    return JSON.parse(localStorage.getItem('CallMed_agendamentos') || '[]');
   },
 
   salvarAgendamento(agendamento) {
@@ -372,14 +372,14 @@ const Storage = {
       agendamentos.push(agendamento);
     }
     
-    localStorage.setItem('AgendaMed_agendamentos', JSON.stringify(agendamentos));
+    localStorage.setItem('CallMed_agendamentos', JSON.stringify(agendamentos));
     console.log('✅ Agendamento salvo:', agendamento);
     return agendamento;
   },
 
   excluirAgendamento(id) {
     const agendamentos = this.getAgendamentos().filter(a => a.id !== id);
-    localStorage.setItem('AgendaMed_agendamentos', JSON.stringify(agendamentos));
+    localStorage.setItem('CallMed_agendamentos', JSON.stringify(agendamentos));
     console.log('🗑️ Agendamento excluído ID:', id);
   },
 
@@ -392,18 +392,18 @@ const Storage = {
      CONFIGURAÇÕES
      =========================================================== */
   getConfiguracoes() {
-    return JSON.parse(localStorage.getItem('AgendaMed_config') || '{"tema":"light","notificacoes":true}');
+    return JSON.parse(localStorage.getItem('CallMed_config') || '{"tema":"light","notificacoes":true}');
   },
 
   salvarConfiguracoes(config) {
-    localStorage.setItem('AgendaMed_config', JSON.stringify(config));
+    localStorage.setItem('CallMed_config', JSON.stringify(config));
   },
 
   /* ===========================================================
      CONFIGURAÇÕES POR USUÁRIO
      =========================================================== */
   salvarConfiguracaoUsuario(usuarioId, chave, dados) {
-    const chaveStorage = `AgendaMed_config_${usuarioId}`;
+    const chaveStorage = `CallMed_config_${usuarioId}`;
     const configs = JSON.parse(localStorage.getItem(chaveStorage) || '{}');
     configs[chave] = dados;
     localStorage.setItem(chaveStorage, JSON.stringify(configs));
@@ -412,18 +412,18 @@ const Storage = {
   },
 
   getConfiguracaoUsuario(usuarioId, chave) {
-    const chaveStorage = `AgendaMed_config_${usuarioId}`;
+    const chaveStorage = `CallMed_config_${usuarioId}`;
     const configs = JSON.parse(localStorage.getItem(chaveStorage) || '{}');
     return configs[chave] || null;
   },
 
   getTodasConfiguracoesUsuario(usuarioId) {
-    const chaveStorage = `AgendaMed_config_${usuarioId}`;
+    const chaveStorage = `CallMed_config_${usuarioId}`;
     return JSON.parse(localStorage.getItem(chaveStorage) || '{}');
   },
 
   removerConfiguracaoUsuario(usuarioId, chave) {
-    const chaveStorage = `AgendaMed_config_${usuarioId}`;
+    const chaveStorage = `CallMed_config_${usuarioId}`;
     const configs = JSON.parse(localStorage.getItem(chaveStorage) || '{}');
     delete configs[chave];
     localStorage.setItem(chaveStorage, JSON.stringify(configs));
@@ -484,36 +484,36 @@ const Storage = {
     const usuarios = this.getUsuarios();
     
     // Conta demo admin
-    if (!usuarios.find(u => u.email === 'admin@AgendaMed.com')) {
-      const admin = this.criarUsuario('Administrador', 'admin@AgendaMed.com', 'admin123');
+    if (!usuarios.find(u => u.email === 'admin@CallMed.com')) {
+      const admin = this.criarUsuario('Administrador', 'admin@CallMed.com', 'admin123');
       if (admin) {
         const usuariosAtualizados = this.getUsuarios();
         const index = usuariosAtualizados.findIndex(u => u.id === admin.id);
         if (index !== -1) {
           usuariosAtualizados[index].tipo = 'clinica';
           usuariosAtualizados[index].tipoClinica = 'admin';
-          localStorage.setItem('AgendaMed_usuarios', JSON.stringify(usuariosAtualizados));
+          localStorage.setItem('CallMed_usuarios', JSON.stringify(usuariosAtualizados));
         }
       }
     }
 
     // Conta demo clínica
-    if (!usuarios.find(u => u.email === 'clinica@AgendaMed.com')) {
-      const clinica = this.criarUsuario('Clínica Saúde Total', 'clinica@AgendaMed.com', 'senha123');
+    if (!usuarios.find(u => u.email === 'clinica@CallMed.com')) {
+      const clinica = this.criarUsuario('Clínica Saúde Total', 'clinica@CallMed.com', 'senha123');
       if (clinica) {
         const usuariosAtualizados = this.getUsuarios();
         const index = usuariosAtualizados.findIndex(u => u.id === clinica.id);
         if (index !== -1) {
           usuariosAtualizados[index].tipo = 'clinica';
           usuariosAtualizados[index].tipoClinica = 'admin';
-          localStorage.setItem('AgendaMed_usuarios', JSON.stringify(usuariosAtualizados));
+          localStorage.setItem('CallMed_usuarios', JSON.stringify(usuariosAtualizados));
           
           // Cria uma clínica demo
           const clinicaDemo = {
             nome: 'Clínica Saúde Total',
             cnpj: '00.000.000/0001-00',
             telefone: '(11) 9999-8888',
-            email: 'clinica@AgendaMed.com',
+            email: 'clinica@CallMed.com',
             endereco: 'Rua Exemplo, 123 - Centro',
             horario_inicio: '08:00',
             horario_fim: '18:00',
@@ -526,43 +526,43 @@ const Storage = {
     }
     
     // Conta demo médico
-    if (!usuarios.find(u => u.email === 'medico@AgendaMed.com')) {
-      const medico = this.criarUsuario('Dr. Carlos Silva', 'medico@AgendaMed.com', 'senha123');
+    if (!usuarios.find(u => u.email === 'medico@CallMed.com')) {
+      const medico = this.criarUsuario('Dr. Carlos Silva', 'medico@CallMed.com', 'senha123');
       if (medico) {
         const usuariosAtualizados = this.getUsuarios();
         const index = usuariosAtualizados.findIndex(u => u.id === medico.id);
         if (index !== -1) {
           usuariosAtualizados[index].tipo = 'clinica';
           usuariosAtualizados[index].tipoClinica = 'medico';
-          localStorage.setItem('AgendaMed_usuarios', JSON.stringify(usuariosAtualizados));
+          localStorage.setItem('CallMed_usuarios', JSON.stringify(usuariosAtualizados));
           this.adicionarMedicoAutomaticamente(usuariosAtualizados[index]);
         }
       }
     }
 
     // Conta demo secretário
-    if (!usuarios.find(u => u.email === 'secretario@AgendaMed.com')) {
-      const secretario = this.criarUsuario('Ana Secretária', 'secretario@AgendaMed.com', 'senha123');
+    if (!usuarios.find(u => u.email === 'secretario@CallMed.com')) {
+      const secretario = this.criarUsuario('Ana Secretária', 'secretario@CallMed.com', 'senha123');
       if (secretario) {
         const usuariosAtualizados = this.getUsuarios();
         const index = usuariosAtualizados.findIndex(u => u.id === secretario.id);
         if (index !== -1) {
           usuariosAtualizados[index].tipo = 'clinica';
           usuariosAtualizados[index].tipoClinica = 'secretario';
-          localStorage.setItem('AgendaMed_usuarios', JSON.stringify(usuariosAtualizados));
+          localStorage.setItem('CallMed_usuarios', JSON.stringify(usuariosAtualizados));
         }
       }
     }
     
     // Conta demo paciente
-    if (!usuarios.find(u => u.email === 'paciente@AgendaMed.com')) {
-      const paciente = this.criarUsuario('João Paciente', 'paciente@AgendaMed.com', 'senha123');
+    if (!usuarios.find(u => u.email === 'paciente@CallMed.com')) {
+      const paciente = this.criarUsuario('João Paciente', 'paciente@CallMed.com', 'senha123');
       if (paciente) {
         const usuariosAtualizados = this.getUsuarios();
         const index = usuariosAtualizados.findIndex(u => u.id === paciente.id);
         if (index !== -1) {
           usuariosAtualizados[index].tipo = 'paciente';
-          localStorage.setItem('AgendaMed_usuarios', JSON.stringify(usuariosAtualizados));
+          localStorage.setItem('CallMed_usuarios', JSON.stringify(usuariosAtualizados));
           this.adicionarPacienteAutomaticamente(usuariosAtualizados[index]);
         }
       }
@@ -594,7 +594,7 @@ const Storage = {
     };
     
     pacientes.push(novoPaciente);
-    localStorage.setItem('AgendaMed_pacientes', JSON.stringify(pacientes));
+    localStorage.setItem('CallMed_pacientes', JSON.stringify(pacientes));
     console.log('✅ Paciente adicionado automaticamente:', novoPaciente.nome);
     return novoPaciente;
   },

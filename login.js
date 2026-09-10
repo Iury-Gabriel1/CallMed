@@ -28,11 +28,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (usuario) {
         // Remove qualquer foto temporária do localStorage anterior
-        localStorage.removeItem('AgendaMed_user_photo');
+        localStorage.removeItem('CallMed_user_photo');
         
         // Se lembrar-me, salva o último email
         if (lembrar) {
-          localStorage.setItem("AgendaMedUltimoLogin", email);
+          localStorage.setItem("CallMedUltimoLogin", email);
         }
         
         // Redireciona baseado no tipo de usuário

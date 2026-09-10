@@ -5,7 +5,7 @@
   <meta name="theme-color" content="#007bff">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AgendaMed - Clínicas</title>
+  <title>CallMed - Clínicas</title>
 
   <!-- CSS -->
   <link rel="stylesheet" href="base.css">
@@ -421,8 +421,8 @@
   <!-- Header / Nav -->
   <header class="header">
     <div class="logo">
-      <img src="logo.png" alt="AgendaMed Logo">
-      <span>AgendaMed</span>
+      <img src="logo.png" alt="CallMed Logo">
+      <span>CallMed</span>
     </div>
     <nav class="nav">
       <ul>
@@ -584,7 +584,7 @@
     // SISTEMA DE TEMA E INICIALIZAÇÃO
     document.addEventListener('DOMContentLoaded', function() {
       // Carrega configurações do tema
-      const config = JSON.parse(localStorage.getItem('AgendaMed_config') || '{"tema":"light","notificacoes":true}');
+      const config = JSON.parse(localStorage.getItem('CallMed_config') || '{"tema":"light","notificacoes":true}');
       document.documentElement.setAttribute('data-theme', config.tema);
 
       // Verifica se usuário está logado

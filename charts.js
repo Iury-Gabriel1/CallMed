@@ -4,7 +4,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const ctx = document.getElementById("chartConsultas").getContext("2d");
 
-  const agendamentos = JSON.parse(localStorage.getItem("AgendaMed_agendamentos")) || [];
+  const agendamentos = JSON.parse(localStorage.getItem("CallMed_agendamentos")) || [];
   const dias = [];
   const contagem = [];
 

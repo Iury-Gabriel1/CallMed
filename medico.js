@@ -794,7 +794,7 @@ const Medico = {
     
     if (consultaIndex !== -1) {
       agendamentos[consultaIndex].status = novoStatus;
-      localStorage.setItem('AgendaMed_agendamentos', JSON.stringify(agendamentos));
+      localStorage.setItem('CallMed_agendamentos', JSON.stringify(agendamentos));
       
       const modal = document.getElementById('modalAgenda');
       if (modal) {

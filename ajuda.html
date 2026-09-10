@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#007bff">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ajuda - AgendaMed</title>
+  <title>Ajuda - CallMed</title>
 <!-- 1. BASE primeiro -->
 <link rel="stylesheet" href="base.css">
 
@@ -68,8 +68,8 @@
 
   <header class="header">
     <div class="logo">
-      <img src="logo.png" alt="AgendaMed Logo">
-      <span>AgendaMed</span>
+      <img src="logo.png" alt="CallMed Logo">
+      <span>CallMed</span>
     </div>
     <nav class="nav">
       <ul>
@@ -93,7 +93,7 @@
     </section>
 
     <section class="ajuda-container">
-      <h3>👋 Bem-vindo à AgendaMed!</h3>
+      <h3>👋 Bem-vindo à CallMed!</h3>
       <p>Nosso sistema foi desenvolvido para simplificar o gerenciamento da sua clínica. Aqui estão as respostas para as dúvidas mais frequentes:</p>
 
       <div class="faq-item">
@@ -124,8 +124,8 @@
       <div class="contato-suporte">
         <h3>📞 Precisa de mais ajuda?</h3>
         <p class="suporte-texto">Nossa equipe de suporte está sempre disponível para atendê-lo</p>
-        <div class="contato-email">suporte@AgendaMed.com</div>
-        <a href="mailto:suporte@AgendaMed.com" class="btn-contato">Enviar E-mail</a>
+        <div class="contato-email">suporte@CallMed.com</div>
+        <a href="mailto:suporte@CallMed.com" class="btn-contato">Enviar E-mail</a>
       </div>
     </section>
   </main>
@@ -140,12 +140,12 @@
   <script src="main.js"></script>
 
 <script>
-// SISTEMA DE TEMA GLOBAL UNIVERSAL - AGENDAMED
+// SISTEMA DE TEMA GLOBAL UNIVERSAL - CallMed
 document.addEventListener('DOMContentLoaded', function() {
   // Carrega configurações
-  const config = JSON.parse(localStorage.getItem('AgendaMed_config') || '{"tema":"light","notificacoes":true}');
+  const config = JSON.parse(localStorage.getItem('CallMed_config') || '{"tema":"light","notificacoes":true}');
   
-  console.log('🌙 Aplicando tema AgendaMed em:', window.location.pathname, 'Tema:', config.tema);
+  console.log('🌙 Aplicando tema CallMed em:', window.location.pathname, 'Tema:', config.tema);
   
   // 1. Aplica tema no HTML
   document.documentElement.setAttribute('data-theme', config.tema);
@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 5. Escuta mudanças no storage entre abas
   window.addEventListener('storage', function(e) {
-    if (e.key === 'AgendaMed_config') {
+    if (e.key === 'CallMed_config') {
       console.log('📦 Storage alterado, atualizando tema...');
       const newConfig = JSON.parse(e.newValue || '{"tema":"light"}');
       document.documentElement.setAttribute('data-theme', newConfig.tema);
