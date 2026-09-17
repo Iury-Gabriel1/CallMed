@@ -1,0 +1,1591 @@
+/* ===========================================================
+   CallMed -  admin.html
+   =========================================================== */
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="manifest" href="pwa/manifest.json">
+  <meta name="theme-color" content="#007bff">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CallMed - Administração</title>
+
+  <!-- Favicons -->
+<link rel="icon" type="image/png" sizes="72x72" href="assets/images/icon-72x72.png">
+<link rel="icon" type="image/png" sizes="96x96" href="assets/images/icon-96x96.png">
+<link rel="icon" type="image/png" sizes="128x128" href="assets/images/icon-128x128.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/images/icon-192x192.png">
+<link rel="apple-touch-icon" sizes="152x152" href="assets/images/icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/images/icon-152x152.png">
+<link rel="manifest" href="pwa/manifest.json">
+
+  <link rel="stylesheet" href="css/styles.css">
+  
+  <style>
+    /* ============================================
+       TAB CONTENT
+       ============================================ */
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease-in;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* ============================================
+       ESTILOS ESPECÍFICOS DE TABS
+       ============================================ */
+    
+    /* Dashboard */
+    .dashboard-grid .card {
+      background: var(--cor-card);
+      padding: var(--espaco-lg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      text-align: center;
+    }
+    
+    .card h3 {
+      font-size: 1.2rem;
+      margin-bottom: var(--espaco-sm);
+      color: var(--cor-principal);
+    }
+    
+    .card p {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--cor-texto);
+    }
+    
+    /* Pacientes, Médicos, Clínicas - Layout comum */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--espaco-lg);
+      flex-wrap: wrap;
+      gap: var(--espaco-md);
+    }
+    
+    .page-header h1 {
+      font-size: 2rem;
+      color: var(--cor-principal);
+      margin: 0;
+    }
+    
+    .btn-add {
+      padding: var(--espaco-sm) var(--espaco-lg);
+      background-color: var(--cor-sucesso);
+      color: #fff;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+      white-space: nowrap;
+    }
+    
+    .btn-add:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .filtros-container {
+      display: flex;
+      gap: var(--espaco-md);
+      margin-bottom: var(--espaco-lg);
+      flex-wrap: wrap;
+    }
+    
+    .search-box {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .search-box input {
+      width: 100%;
+      padding: var(--espaco-sm);
+      border: 1px solid var(--cor-borda);
+      border-radius: var(--radius-md);
+      background: var(--cor-fundo);
+      color: var(--cor-texto);
+    }
+    
+    .filter-select {
+      min-width: 150px;
+    }
+    
+    .filter-select select {
+      width: 100%;
+      padding: var(--espaco-sm);
+      border: 1px solid var(--cor-borda);
+      border-radius: var(--radius-md);
+      background: var(--cor-fundo);
+      color: var(--cor-texto);
+    }
+    
+    .table-container {
+      overflow-x: auto;
+      margin-top: var(--espaco-md);
+      background-color: var(--cor-card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 600px;
+    }
+    
+    table th, table td {
+      padding: var(--espaco-sm);
+      text-align: left;
+      border-bottom: 1px solid var(--cor-borda);
+    }
+    
+    table th {
+      background-color: var(--cor-principal);
+      color: #fff;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    
+    table tr:nth-child(even) {
+      background-color: rgba(0, 0, 0, 0.02);
+    }
+    
+    table tr:hover {
+      background-color: var(--cor-destaque);
+      transition: background-color var(--transition-fast);
+    }
+    
+    .acoes-cell {
+      white-space: nowrap;
+    }
+    
+    .btn-acao {
+      padding: var(--espaco-xs) var(--espaco-sm);
+      margin: 0 2px;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all var(--transition-fast);
+    }
+    
+    .btn-editar {
+      background-color: var(--cor-aviso);
+      color: rgb(0, 0, 0);
+    }
+    
+    .btn-excluir {
+      background-color: var(--cor-erro);
+      color: white;
+    }
+    
+    .btn-ver-agenda {
+      background-color: var(--cor-info);
+      color: rgb(0, 0, 0);
+    }
+    
+    .btn-ver-medicos {
+      background-color: var(--cor-info);
+      color: rgb(0, 0, 0);
+    }
+    
+    /* Status badges */
+    .status-badge {
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .status-ativo {
+      background: var(--cor-sucesso);
+      color: white;
+    }
+    
+    .status-inativo {
+      background: var(--cor-secundaria);
+      color: white;
+    }
+    
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: var(--espaco-xl);
+      color: var(--cor-secundaria);
+    }
+    
+    .empty-state .icon {
+      font-size: 3rem;
+      margin-bottom: var(--espaco-md);
+    }
+    
+    /* Cards para mobile */
+    .pacientes-cards,
+    .medicos-cards,
+    .clinicas-cards {
+      display: none;
+      flex-direction: column;
+      gap: var(--espaco-md);
+      margin-top: var(--espaco-md);
+    }
+    
+    /* Modal */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 200;
+      padding: var(--espaco-md);
+    }
+    
+    .modal.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: var(--cor-card);
+      padding: var(--espaco-lg);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+    }
+    
+    .modal-content h2 {
+      margin-bottom: var(--espaco-md);
+      color: var(--cor-principal);
+      font-size: 1.5rem;
+    }
+    
+    .modal-close {
+      position: absolute;
+      top: var(--espaco-md);
+      right: var(--espaco-md);
+      cursor: pointer;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--cor-secundaria);
+      background: none;
+      border: none;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-close:hover {
+      color: var(--cor-erro);
+    }
+    
+    .form-group {
+      margin-bottom: var(--espaco-md);
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: var(--espaco-xs);
+      font-weight: 600;
+      color: var(--cor-texto);
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: var(--espaco-sm);
+      border: 1px solid var(--cor-borda);
+      border-radius: var(--radius-md);
+      background: var(--cor-fundo);
+      color: var(--cor-texto);
+      font-size: 1rem;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--espaco-md);
+    }
+    
+    .btn-submit {
+      width: 100%;
+      padding: var(--espaco-md);
+      background-color: var(--cor-sucesso);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: var(--espaco-md);
+    }
+    
+    .btn-submit:hover {
+      background-color: #218838;
+    }
+    
+    /* Histórico */
+    .filtros {
+      background: var(--cor-card);
+      padding: var(--espaco-lg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      margin-bottom: var(--espaco-lg);
+    }
+    
+    .filtros-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--espaco-md);
+      align-items: end;
+    }
+    
+    .filtro-group label {
+      font-weight: 600;
+      margin-bottom: var(--espaco-sm);
+      color: var(--cor-principal);
+      display: block;
+    }
+    
+    .btn-limpar {
+      background: var(--cor-secundaria);
+      color: white;
+      padding: var(--espaco-sm) var(--espaco-lg);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      border: none;
+    }
+    
+    /* Configurações */
+    .config-section {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .config-item {
+      background: var(--cor-card);
+      padding: var(--espaco-lg);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--espaco-lg);
+      border: 1px solid var(--cor-borda);
+      text-align: center;
+    }
+    
+    .config-item h3 {
+      text-align: center;
+      margin-bottom: var(--espaco-md);
+    }
+    
+    .perfil-section {
+      background: var(--cor-card);
+      padding: var(--espaco-lg);
+      border-radius: var(--radius-lg);
+      margin: var(--espaco-lg) auto;
+      border: 1px solid var(--cor-borda);
+      text-align: center;
+      max-width: 800px;
+    }
+    
+    .foto-perfil-container {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid var(--cor-principal);
+      cursor: pointer;
+      margin: 0 auto;
+    }
+    
+    .foto-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: white;
+      background: linear-gradient(135deg, var(--cor-principal), #0056b3);
+    }
+    
+    .foto-preview {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    
+    .foto-preview.visible {
+      display: block;
+    }
+    
+    .foto-placeholder.hidden {
+      display: none;
+    }
+    
+    /* Ajuda */
+    .ajuda-container {
+      background: var(--cor-card);
+      padding: var(--espaco-xl);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .faq-item {
+      margin-bottom: var(--espaco-xl);
+      padding: var(--espaco-lg);
+      background: #f8f9fa;
+      border-radius: var(--radius-md);
+      border-left: 4px solid var(--cor-principal);
+    }
+    
+    .faq-item h4 {
+      color: var(--cor-principal);
+      margin-bottom: var(--espaco-sm);
+    }
+    
+    /* Chatbot */
+    .chatbot-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: var(--cor-card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      height: 80vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .chatbot-header {
+      background: var(--cor-principal);
+      color: white;
+      padding: var(--espaco-md);
+      display: flex;
+      align-items: center;
+      gap: var(--espaco-sm);
+    }
+    
+    .chat-messages {
+      flex: 1;
+      padding: var(--espaco-md);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--espaco-sm);
+    }
+    
+    .message {
+      max-width: 85%;
+      padding: var(--espaco-sm) var(--espaco-md);
+      border-radius: var(--radius-lg);
+      line-height: 1.4;
+      font-size: 0.9rem;
+    }
+    
+    .message.bot {
+      background: var(--cor-fundo);
+      border: 1px solid var(--cor-borda);
+      align-self: flex-start;
+    }
+    
+    .message.user {
+      background: var(--cor-principal);
+      color: white;
+      align-self: flex-end;
+    }
+    
+    .chat-input-container {
+      padding: var(--espaco-md);
+      border-top: 1px solid var(--cor-borda);
+    }
+    
+    .chat-input-form {
+      display: flex;
+      gap: var(--espaco-sm);
+    }
+    
+    .chat-input {
+      flex: 1;
+      padding: var(--espaco-sm);
+      border: 1px solid var(--cor-borda);
+      border-radius: var(--radius-md);
+      resize: none;
+      min-height: 45px;
+      background: var(--cor-card);
+      color: var(--cor-texto);
+    }
+    
+    .send-btn {
+      background: var(--cor-principal);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: var(--espaco-sm) var(--espaco-md);
+      cursor: pointer;
+    }
+    
+    /* Responsividade */
+    @media (max-width: 768px) {
+      .page-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .page-header h1 {
+        font-size: 1.5rem;
+        text-align: center;
+      }
+      
+      .btn-add {
+        width: 100%;
+      }
+      
+      .table-container {
+        display: none;
+      }
+      
+      .pacientes-cards,
+      .medicos-cards,
+      .clinicas-cards {
+        display: flex;
+      }
+      
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .filtros-container {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body data-tipo="admin">
+
+  <!-- Header (injetado pelo components.js) -->
+  <div id="header-placeholder"></div>
+  
+  <!-- Conteúdo das Tabs -->
+  <main class="container">
+    
+    <!-- ============================================ -->
+    <!-- TAB: DASHBOARD                                -->
+    <!-- ============================================ -->
+    <div class="tab-content active" id="tab-dashboard">
+      <section class="welcome">
+        <div class="user-welcome">
+          <div class="foto-container">
+            <div class="foto-grande">
+              <div class="foto-placeholder" id="welcomePlaceholder" style="display: none;">
+                <span id="welcomeInitials">U</span>
+              </div>
+              <img id="welcomePhoto" alt="Foto do usuário">
+            </div>
+          </div>
+          <div class="welcome-text">
+            <h1>Bem-vindo, <span id="userName">Usuário</span>!</h1>
+            <p>Resumo rápido do dia:</p>
+          </div>
+        </div>
+      </section>
+      
+      <section class="dashboard-grid">
+        <div class="card">
+          <h3>Consultas Hoje</h3>
+          <p id="consultasHoje">0</p>
+        </div>
+        <div class="card">
+          <h3>Próximos Pacientes</h3>
+          <p id="proximosPacientes">0</p>
+        </div>
+        <div class="card">
+          <h3>Total de Médicos</h3>
+          <p id="totalMedicos">0</p>
+        </div>
+        <div class="card">
+          <h3>Alertas</h3>
+          <p id="alertas">Nenhum</p>
+        </div>
+      </section>
+      
+      <section class="proximas-consultas" style="margin-top: var(--espaco-xl);">
+        <h2 style="color: var(--cor-principal); margin-bottom: var(--espaco-lg);">Próximas Consultas</h2>
+        <div class="consultas-list" id="proximasConsultasList"></div>
+      </section>
+    </div>
+    
+    <!-- ============================================ -->
+    <!-- TAB: PACIENTES                                -->
+    <!-- ============================================ -->
+    <div class="tab-content" id="tab-pacientes">
+      <div class="page-header">
+        <h1>Pacientes</h1>
+        <button class="btn-add" id="openModalPacienteBtn">+ Novo Paciente</button>
+      </div>
+      
+      <div class="filtros-container">
+        <div class="search-box">
+          <input type="text" id="searchPacienteInput" placeholder="Buscar paciente...">
+        </div>
+      </div>
+      
+      <div class="table-container">
+        <table id="pacientesTable">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>E-mail</th>
+              <th>Telefone</th>
+              <th>Data Nasc.</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      
+      <div class="pacientes-cards" id="pacientesCards"></div>
+      
+      <div class="empty-state" id="emptyStatePacientes" style="display: none;">
+        <div class="icon">👥</div>
+        <h3>Nenhum paciente cadastrado</h3>
+        <p>Comece adicionando seu primeiro paciente clicando no botão acima.</p>
+      </div>
+    </div>
+    
+    <!-- ============================================ -->
+    <!-- TAB: MÉDICOS                                  -->
+    <!-- ============================================ -->
+    <div class="tab-content" id="tab-medicos">
+      <div class="page-header">
+        <h1>Médicos</h1>
+        <button class="btn-add" id="openModalMedicoBtn">+ Novo Médico</button>
+      </div>
+      
+      <div class="filtros-container">
+        <div class="search-box">
+          <input type="text" id="searchMedicoInput" placeholder="Buscar médico...">
+        </div>
+        <div class="filter-select">
+          <select id="especialidadeFilter">
+            <option value="">Todas especialidades</option>
+          </select>
+        </div>
+        <div class="filter-select">
+          <select id="clinicaFilter">
+            <option value="">Todas clínicas</option>
+          </select>
+        </div>
+        <div class="filter-select">
+          <select id="statusMedicoFilter">
+            <option value="">Todos os status</option>
+            <option value="ativo">Ativos</option>
+            <option value="inativo">Inativos</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="table-container">
+        <table id="medicosTable">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Especialidade</th>
+              <th>Clínica</th>
+              <th>Telefone</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      
+      <div class="medicos-cards" id="medicosCards"></div>
+      
+      <div class="empty-state" id="emptyStateMedicos" style="display: none;">
+        <div class="icon">👨‍⚕️</div>
+        <h3>Nenhum médico cadastrado</h3>
+        <p>Comece adicionando seu primeiro médico clicando no botão acima.</p>
+      </div>
+    </div>
+    
+    <!-- ============================================ -->
+    <!-- TAB: CLÍNICAS                                 -->
+    <!-- ============================================ -->
+    <div class="tab-content" id="tab-clinicas">
+      <div class="page-header">
+        <h1>Clínicas</h1>
+        <button class="btn-add" id="openModalClinicaBtn">+ Nova Clínica</button>
+      </div>
+      
+      <div class="filtros-container">
+        <div class="search-box">
+          <input type="text" id="searchClinicaInput" placeholder="Buscar clínica...">
+        </div>
+        <div class="filter-select">
+          <select id="statusClinicaFilter">
+            <option value="">Todos os status</option>
+            <option value="ativo">Ativas</option>
+            <option value="inativo">Inativas</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="table-container">
+        <table id="clinicasTable">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>CNPJ</th>
+              <th>Telefone</th>
+              <th>E-mail</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      
+      <div class="clinicas-cards" id="clinicasCards"></div>
+      
+      <div class="empty-state" id="emptyStateClinicas" style="display: none;">
+        <div class="icon">🏥</div>
+        <h3>Nenhuma clínica cadastrada</h3>
+        <p>Comece adicionando sua primeira clínica clicando no botão acima.</p>
+      </div>
+    </div>
+    
+    <!-- ============================================ -->
+    <!-- TAB: ESPECIALIDADES                           -->
+    <!-- ============================================ -->
+    <div class="tab-content" id="tab-especialidades">
+      <div class="page-header">
+        <h1>Especialidades</h1>
+        <button class="btn-add" id="openModalEspecialidadeBtn">+ Nova Especialidade</button>
+      </div>
+      
+      <div class="filtros-container">
+        <div class="search-box">
+          <input type="text" id="searchEspecialidadeInput" placeholder="Buscar especialidade...">
+        </div>
+        <div class="filter-select">
+          <select id="statusEspecialidadeFilter">
+            <option value="">Todos os status</option>
+            <option value="ativo">Ativas</option>
+            <option value="inativo">Inativas</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="table-container">
+        <table id="especialidadesTable">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Descrição</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      
+      <div class="empty-state" id="emptyStateEspecialidades" style="display: none;">
+        <div class="icon">🩺</div>
+        <h3>Nenhuma especialidade cadastrada</h3>
+        <p>Comece adicionando sua primeira especialidade clicando no botão acima.</p>
+      </div>
+    </div>
+    
+    <!-- ============================================ -->
+    <!-- TAB: AGENDAR                                  -->
+    <!-- ============================================ -->
+    <div class="tab-content" id="tab-agendar">
+      <div class="page-header">
+        <h1>Agendar Consulta</h1>
+        <button class="btn-add" id="openModalAgendamentoBtn">+ Nova Consulta</button>
+      </div>
+      
+      <div class="table-container">
+        <table id="agendamentosTable">
+          <thead>
+            <tr>
+              <th>Paciente</th>
+              <th>Médico</th>
+              <th>Data</th>
+              <th>Hora</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- ============================================ -->
+    <!-- TAB: HISTÓRICO                                -->
+    <!-- ============================================ -->
+    <div class="tab-content" id="tab-historico">
+      <section class="page-header">
+        <h1>Histórico de Atendimentos</h1>
+      </section>
+      
+      <section class="filtros">
+        <form id="filtroForm" class="filtros-form">
+          <div class="filtro-group">
+            <label for="filtroPaciente">Paciente</label>
+            <input type="text" id="filtroPaciente" placeholder="Filtrar por paciente...">
+          </div>
+          <div class="filtro-group">
+            <label for="filtroMedico">Médico</label>
+            <input type="text" id="filtroMedico" placeholder="Filtrar por médico...">
+          </div>
+          <div class="filtro-group">
+            <label for="filtroData">Data</label>
+            <input type="date" id="filtroData">
+          </div>
+          <div class="filtro-group">
+            <button type="submit" class="btn-primary">Aplicar Filtros</button>
+            <button type="button" class="btn-limpar" id="btnLimparFiltros">Limpar</button>
+          </div>
+        </form>
+      </section>
+      
+      <section class="tabela-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Paciente</th>
+              <th>Médico</th>
+              <th>Data</th>
+              <th>Hora</th>
+              <th>Status</th>
+              <th>Diagnóstico</th>
+            </tr>
+          </thead>
+          <tbody id="historicoTableBody"></tbody>
+        </table>
+        <div id="semDados" class="sem-dados" style="display: none; padding: 20px; text-align: center;">
+          Nenhum atendimento encontrado nos filtros aplicados.
+        </div>
+      </section>
+    </div>
+    
+    <!-- ============================================ -->
+    <!-- TAB: CONFIGURAÇÕES                            -->
+    <!-- ============================================ -->
+    <div class="tab-content" id="tab-configuracoes">
+      <section class="page-header">
+        <h1>Configurações do Sistema</h1>
+        <p>Personalize sua experiência no CallMed</p>
+      </section>
+      
+      <!-- Perfil -->
+      <section class="perfil-section">
+        <div class="perfil-header">
+          <div class="foto-perfil-container" id="fotoPerfilContainer">
+            <div class="foto-placeholder" id="fotoPlaceholder">
+              <span id="fotoInicial">U</span>
+            </div>
+            <img id="fotoPreview" class="foto-preview" alt="Foto do perfil">
+            <input type="file" id="fotoInput" accept="image/*" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;">
+          </div>
+          <div class="perfil-info" style="text-align: center; margin-top: 15px;">
+            <h2 id="userNameDisplay">Usuário</h2>
+            <p id="userEmailDisplay">usuario@email.com</p>
+          </div>
+        </div>
+        
+        <form id="perfilForm" style="max-width: 600px; margin: 20px auto;">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="userNome">Nome Completo</label>
+              <input type="text" id="userNome" required>
+            </div>
+            <div class="form-group">
+              <label for="userEmail">E-mail</label>
+              <input type="email" id="userEmail" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="userTelefone">Telefone</label>
+              <input type="text" id="userTelefone" placeholder="(11) 99999-9999">
+            </div>
+            <div class="form-group">
+              <label for="userTipo">Tipo de Usuário</label>
+              <input type="text" id="userTipo" disabled style="background: var(--cor-fundo);">
+            </div>
+          </div>
+          <div style="text-align: center; margin-top: 20px;">
+            <button type="submit" class="btn-primary">Salvar Alterações</button>
+            <button type="button" class="btn-delete" id="btnRemoverFoto" style="display: none; margin-left: 10px;">Remover Foto</button>
+          </div>
+        </form>
+      </section>
+      
+      <!-- Configurações Gerais -->
+      <section class="config-section">
+        <div class="config-item">
+          <h3>Tema da Aplicação</h3>
+          <select id="themeSelect" style="max-width: 300px; margin: 0 auto; padding: 10px; border-radius: 8px;">
+            <option value="light">Claro</option>
+            <option value="dark">Escuro</option>
+            <option value="blue">Azul</option>
+            <option value="green">Verde</option>
+          </select>
+        </div>
+        
+        <div class="config-item">
+          <h3>Notificações</h3>
+          <label>
+            <input type="checkbox" id="notifToggle"> Ativar notificações do sistema
+          </label>
+        </div>
+        
+        <div class="config-item">
+          <h3>Backup de Dados</h3>
+          <p>Exporte ou importe seus dados para backup</p>
+          <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 15px;">
+            <button type="button" class="btn-primary" id="btnExport">Exportar Backup</button>
+            <label for="importInput" style="background: var(--cor-secundaria); color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
+              Importar Backup
+              <input type="file" id="importInput" accept=".json" style="display: none;">
+            </label>
+          </div>
+        </div>
+      </section>
+    </div>
+    
+    <!-- ============================================ -->
+    <!-- TAB: AJUDA                                    -->
+    <!-- ============================================ -->
+    <div class="tab-content" id="tab-ajuda">
+      <section class="page-header">
+        <h1>Central de Ajuda</h1>
+        <p>Encontre respostas rápidas para suas dúvidas</p>
+      </section>
+      
+      <section class="ajuda-container">
+        <h3>Bem-vindo à CallMed!</h3>
+        <p>Nosso sistema foi desenvolvido para simplificar o gerenciamento da sua clínica.</p>
+        
+        <div class="faq-item">
+          <h4>Como cadastrar pacientes?</h4>
+          <p>Clique na aba "Pacientes" e depois em "+ Novo Paciente". Preencha o formulário e clique em "Salvar".</p>
+        </div>
+        
+        <div class="faq-item">
+          <h4>Como cadastrar médicos?</h4>
+          <p>Clique na aba "Médicos" e depois em "+ Novo Médico". Informe nome, e-mail, especialidade, clínica e telefone.</p>
+        </div>
+        
+        <div class="faq-item">
+          <h4>Como cadastrar clínicas?</h4>
+          <p>Clique na aba "Clínicas" e depois em "+ Nova Clínica". Informe nome, CNPJ, telefone, e-mail e endereço.</p>
+        </div>
+        
+        <div class="faq-item">
+          <h4>Como agendar uma consulta?</h4>
+          <p>Na aba "Agendar", clique em "+ Nova Consulta" e selecione o paciente, médico, data e horário.</p>
+        </div>
+        
+        <div class="faq-item">
+          <h4>Onde vejo o histórico?</h4>
+          <p>Na aba "Histórico" você encontra todos os atendimentos realizados.</p>
+        </div>
+        
+        <div class="faq-item">
+          <h4>Posso personalizar o sistema?</h4>
+          <p>Sim! Em "Configurações" você pode alterar o tema, notificações e fazer backup.</p>
+        </div>
+        
+        <div style="background: linear-gradient(135deg, var(--cor-principal), #0056b3); color: white; padding: 30px; border-radius: 15px; margin-top: 30px; text-align: center;">
+          <h3 style="color: white;">Precisa de mais ajuda?</h3>
+          <p style="color: white;">Nossa equipe está sempre disponível</p>
+          <div style="font-size: 1.2rem; font-weight: 600; margin: 15px 0;">suporte@CallMed.com</div>
+          <a href="mailto:suporte@CallMed.com" style="background: white; color: var(--cor-principal); padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;">Enviar E-mail</a>
+        </div>
+      </section>
+    </div>
+    
+    <!-- ============================================ -->
+    <!-- TAB: CHATBOT                                  -->
+    <!-- ============================================ -->
+    <div class="tab-content" id="tab-chatbot">
+      <div class="chatbot-container">
+        <div class="chatbot-header">
+          <img src="assets/images/chatbot.png" alt="Chatbot" style="width: 40px; height: 40px;">
+          <div>
+            <h2 style="margin: 0; font-size: 1.2rem;">Assistente Médico Inteligente</h2>
+            <p style="margin: 0; font-size: 0.8rem; opacity: 0.9;">Suporte avançado para decisões clínicas</p>
+          </div>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages"></div>
+        
+        <div class="chat-input-container">
+          <form id="chatForm" class="chat-input-form">
+            <textarea class="chat-input" id="messageInput" placeholder="Descreva sintomas, solicite análise..." rows="1" required></textarea>
+            <button type="submit" class="send-btn">Enviar</button>
+          </form>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 15px;">
+            <button class="category-btn" data-category="triagem" style="background: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 8px; padding: 10px; cursor: pointer;">Triagem</button>
+            <button class="category-btn" data-category="diagnostico" style="background: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 8px; padding: 10px; cursor: pointer;">Diagnóstico</button>
+            <button class="category-btn" data-category="medicamentos" style="background: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 8px; padding: 10px; cursor: pointer;">Medicamentos</button>
+            <button class="category-btn" data-category="estatisticas" style="background: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 8px; padding: 10px; cursor: pointer;">Estatísticas</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  </main>
+  
+  <!-- ============================================ -->
+  <!-- MODAIS                                        -->
+  <!-- ============================================ -->
+  
+  <!-- Modal Paciente -->
+  <div class="modal" id="modalPaciente">
+    <div class="modal-content">
+      <button class="modal-close" id="closeModalPacienteBtn">&times;</button>
+      <h2>Novo Paciente</h2>
+      <form id="pacienteForm">
+        <div class="form-group">
+          <label for="nome">Nome completo</label>
+          <input type="text" id="nome" placeholder="Digite o nome completo" required>
+        </div>
+        <div class="form-group">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" placeholder="exemplo@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="telefone">Telefone</label>
+          <input type="tel" id="telefone" placeholder="(11) 99999-9999" required>
+        </div>
+        <div class="form-group">
+          <label for="nascimento">Data de Nascimento</label>
+          <input type="date" id="nascimento" required>
+        </div>
+        <button type="submit" class="btn-submit">Salvar Paciente</button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Modal Médico -->
+  <div class="modal" id="modalMedico">
+    <div class="modal-content">
+      <button class="modal-close" id="closeModalMedicoBtn">&times;</button>
+      <h2 id="modalMedicoTitle">Novo Médico</h2>
+      <form id="medicoForm">
+        <div class="form-group">
+          <label for="medicoNome">Nome completo</label>
+          <input type="text" id="medicoNome" placeholder="Digite o nome completo" required>
+        </div>
+        <div class="form-group">
+          <label for="medicoEmail">E-mail</label>
+          <input type="email" id="medicoEmail" placeholder="exemplo@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="especialidade">Especialidade</label>
+          <select id="especialidade" required>
+            <option value="">Selecione uma especialidade</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="clinica">Clínica Vinculada</label>
+          <select id="clinica">
+            <option value="">Selecione uma clínica</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="medicoTelefone">Telefone</label>
+          <input type="tel" id="medicoTelefone" placeholder="(11) 99999-9999" required>
+        </div>
+        <div class="form-group">
+          <label for="crm">CRM</label>
+          <input type="text" id="crm" placeholder="Número do CRM">
+        </div>
+        <button type="submit" class="btn-submit">Salvar Médico</button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Modal Clínica -->
+  <div class="modal" id="modalClinica">
+    <div class="modal-content">
+      <button class="modal-close" id="closeModalClinicaBtn">&times;</button>
+      <h2 id="modalClinicaTitle">Nova Clínica</h2>
+      <form id="clinicaForm">
+        <div class="form-group">
+          <label for="clinicaNome">Nome da Clínica *</label>
+          <input type="text" id="clinicaNome" placeholder="Digite o nome da clínica" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cnpj">CNPJ *</label>
+            <input type="text" id="cnpj" placeholder="00.000.000/0000-00" required>
+          </div>
+          <div class="form-group">
+            <label for="clinicaTelefone">Telefone *</label>
+            <input type="tel" id="clinicaTelefone" placeholder="(11) 99999-9999" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="clinicaEmail">E-mail</label>
+          <input type="email" id="clinicaEmail" placeholder="contato@clinica.com.br">
+        </div>
+        <div class="form-group">
+          <label for="endereco">Endereço</label>
+          <input type="text" id="endereco" placeholder="Rua, número, bairro, cidade - UF">
+        </div>
+        <button type="submit" class="btn-submit">Salvar Clínica</button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Modal Especialidade -->
+  <div class="modal" id="modalEspecialidade">
+    <div class="modal-content">
+      <button class="modal-close" id="closeModalEspecialidadeBtn">&times;</button>
+      <h2 id="modalEspecialidadeTitle">Nova Especialidade</h2>
+      <form id="especialidadeForm">
+        <div class="form-group">
+          <label for="espNome">Nome da Especialidade *</label>
+          <input type="text" id="espNome" placeholder="Digite o nome da especialidade" required>
+        </div>
+        <div class="form-group">
+          <label for="espDescricao">Descrição</label>
+          <textarea id="espDescricao" placeholder="Descreva a especialidade..." rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="espStatus">Status</label>
+          <select id="espStatus">
+            <option value="ativo">Ativo</option>
+            <option value="inativo">Inativo</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-submit">Salvar Especialidade</button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Modal Agendamento -->
+  <div class="modal" id="modalAgendamento">
+    <div class="modal-content">
+      <button class="modal-close" id="closeModalAgendamentoBtn">&times;</button>
+      <h2>Nova Consulta</h2>
+      <form id="agendamentoForm">
+        <div class="form-group">
+          <label for="pacienteSelect">Paciente</label>
+          <select id="pacienteSelect" required>
+            <option value="">Selecione um paciente</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="medicoSelect">Médico</label>
+          <select id="medicoSelect" required>
+            <option value="">Selecione um médico</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="dataConsulta">Data</label>
+            <input type="date" id="dataConsulta" required>
+          </div>
+          <div class="form-group">
+            <label for="horaConsulta">Hora</label>
+            <input type="time" id="horaConsulta" required>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%;">Agendar Consulta</button>
+      </form>
+    </div>
+  </div>
+  
+  <div id="footer-placeholder"></div>
+  
+  <!-- ============================================ -->
+  <!-- SCRIPTS                                       -->
+  <!-- ============================================ -->
+  <script src="js/components.js"></script>
+  <script src="js/tabs.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/crud.js"></script>
+  <script src="js/agendamento.js"></script>
+  <script src="js/features.js"></script>
+  
+  <script>
+    // ============================================
+    // INICIALIZAÇÃO ESPECÍFICA DA PÁGINA ADMIN
+    // ============================================
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('Admin inicializando...');
+      
+      // Verifica login
+      const user = Storage.getUsuarioLogado();
+      if (!user) {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      if (user.tipo === 'paciente') {
+        window.location.href = 'paciente.html';
+        return;
+      }
+      
+      // Aplica tema
+      const config = Storage.getConfiguracoes();
+      document.documentElement.setAttribute('data-theme', config.tema);
+      
+      // Atualiza nome do usuário no dashboard
+      const userNameEl = document.getElementById('userName');
+      if (userNameEl) userNameEl.textContent = user.nome;
+      
+      // Carrega foto do usuário
+      const fotoCustomizada = Storage.getFotoUsuario(user.id);
+      const welcomePhoto = document.getElementById('welcomePhoto');
+      if (welcomePhoto) {
+        welcomePhoto.src = fotoCustomizada || 'assets/images/avatar.png';
+      }
+      
+      // Carrega estatísticas do dashboard
+      carregarDashboard();
+      
+      // Configura form de perfil
+      configurarPerfil(user);
+      
+      // Configura tema
+      configurarTema();
+      
+      // Configura backup
+      configurarBackup();
+      
+      // Configura o sistema de abas para inicializar módulos
+      configurarModulosTabs();
+    });
+    
+    function carregarDashboard() {
+      const agendamentos = Storage.getAgendamentos();
+      const medicos = Storage.getMedicos();
+      const hoje = new Date().toISOString().split('T')[0];
+      
+      const consultasHoje = agendamentos.filter(a => a.data === hoje).length;
+      const proximosPacientes = agendamentos.filter(a => new Date(a.data) >= new Date()).length;
+      
+      const el1 = document.getElementById('consultasHoje');
+      const el2 = document.getElementById('proximosPacientes');
+      const el3 = document.getElementById('totalMedicos');
+      const el4 = document.getElementById('alertas');
+      
+      if (el1) el1.textContent = consultasHoje;
+      if (el2) el2.textContent = proximosPacientes;
+      if (el3) el3.textContent = medicos.length;
+      if (el4) el4.textContent = consultasHoje === 0 ? 'Nenhum' : `${consultasHoje} consultas hoje`;
+      
+      carregarProximasConsultas();
+    }
+    
+    function carregarProximasConsultas() {
+      const agendamentos = Storage.getAgendamentos();
+      const pacientes = Storage.getPacientes();
+      const medicos = Storage.getMedicos();
+      const hoje = new Date();
+      
+      const proximas = agendamentos
+        .filter(a => new Date(a.data) >= hoje)
+        .sort((a, b) => new Date(a.data) - new Date(b.data))
+        .slice(0, 5);
+      
+      const lista = document.getElementById('proximasConsultasList');
+      if (!lista) return;
+      
+      if (proximas.length === 0) {
+        lista.innerHTML = '<p style="text-align:center; color: var(--cor-secundaria);">Nenhuma consulta agendada</p>';
+        return;
+      }
+      
+      lista.innerHTML = proximas.map(ag => {
+        const paciente = pacientes.find(p => p.id == ag.pacienteId);
+        const medico = medicos.find(m => m.id == ag.medicoId);
+        const data = new Date(ag.data);
+        
+        return `
+          <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--cor-card); border-radius: 12px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--cor-principal); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+              ${paciente?.nome?.charAt(0) || 'P'}
+            </div>
+            <div style="flex: 1;">
+              <strong>${paciente?.nome || 'Paciente'}</strong>
+              <div style="font-size: 0.9rem; color: var(--cor-secundaria);">
+                ${medico?.nome || 'Médico'} - ${data.toLocaleDateString('pt-BR')} ${ag.hora}
+              </div>
+            </div>
+            <span style="padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; background: var(--cor-principal); color: white;">
+              ${ag.status || 'agendado'}
+            </span>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    function configurarPerfil(user) {
+      const fotoInput = document.getElementById('fotoInput');
+      const perfilForm = document.getElementById('perfilForm');
+      const btnRemoverFoto = document.getElementById('btnRemoverFoto');
+      
+      // Carrega dados
+      const userNome = document.getElementById('userNome');
+      const userEmail = document.getElementById('userEmail');
+      const userTelefone = document.getElementById('userTelefone');
+      const userTipo = document.getElementById('userTipo');
+      const userNameDisplay = document.getElementById('userNameDisplay');
+      const userEmailDisplay = document.getElementById('userEmailDisplay');
+      
+      if (userNome) userNome.value = user.nome || '';
+      if (userEmail) userEmail.value = user.email || '';
+      if (userTelefone) userTelefone.value = user.telefone || '';
+      if (userTipo) userTipo.value = user.tipoClinica === 'medico' ? 'Médico' : user.tipoClinica === 'secretario' ? 'Secretário(a)' : 'Administrador';
+      if (userNameDisplay) userNameDisplay.textContent = user.nome;
+      if (userEmailDisplay) userEmailDisplay.textContent = user.email;
+      
+      // Foto
+      const fotoCustomizada = Storage.getFotoUsuario(user.id);
+      const fotoPreview = document.getElementById('fotoPreview');
+      const fotoPlaceholder = document.getElementById('fotoPlaceholder');
+      const fotoInicial = document.getElementById('fotoInicial');
+      
+      if (fotoCustomizada) {
+        if (fotoPreview) { fotoPreview.src = fotoCustomizada; fotoPreview.classList.add('visible'); }
+        if (fotoPlaceholder) fotoPlaceholder.classList.add('hidden');
+        if (btnRemoverFoto) btnRemoverFoto.style.display = 'inline-block';
+      } else {
+        if (fotoPreview) fotoPreview.classList.remove('visible');
+        if (fotoPlaceholder) fotoPlaceholder.classList.remove('hidden');
+        if (btnRemoverFoto) btnRemoverFoto.style.display = 'none';
+        if (fotoInicial) {
+          const iniciais = user.nome ? user.nome.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) : 'U';
+          fotoInicial.textContent = iniciais;
+        }
+      }
+      
+      // Upload foto
+      if (fotoInput) {
+        fotoInput.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          
+          if (!file.type.startsWith('image/')) {
+            alert('Por favor, selecione uma imagem válida!');
+            return;
+          }
+          
+          if (file.size > 5 * 1024 * 1024) {
+            alert('A imagem deve ter no máximo 5MB!');
+            return;
+          }
+          
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            const fotoUrl = ev.target.result;
+            if (fotoPreview) { fotoPreview.src = fotoUrl; fotoPreview.classList.add('visible'); }
+            if (fotoPlaceholder) fotoPlaceholder.classList.add('hidden');
+            if (btnRemoverFoto) btnRemoverFoto.style.display = 'inline-block';
+            
+            Storage.salvarFotoUsuario(user.id, fotoUrl);
+            if (typeof Notificacao !== 'undefined') {
+              Notificacao.show('Foto atualizada!', 'success');
+            }
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+      
+      // Remover foto
+      if (btnRemoverFoto) {
+        btnRemoverFoto.addEventListener('click', () => {
+          if (confirm('Deseja remover sua foto?')) {
+            if (fotoPreview) fotoPreview.classList.remove('visible');
+            if (fotoPlaceholder) fotoPlaceholder.classList.remove('hidden');
+            btnRemoverFoto.style.display = 'none';
+            
+            Storage.removerFotoUsuario(user.id);
+            alert('Foto removida!');
+          }
+        });
+      }
+      
+      // Submit do perfil
+      if (perfilForm) {
+        perfilForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          
+          const usuarios = Storage.getUsuarios();
+          const idx = usuarios.findIndex(u => u.id === user.id);
+          
+          if (idx !== -1) {
+            usuarios[idx].nome = userNome.value;
+            usuarios[idx].email = userEmail.value;
+            usuarios[idx].telefone = userTelefone.value;
+            
+            localStorage.setItem('CallMed_usuarios', JSON.stringify(usuarios));
+            
+            const usuarioAtualizado = usuarios[idx];
+            localStorage.setItem('usuarioLogado', JSON.stringify(usuarioAtualizado));
+            
+            if (userNameDisplay) userNameDisplay.textContent = usuarioAtualizado.nome;
+            if (userEmailDisplay) userEmailDisplay.textContent = usuarioAtualizado.email;
+            
+            alert('Perfil atualizado com sucesso!');
+          }
+        });
+      }
+    }
+    
+    function configurarTema() {
+      const themeSelect = document.getElementById('themeSelect');
+      if (!themeSelect) return;
+      
+      const config = Storage.getConfiguracoes();
+      themeSelect.value = config.tema;
+      
+      themeSelect.addEventListener('change', (e) => {
+        const novoTema = e.target.value;
+        document.documentElement.setAttribute('data-theme', novoTema);
+        
+        const novaConfig = Storage.getConfiguracoes();
+        novaConfig.tema = novoTema;
+        Storage.salvarConfiguracoes(novaConfig);
+        
+        window.dispatchEvent(new CustomEvent('temaAlterado', { detail: novoTema }));
+      });
+    }
+    
+    function configurarBackup() {
+      const btnExport = document.getElementById('btnExport');
+      const importInput = document.getElementById('importInput');
+      
+      if (btnExport) {
+        btnExport.addEventListener('click', () => {
+          if (typeof Backup !== 'undefined') {
+            Backup.export();
+          }
+        });
+      }
+      
+      if (importInput) {
+        importInput.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (file && typeof Backup !== 'undefined') {
+            Backup.import(file);
+          }
+        });
+      }
+    }
+    
+    function configurarModulosTabs() {
+      // Pacientes
+      const openModalPacienteBtn = document.getElementById('openModalPacienteBtn');
+      if (openModalPacienteBtn) {
+        openModalPacienteBtn.addEventListener('click', () => {
+          document.getElementById('modalPaciente').classList.add('active');
+          const form = document.getElementById('pacienteForm');
+          if (form) { form.reset(); delete form.dataset.editId; }
+        });
+      }
+      
+      // Médicos
+      const openModalMedicoBtn = document.getElementById('openModalMedicoBtn');
+      if (openModalMedicoBtn) {
+        openModalMedicoBtn.addEventListener('click', () => {
+          document.getElementById('modalMedico').classList.add('active');
+          const form = document.getElementById('medicoForm');
+          if (form) { form.reset(); delete form.dataset.editId; }
+          const title = document.getElementById('modalMedicoTitle');
+          if (title) title.textContent = 'Novo Médico';
+        });
+      }
+      
+      // Clínicas
+      const openModalClinicaBtn = document.getElementById('openModalClinicaBtn');
+      if (openModalClinicaBtn) {
+        openModalClinicaBtn.addEventListener('click', () => {
+          document.getElementById('modalClinica').classList.add('active');
+          const form = document.getElementById('clinicaForm');
+          if (form) { form.reset(); delete form.dataset.editId; }
+          const title = document.getElementById('modalClinicaTitle');
+          if (title) title.textContent = 'Nova Clínica';
+        });
+      }
+      
+      // Especialidades
+      const openModalEspecialidadeBtn = document.getElementById('openModalEspecialidadeBtn');
+      if (openModalEspecialidadeBtn) {
+        openModalEspecialidadeBtn.addEventListener('click', () => {
+          document.getElementById('modalEspecialidade').classList.add('active');
+          const form = document.getElementById('especialidadeForm');
+          if (form) { form.reset(); delete form.dataset.editId; }
+          const title = document.getElementById('modalEspecialidadeTitle');
+          if (title) title.textContent = 'Nova Especialidade';
+        });
+      }
+      
+      // Agendamento
+      const openModalAgendamentoBtn = document.getElementById('openModalAgendamentoBtn');
+      if (openModalAgendamentoBtn) {
+        openModalAgendamentoBtn.addEventListener('click', () => {
+          document.getElementById('modalAgendamento').classList.add('active');
+          if (typeof Agendamento !== 'undefined' && Agendamento.carregarSelects) {
+            Agendamento.carregarSelects();
+          }
+        });
+      }
+      
+      // Fecha modais
+      document.querySelectorAll('.modal-close').forEach(btn => {
+        btn.addEventListener('click', () => {
+          btn.closest('.modal').classList.remove('active');
+        });
+      });
+      
+      // Fechar ao clicar fora
+      document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) modal.classList.remove('active');
+        });
+      });
+    }
+  </script>
+</body>
+</html>

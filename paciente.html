@@ -1,0 +1,1769 @@
+/* ===========================================================
+   CallMed -  paciente.html
+   =========================================================== */
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="manifest" href="pwa/manifest.json">
+  <meta name="theme-color" content="#007bff">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CallMed - Área do Paciente</title>
+
+  <!-- Favicons -->
+<link rel="icon" type="image/png" sizes="72x72" href="assets/images/icon-72x72.png">
+<link rel="icon" type="image/png" sizes="96x96" href="assets/images/icon-96x96.png">
+<link rel="icon" type="image/png" sizes="128x128" href="assets/images/icon-128x128.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/images/icon-192x192.png">
+<link rel="apple-touch-icon" sizes="152x152" href="assets/images/icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/images/icon-152x152.png">
+<link rel="manifest" href="pwa/manifest.json">
+
+  <link rel="stylesheet" href="css/styles.css">
+  
+  <style>
+    /* ============================================
+       TAB CONTENT
+       ============================================ */
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease-in;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* ============================================
+       ESTILOS ESPECÍFICOS DO PACIENTE
+       ============================================ */
+    
+    /* Welcome */
+    .welcome-section {
+      display: flex;
+      align-items: center;
+      gap: var(--espaco-lg);
+      margin-bottom: var(--espaco-xl);
+      flex-wrap: wrap;
+    }
+    
+    .foto-grande {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 4px solid var(--cor-principal);
+      overflow: hidden;
+      position: relative;
+      flex-shrink: 0;
+    }
+    
+    .foto-grande img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    /* Quick Actions */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--espaco-md);
+      margin-bottom: var(--espaco-xl);
+    }
+    
+    .action-card {
+      background: var(--cor-card);
+      padding: var(--espaco-lg);
+      border-radius: var(--radius-lg);
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      border: 2px solid transparent;
+    }
+    
+    .action-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--cor-principal);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .action-card h3 {
+      color: var(--cor-principal);
+      margin-bottom: 5px;
+      font-size: 1.1rem;
+    }
+    
+    .action-card p {
+      color: var(--cor-secundaria);
+      font-size: 0.9rem;
+      margin: 0;
+    }
+    
+    /* Consulta Card */
+    .consulta-card {
+      background: var(--cor-card);
+      padding: var(--espaco-lg);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--espaco-md);
+      border-left: 4px solid var(--cor-principal);
+      transition: transform var(--transition-fast);
+    }
+    
+    .consulta-card:hover {
+      transform: translateX(5px);
+    }
+    
+    .consulta-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--espaco-sm);
+      flex-wrap: wrap;
+      gap: var(--espaco-sm);
+    }
+    
+    .consulta-status {
+      padding: var(--espaco-xs) var(--espaco-sm);
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    
+    .status-agendado { background: #d4edda; color: #155724; }
+    .status-concluido { background: #d1ecf1; color: #0c5460; }
+    .status-cancelado { background: #f8d7da; color: #721c24; }
+    .status-pendente { background: #fff3cd; color: #856404; }
+    
+    .consulta-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--espaco-md);
+      margin-top: var(--espaco-md);
+      padding-top: var(--espaco-md);
+      border-top: 1px solid var(--cor-borda);
+    }
+    
+    .detail-item {
+      display: flex;
+      align-items: center;
+      gap: var(--espaco-sm);
+    }
+    
+    /* Filtros */
+    .filtros-consultas {
+      background: var(--cor-card);
+      padding: var(--espaco-lg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      margin-bottom: var(--espaco-lg);
+    }
+    
+    .filtros-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--espaco-md);
+      align-items: end;
+    }
+    
+    /* Médicos Grid */
+    .medicos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: var(--espaco-lg);
+      margin-top: var(--espaco-lg);
+    }
+    
+    .medico-card {
+      background: var(--cor-card);
+      border-radius: var(--radius-lg);
+      padding: var(--espaco-lg);
+      text-align: center;
+      transition: all var(--transition-fast);
+      border: 2px solid transparent;
+    }
+    
+    .medico-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--cor-principal);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .medico-foto {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin: 0 auto var(--espaco-md);
+      background: var(--cor-principal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: bold;
+      color: white;
+    }
+    
+    .medico-especialidade {
+      color: var(--cor-principal);
+      font-weight: 600;
+      margin: var(--espaco-xs) 0;
+    }
+    
+    .medico-details {
+      margin: var(--espaco-md) 0;
+      text-align: left;
+    }
+    
+    /* Agendamento em passos */
+    .agendamento-container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .agendamento-card {
+      background: var(--cor-card);
+      padding: var(--espaco-xl);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .passo-indicador {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: var(--espaco-xl);
+      position: relative;
+    }
+    
+    .passo-indicador::before {
+      content: '';
+      position: absolute;
+      top: 15px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--cor-borda);
+      z-index: 1;
+    }
+    
+    .passo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .passo-numero {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--cor-borda);
+      color: var(--cor-texto);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-bottom: var(--espaco-xs);
+    }
+    
+    .passo.ativo .passo-numero {
+      background: var(--cor-principal);
+      color: white;
+    }
+    
+    .passo.concluido .passo-numero {
+      background: var(--cor-sucesso);
+      color: white;
+    }
+    
+    .passo-texto {
+      font-size: 0.8rem;
+      text-align: center;
+    }
+    
+    .passo-conteudo {
+      display: none;
+    }
+    
+    .passo-conteudo.ativo {
+      display: block;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    .horarios-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      gap: var(--espaco-sm);
+      margin-top: var(--espaco-md);
+    }
+    
+    .horario-btn {
+      padding: var(--espaco-sm);
+      border: 2px solid var(--cor-borda);
+      border-radius: var(--radius-md);
+      background: var(--cor-card);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      text-align: center;
+    }
+    
+    .horario-btn:hover {
+      border-color: var(--cor-principal);
+    }
+    
+    .horario-btn.selecionado {
+      background: var(--cor-principal);
+      color: white;
+      border-color: var(--cor-principal);
+    }
+    
+    .horario-btn.ocupado {
+      background: var(--cor-erro);
+      color: white;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    
+    .resumo-consulta {
+      background: var(--cor-fundo);
+      padding: var(--espaco-lg);
+      border-radius: var(--radius-lg);
+      margin-top: var(--espaco-lg);
+    }
+    
+    .resumo-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: var(--espaco-sm);
+      padding-bottom: var(--espaco-sm);
+      border-bottom: 1px solid var(--cor-borda);
+    }
+    
+    .nav-botoes {
+      display: flex;
+      justify-content: space-between;
+      margin-top: var(--espaco-xl);
+    }
+    
+    /* Chatbot */
+    .chatbot-container {
+      max-width: 1050px;
+      margin: 0 auto;
+      background: var(--cor-card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      height: 80vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .chatbot-header {
+      background: var(--cor-principal);
+      color: white;
+      padding: var(--espaco-md);
+      display: flex;
+      align-items: center;
+      gap: var(--espaco-sm);
+    }
+    
+    .chat-messages {
+      flex: 1;
+      padding: var(--espaco-md);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--espaco-sm);
+    }
+    
+    .message {
+      max-width: 80%;
+      padding: var(--espaco-sm) var(--espaco-md);
+      border-radius: var(--radius-lg);
+      line-height: 1.4;
+      font-size: 0.9rem;
+    }
+    
+    .message.bot {
+      background: var(--cor-fundo);
+      border: 1px solid var(--cor-borda);
+      align-self: flex-start;
+    }
+    
+    .message.user {
+      background: var(--cor-principal);
+      color: white;
+      align-self: flex-end;
+    }
+    
+    .chat-input-container {
+      padding: var(--espaco-md);
+      border-top: 1px solid var(--cor-borda);
+    }
+    
+    .chat-input-form {
+      display: flex;
+      gap: var(--espaco-sm);
+    }
+    
+    .chat-input {
+      flex: 1;
+      padding: var(--espaco-sm);
+      border: 1px solid var(--cor-borda);
+      border-radius: var(--radius-md);
+      resize: none;
+      min-height: 45px;
+    }
+    
+    .send-btn {
+      background: var(--cor-principal);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: var(--espaco-sm) var(--espaco-md);
+      cursor: pointer;
+    }
+    
+    /* Perfil */
+    .perfil-section {
+      background: var(--cor-card);
+      padding: var(--espaco-lg);
+      border-radius: var(--radius-lg);
+      margin: var(--espaco-lg) auto;
+      border: 1px solid var(--cor-borda);
+      max-width: 800px;
+    }
+    
+    .perfil-header {
+      text-align: center;
+      margin-bottom: var(--espaco-lg);
+    }
+    
+    .perfil-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: var(--espaco-md);
+      margin-bottom: var(--espaco-xl);
+    }
+    
+    .stat-card {
+      background: var(--cor-card);
+      padding: var(--espaco-lg);
+      border-radius: var(--radius-lg);
+      text-align: center;
+      border-left: 4px solid var(--cor-principal);
+    }
+    
+    .stat-number {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--cor-principal);
+      display: block;
+    }
+    
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--cor-secundaria);
+    }
+    
+    /* Configurações */
+    .config-section {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .config-item {
+      background: var(--cor-card);
+      padding: var(--espaco-lg);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--espaco-lg);
+      border: 1px solid var(--cor-borda);
+      text-align: center;
+    }
+    
+    /* Ajuda */
+    .ajuda-container {
+      background: var(--cor-card);
+      padding: var(--espaco-xl);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .faq-item {
+      margin-bottom: var(--espaco-xl);
+      padding: var(--espaco-lg);
+      background: #f8f9fa;
+      border-radius: var(--radius-md);
+      border-left: 4px solid var(--cor-principal);
+    }
+    
+    .faq-item h4 {
+      color: var(--cor-principal);
+      margin-bottom: var(--espaco-sm);
+    }
+    
+    /* Modal */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 200;
+      padding: var(--espaco-md);
+    }
+    
+    .modal.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: var(--cor-card);
+      padding: var(--espaco-lg);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+    
+    .modal-close {
+      position: absolute;
+      top: var(--espaco-md);
+      right: var(--espaco-md);
+      cursor: pointer;
+      font-size: 1.5rem;
+      background: none;
+      border: none;
+      color: var(--cor-secundaria);
+    }
+    
+    /* Chatbot Flutuante */
+    .chatbot-fixed {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background: var(--cor-principal);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-lg);
+      cursor: pointer;
+      z-index: 1000;
+      transition: transform 0.2s;
+    }
+    
+    .chatbot-fixed:hover {
+      transform: scale(1.1);
+    }
+    
+    /* Responsividade */
+    @media (max-width: 768px) {
+      .welcome-section {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .medicos-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .filtros-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .chatbot-fixed {
+        bottom: 15px;
+        right: 15px;
+      }
+    }
+  </style>
+</head>
+<body data-tipo="paciente">
+
+  <!-- Header (injetado pelo components.js) -->
+  <div id="header-placeholder"></div>
+  
+  <!-- Conteúdo das Tabs -->
+  <main class="container">
+    
+    <!-- ============================================ -->
+    <!-- TAB: DASHBOARD                                -->
+    <!-- ============================================ -->
+    <div class="tab-content active" id="tab-dashboard">
+      <section class="welcome-section">
+        <div class="foto-grande">
+          <img id="userPhoto" alt="Foto do paciente" src="assets/images/avatar.png">
+        </div>
+        <div>
+          <h1>Olá, <span id="userWelcomeName">Usuário</span>!</h1>
+          <p>Gerencie suas consultas e saúde de forma simples</p>
+        </div>
+      </section>
+      
+      <section class="quick-actions">
+        <div class="action-card" onclick="Tabs.irPara('agendar')">
+          <h3>Agendar Consulta</h3>
+          <p>Marque uma nova consulta</p>
+        </div>
+        
+        <div class="action-card" onclick="Tabs.irPara('consultas')">
+          <h3>Minhas Consultas</h3>
+          <p>Ver histórico e próximas</p>
+        </div>
+        
+        <div class="action-card" onclick="Tabs.irPara('medicos')">
+          <h3>Médicos</h3>
+          <p>Encontre especialistas</p>
+        </div>
+        
+        <div class="action-card" onclick="Tabs.irPara('chatbot')">
+          <h3>Assistente</h3>
+          <p>Tire suas dúvidas</p>
+        </div>
+      </section>
+      
+      <section style="margin-bottom: var(--espaco-xl);">
+        <h2 style="color: var(--cor-principal); margin-bottom: var(--espaco-lg);">Próximas Consultas</h2>
+        <div id="proximasConsultasList"></div>
+      </section>
+      
+      <section>
+        <h2 style="color: var(--cor-principal); margin-bottom: var(--espaco-lg);">Histórico Recente</h2>
+        <div id="historicoList"></div>
+      </section>
+    </div>
+    
+    <!-- ============================================ -->
+    <!-- TAB: CONSULTAS                                -->
+    <!-- ============================================ -->
+    <div class="tab-content" id="tab-consultas">
+      <div class="page-header">
+        <h1>Minhas Consultas</h1>
+        <p>Gerencie todas as suas consultas agendadas</p>
+      </div>
+      
+      <section class="filtros-consultas">
+        <div class="filtros-grid">
+          <div class="form-group">
+            <label for="filtroData">Filtrar por Data</label>
+            <input type="date" id="filtroData">
+          </div>
+          
+          <div class="form-group">
+            <label for="filtroMedico">Filtrar por Médico</label>
+            <select id="filtroMedico">
+              <option value="">Todos os médicos</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="filtroStatus">Filtrar por Status</label>
+            <select id="filtroStatus">
+              <option value="">Todos os status</option>
+              <option value="agendado">Agendadas</option>
+              <option value="concluido">Concluídas</option>
+              <option value="cancelado">Canceladas</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <button type="button" class="btn-primary" id="btnAplicarFiltros">Aplicar Filtros</button>
+            <button type="button" class="btn-limpar" id="btnLimparFiltros">Limpar</button>
+          </div>
+        </div>
+      </section>
+      
+      <section id="consultasContainer"></section>
+    </div>
+    
+    <!-- ============================================ -->
+    <!-- TAB: MÉDICOS                                  -->
+    <!-- ============================================ -->
+    <div class="tab-content" id="tab-medicos">
+      <div class="page-header">
+        <h1>Nossos Médicos</h1>
+        <p>Encontre o especialista ideal para sua necessidade</p>
+      </div>
+      
+      <section style="background: var(--cor-card); padding: var(--espaco-lg); border-radius: var(--radius-lg); margin-bottom: var(--espaco-lg);">
+        <div class="filtros-grid">
+          <div class="form-group">
+            <label for="filtroEspecialidade">Especialidade</label>
+            <select id="filtroEspecialidade">
+              <option value="">Todas as especialidades</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="filtroNomeMedico">Nome do Médico</label>
+            <input type="text" id="filtroNomeMedico" placeholder="Buscar por nome...">
+          </div>
+          
+          <div class="form-group">
+            <button type="button" class="btn-primary" id="btnBuscarMedicos">Buscar</button>
+            <button type="button" class="btn-limpar" id="btnLimparMedicos">Limpar</button>
+          </div>
+        </div>
+      </section>
+      
+      <section class="medicos-grid" id="medicosGrid"></section>
+    </div>
+    
+    <!-- ============================================ -->
+    <!-- TAB: AGENDAR                                  -->
+    <!-- ============================================ -->
+    <div class="tab-content" id="tab-agendar">
+      <div class="page-header">
+        <h1>Agendar Nova Consulta</h1>
+        <p>Siga os passos para agendar sua consulta</p>
+      </div>
+      
+      <div class="agendamento-container">
+        <div class="agendamento-card">
+          <!-- Indicador de Passos -->
+          <div class="passo-indicador">
+            <div class="passo ativo" data-passo="1">
+              <div class="passo-numero">1</div>
+              <div class="passo-texto">Médico</div>
+            </div>
+            <div class="passo" data-passo="2">
+              <div class="passo-numero">2</div>
+              <div class="passo-texto">Data</div>
+            </div>
+            <div class="passo" data-passo="3">
+              <div class="passo-numero">3</div>
+              <div class="passo-texto">Horário</div>
+            </div>
+            <div class="passo" data-passo="4">
+              <div class="passo-numero">4</div>
+              <div class="passo-texto">Confirmar</div>
+            </div>
+          </div>
+          
+          <!-- Passo 1: Médico -->
+          <div class="passo-conteudo ativo" id="passo1">
+            <h3>Selecione o Médico</h3>
+            <p>Escolha o médico e especialidade desejada</p>
+            
+            <div class="form-group">
+              <label for="selectEspecialidade">Especialidade</label>
+              <select id="selectEspecialidade" required>
+                <option value="">Selecione uma especialidade</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="selectMedico">Médico</label>
+              <select id="selectMedico" required disabled>
+                <option value="">Primeiro selecione uma especialidade</option>
+              </select>
+            </div>
+            
+            <div id="infoMedico" style="display: none; margin-top: var(--espaco-lg); padding: var(--espaco-md); background: var(--cor-fundo); border-radius: var(--radius-md);">
+              <h4>Informações do Médico</h4>
+              <div id="detalhesMedico"></div>
+            </div>
+          </div>
+          
+          <!-- Passo 2: Data -->
+          <div class="passo-conteudo" id="passo2">
+            <h3>Escolha a Data</h3>
+            <p>Selecione uma data disponível para a consulta</p>
+            
+            <div class="form-group">
+              <label for="selectData">Data da Consulta</label>
+              <input type="date" id="selectData" required>
+            </div>
+            
+            <div style="margin-top: var(--espaco-md); padding: var(--espaco-md); background: var(--cor-aviso); color: #000; border-radius: var(--radius-md);">
+              <small><strong>Horários:</strong> Segunda a Sexta: 8h-18h, Sábados: 8h-12h</small>
+            </div>
+          </div>
+          
+          <!-- Passo 3: Horário -->
+          <div class="passo-conteudo" id="passo3">
+            <h3>Selecione o Horário</h3>
+            <p>Escolha um horário disponível</p>
+            
+            <div id="loadingHorarios" style="text-align: center; padding: var(--espaco-xl);">Carregando horários...</div>
+            <div id="horariosContainer" style="display: none;">
+              <div class="horarios-grid" id="gridHorarios"></div>
+            </div>
+            <div id="semHorarios" style="display: none; text-align: center; padding: var(--espaco-xl);">
+              <p>Nenhum horário disponível para esta data.</p>
+              <p>Por favor, selecione outra data.</p>
+            </div>
+          </div>
+          
+          <!-- Passo 4: Confirmar -->
+          <div class="passo-conteudo" id="passo4">
+            <h3>Confirme seu Agendamento</h3>
+            <p>Revise as informações antes de confirmar</p>
+            
+            <div class="resumo-consulta">
+              <div class="resumo-item">
+                <span>Médico:</span>
+                <span id="resumoMedico">-</span>
+              </div>
+              <div class="resumo-item">
+                <span>Data:</span>
+                <span id="resumoData">-</span>
+              </div>
+              <div class="resumo-item">
+                <span>Horário:</span>
+                <span id="resumoHorario">-</span>
+              </div>
+              <div class="resumo-item">
+                <span>Especialidade:</span>
+                <span id="resumoEspecialidade">-</span>
+              </div>
+            </div>
+            
+            <div class="form-group" style="margin-top: var(--espaco-lg);">
+              <label for="observacoes">Observações (opcional)</label>
+              <textarea id="observacoes" placeholder="Alguma observação importante para o médico..." style="width: 100%; padding: 10px; border: 1px solid var(--cor-borda); border-radius: 8px; min-height: 80px;"></textarea>
+            </div>
+          </div>
+          
+          <!-- Navegação -->
+          <div class="nav-botoes">
+            <button type="button" class="btn-secondary" id="btnVoltar" style="display: none;">Voltar</button>
+            <button type="button" class="btn-primary" id="btnAvancar">Avançar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ============================================ -->
+    <!-- TAB: CHATBOT                                  -->
+    <!-- ============================================ -->
+    <div class="tab-content" id="tab-chatbot">
+      <div class="chatbot-container">
+        <div class="chatbot-header">
+          <img src="assets/images/chatbot.png" alt="Chatbot" style="width: 40px; height: 40px;">
+          <div>
+            <h2 style="margin: 0; font-size: 1.2rem;">Assistente Virtual</h2>
+            <p style="margin: 0; font-size: 0.8rem; opacity: 0.9;">Como posso ajudar você hoje?</p>
+          </div>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages"></div>
+        
+        <div class="chat-input-container">
+          <form id="chatForm" class="chat-input-form">
+            <textarea class="chat-input" id="messageInput" placeholder="Digite sua mensagem..." rows="1" required></textarea>
+            <button type="submit" class="send-btn">Enviar</button>
+          </form>
+          
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 15px;">
+            <button class="category-btn" data-category="agendamento" style="background: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 8px; padding: 10px; cursor: pointer;">Agendamento</button>
+            <button class="category-btn" data-category="medicos" style="background: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 8px; padding: 10px; cursor: pointer;">Médicos</button>
+            <button class="category-btn" data-category="matchmaking" style="background: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 8px; padding: 10px; cursor: pointer;">Matchmaking</button>
+            <button class="category-btn" data-category="duvidas" style="background: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 8px; padding: 10px; cursor: pointer;">Dúvidas</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ============================================ -->
+    <!-- TAB: PERFIL                                   -->
+    <!-- ============================================ -->
+    <div class="tab-content" id="tab-perfil">
+      <section class="page-header">
+        <h1>Meu Perfil</h1>
+        <p>Gerencie suas informações pessoais</p>
+      </section>
+      
+      <div class="perfil-section">
+        <div class="perfil-header">
+          <div class="foto-grande" id="fotoPerfilContainer" style="margin: 0 auto 15px; cursor: pointer;">
+            <img id="fotoPerfil" src="assets/images/avatar.png" alt="Foto do perfil">
+            <input type="file" id="fotoInput" accept="image/*" style="display: none;">
+          </div>
+          <h2 id="nomeUsuarioPerfil">Carregando...</h2>
+          <p id="emailUsuarioPerfil">carregando...</p>
+          <p id="tipoUsuarioPerfil">Paciente</p>
+        </div>
+        
+        <div class="perfil-stats">
+          <div class="stat-card">
+            <span class="stat-number" id="totalConsultasPerfil">0</span>
+            <span class="stat-label">Total de Consultas</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number" id="consultasAgendadasPerfil">0</span>
+            <span class="stat-label">Próximas Consultas</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number" id="consultasConcluidasPerfil">0</span>
+            <span class="stat-label">Consultas Concluídas</span>
+          </div>
+        </div>
+        
+        <form id="formPerfil" style="max-width: 600px; margin: 0 auto;">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="inputNomePerfil">Nome Completo</label>
+              <input type="text" id="inputNomePerfil" required>
+            </div>
+            <div class="form-group">
+              <label for="inputEmailPerfil">E-mail</label>
+              <input type="email" id="inputEmailPerfil" required>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="inputTelefonePerfil">Telefone</label>
+              <input type="text" id="inputTelefonePerfil" placeholder="(11) 99999-9999">
+            </div>
+            <div class="form-group">
+              <label for="inputNascimentoPerfil">Data de Nascimento</label>
+              <input type="date" id="inputNascimentoPerfil">
+            </div>
+          </div>
+          
+          <div style="text-align: center; margin-top: 20px;">
+            <button type="submit" class="btn-primary">Salvar Alterações</button>
+            <button type="button" class="btn-delete" id="btnRemoverFotoPerfil" style="display: none; margin-left: 10px;">Remover Foto</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- ============================================ -->
+    <!-- TAB: CONFIGURAÇÕES                            -->
+    <!-- ============================================ -->
+    <div class="tab-content" id="tab-configuracoes">
+      <section class="page-header">
+        <h1>Configurações</h1>
+        <p>Personalize sua experiência no CallMed</p>
+      </section>
+      
+      <section class="config-section">
+        <div class="config-item">
+          <h3>Tema da Aplicação</h3>
+          <select id="themeSelect" style="max-width: 300px; margin: 0 auto; padding: 10px; border-radius: 8px;">
+            <option value="light">Claro</option>
+            <option value="dark">Escuro</option>
+            <option value="blue">Azul</option>
+            <option value="green">Verde</option>
+          </select>
+        </div>
+        
+        <div class="config-item">
+          <h3>Notificações</h3>
+          <label>
+            <input type="checkbox" id="notifToggle"> Ativar notificações
+          </label>
+          <label style="display: block; margin-top: 10px;">
+            <input type="checkbox" id="notifLembretes" checked> Receber lembretes 24h antes
+          </label>
+        </div>
+        
+        <div class="config-item">
+          <h3>Segurança</h3>
+          <div class="form-group">
+            <label for="senhaAtual">Senha Atual</label>
+            <input type="password" id="senhaAtual" placeholder="Digite sua senha atual">
+          </div>
+          <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="form-group">
+              <label for="novaSenha">Nova Senha</label>
+              <input type="password" id="novaSenha" placeholder="Nova senha">
+            </div>
+            <div class="form-group">
+              <label for="confirmarSenha">Confirmar Senha</label>
+              <input type="password" id="confirmarSenha" placeholder="Repita a nova senha">
+            </div>
+          </div>
+          <button type="button" class="btn-primary" id="btnAlterarSenha" style="margin-top: 15px;">Alterar Senha</button>
+        </div>
+        
+        <div class="config-item">
+          <h3>Backup de Dados</h3>
+          <p>Exporte seus dados para backup</p>
+          <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 15px;">
+            <button type="button" class="btn-primary" id="btnExportPaciente">Exportar Backup</button>
+          </div>
+        </div>
+      </section>
+    </div>
+    
+    <!-- ============================================ -->
+    <!-- TAB: AJUDA                                    -->
+    <!-- ============================================ -->
+    <div class="tab-content" id="tab-ajuda">
+      <section class="page-header">
+        <h1>Central de Ajuda</h1>
+        <p>Encontre respostas rápidas para suas dúvidas</p>
+      </section>
+      
+      <section class="ajuda-container">
+        <h3>Bem-vindo à CallMed!</h3>
+        <p>Nosso sistema foi desenvolvido para simplificar o agendamento e acompanhamento das suas consultas médicas.</p>
+        
+        <div class="faq-item">
+          <h4>Como agendar uma consulta?</h4>
+          <p>Acesse a aba "Agendar", escolha o médico, selecione data e horário, e confirme o agendamento.</p>
+        </div>
+        
+        <div class="faq-item">
+          <h4>Como ver minhas consultas?</h4>
+          <p>Na aba "Minhas Consultas" você encontra todas as consultas futuras e o histórico completo.</p>
+        </div>
+        
+        <div class="faq-item">
+          <h4>Como cancelar uma consulta?</h4>
+          <p>Vá em "Minhas Consultas", encontre a consulta e clique em "Cancelar". Cancelamentos devem ser feitos com 24h de antecedência.</p>
+        </div>
+        
+        <div class="faq-item">
+          <h4>Como encontrar um médico?</h4>
+          <p>Na aba "Médicos" você pode buscar por especialidade, nome ou ver todos os profissionais disponíveis.</p>
+        </div>
+        
+        <div class="faq-item">
+          <h4>Para que serve o assistente virtual?</h4>
+          <p>O assistente pode tirar dúvidas, ajudar no agendamento, e usar o Matchmaking Inteligente para recomendar o médico ideal.</p>
+        </div>
+        
+        <div style="background: linear-gradient(135deg, var(--cor-principal), #0056b3); color: white; padding: 30px; border-radius: 15px; margin-top: 30px; text-align: center;">
+          <h3 style="color: white;">Precisa de mais ajuda?</h3>
+          <p style="color: white;">Nossa equipe está sempre disponível</p>
+          <div style="font-size: 1.2rem; font-weight: 600; margin: 15px 0;">suporte@CallMed.com</div>
+          <a href="mailto:suporte@CallMed.com" style="background: white; color: var(--cor-principal); padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;">Enviar E-mail</a>
+        </div>
+      </section>
+    </div>
+    
+  </main>
+  
+  <!-- Botão Flutuante do Chatbot -->
+  <div class="chatbot-fixed" onclick="Tabs.irPara('chatbot')">
+    <img src="assets/images/chatbot.png" alt="Chatbot" style="width: 30px; height: 30px;">
+  </div>
+  
+  <!-- Modal Cancelamento -->
+  <div class="modal" id="modalCancelar">
+    <div class="modal-content">
+      <button class="modal-close" id="closeModalCancelarBtn">&times;</button>
+      <h3>Cancelar Consulta</h3>
+      <p id="cancelarTexto">Tem certeza que deseja cancelar esta consulta?</p>
+      <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+        <button class="btn-delete" id="btnConfirmarCancelar">Sim, Cancelar</button>
+        <button class="btn-secondary" id="btnCancelarAcao">Manter Consulta</button>
+      </div>
+    </div>
+  </div>
+  
+  <div id="footer-placeholder"></div>
+  
+  <!-- ============================================ -->
+  <!-- SCRIPTS                                       -->
+  <!-- ============================================ -->
+  <script src="js/components.js"></script>
+  <script src="js/tabs.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/crud.js"></script>
+  <script src="js/agendamento.js"></script>
+  <script src="js/features.js"></script>
+  
+  <script>
+    // ============================================
+    // INICIALIZAÇÃO ESPECÍFICA DA PÁGINA PACIENTE
+    // ============================================
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('Paciente inicializando...');
+      
+      // Verifica login
+      const user = Storage.getUsuarioLogado();
+      if (!user) {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      if (user.tipo !== 'paciente') {
+        window.location.href = 'admin.html';
+        return;
+      }
+      
+      // Aplica tema
+      const config = Storage.getConfiguracoes();
+      document.documentElement.setAttribute('data-theme', config.tema);
+      
+      // Atualiza dados do usuário
+      const userWelcomeName = document.getElementById('userWelcomeName');
+      if (userWelcomeName) userWelcomeName.textContent = user.nome;
+      
+      // Carrega foto
+      const fotoCustomizada = Storage.getFotoUsuario(user.id);
+      const userPhoto = document.getElementById('userPhoto');
+      if (userPhoto) {
+        userPhoto.src = fotoCustomizada || 'assets/images/avatar.png';
+      }
+      
+      // Carrega dados do paciente
+      carregarDadosPaciente(user);
+      
+      // Configura as tabs específicas
+      configurarTabsPaciente();
+      
+      // Configura o agendamento em passos
+      inicializarAgendamento();
+    });
+    
+    function carregarDadosPaciente(user) {
+      // Busca paciente
+      let paciente = Storage.getPacientePorUsuarioId(user.id);
+      if (!paciente) {
+        paciente = Storage.criarPacienteParaUsuario(user.id, {
+          nome: user.nome,
+          email: user.email,
+          telefone: user.telefone || '',
+          dataNascimento: ''
+        });
+      }
+      
+      // Carrega próximas consultas e histórico
+      carregarConsultasPacienteDashboard(paciente.id);
+      
+      // Atualiza perfil
+      carregarPerfilPaciente(user, paciente);
+    }
+    
+    function carregarConsultasPacienteDashboard(pacienteId) {
+      const agendamentos = Storage.getAgendamentos();
+      const medicos = Storage.getMedicos();
+      
+      const consultasPaciente = agendamentos.filter(a => a.pacienteId == pacienteId);
+      const hoje = new Date();
+      
+      const proximas = consultasPaciente
+        .filter(a => new Date(a.data) >= hoje)
+        .sort((a, b) => new Date(a.data) - new Date(b.data))
+        .slice(0, 3);
+      
+      const historico = consultasPaciente
+        .filter(a => new Date(a.data) < hoje)
+        .sort((a, b) => new Date(b.data) - new Date(a.data))
+        .slice(0, 5);
+      
+      // Renderiza próximas
+      const proximasList = document.getElementById('proximasConsultasList');
+      if (proximasList) {
+        if (proximas.length === 0) {
+          proximasList.innerHTML = `
+            <div class="consulta-card">
+              <p style="text-align: center; color: var(--cor-secundaria);">Nenhuma consulta agendada</p>
+              <p style="text-align: center; margin-top: 10px;">
+                <a href="#" onclick="event.preventDefault(); Tabs.irPara('agendar')" style="color: var(--cor-principal);">Agendar minha primeira consulta</a>
+              </p>
+            </div>
+          `;
+        } else {
+          proximasList.innerHTML = proximas.map(consulta => {
+            const medico = medicos.find(m => m.id == consulta.medicoId);
+            const data = new Date(consulta.data);
+            
+            return `
+              <div class="consulta-card">
+                <div class="consulta-header">
+                  <h4>${medico?.nome || 'Médico'} - ${medico?.especialidade || 'Consulta'}</h4>
+                  <span class="consulta-status status-agendado">${consulta.status || 'Agendado'}</span>
+                </div>
+                <p>${data.toLocaleDateString('pt-BR')} - ${consulta.hora || '--:--'}</p>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+      
+      // Renderiza histórico
+      const historicoList = document.getElementById('historicoList');
+      if (historicoList) {
+        if (historico.length === 0) {
+          historicoList.innerHTML = '<div class="consulta-card"><p style="text-align: center; color: var(--cor-secundaria);">Nenhum histórico de consultas</p></div>';
+        } else {
+          historicoList.innerHTML = historico.map(consulta => {
+            const medico = medicos.find(m => m.id == consulta.medicoId);
+            const data = new Date(consulta.data);
+            
+            return `
+              <div class="consulta-card">
+                <div class="consulta-header">
+                  <h4>${medico?.nome || 'Médico'}</h4>
+                  <span class="consulta-status status-concluido">Concluída</span>
+                </div>
+                <p>${data.toLocaleDateString('pt-BR')} - ${consulta.hora || '--:--'}</p>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+    }
+    
+    function carregarPerfilPaciente(user, paciente) {
+      // Perfil
+      const nomeUsuarioPerfil = document.getElementById('nomeUsuarioPerfil');
+      const emailUsuarioPerfil = document.getElementById('emailUsuarioPerfil');
+      const inputNomePerfil = document.getElementById('inputNomePerfil');
+      const inputEmailPerfil = document.getElementById('inputEmailPerfil');
+      const inputTelefonePerfil = document.getElementById('inputTelefonePerfil');
+      const inputNascimentoPerfil = document.getElementById('inputNascimentoPerfil');
+      
+      if (nomeUsuarioPerfil) nomeUsuarioPerfil.textContent = user.nome;
+      if (emailUsuarioPerfil) emailUsuarioPerfil.textContent = user.email;
+      if (inputNomePerfil) inputNomePerfil.value = user.nome;
+      if (inputEmailPerfil) inputEmailPerfil.value = user.email;
+      if (inputTelefonePerfil) inputTelefonePerfil.value = user.telefone || '';
+      if (inputNascimentoPerfil) inputNascimentoPerfil.value = paciente.dataNascimento || '';
+      
+      // Foto
+      const fotoCustomizada = Storage.getFotoUsuario(user.id);
+      const fotoPerfil = document.getElementById('fotoPerfil');
+      const btnRemoverFoto = document.getElementById('btnRemoverFotoPerfil');
+      
+      if (fotoCustomizada && fotoPerfil) {
+        fotoPerfil.src = fotoCustomizada;
+        if (btnRemoverFoto) btnRemoverFoto.style.display = 'inline-block';
+      }
+      
+      // Stats
+      const agendamentos = Storage.getAgendamentos();
+      const consultasPaciente = agendamentos.filter(a => a.pacienteId == paciente.id);
+      const hoje = new Date();
+      
+      const totalEl = document.getElementById('totalConsultasPerfil');
+      const agendadasEl = document.getElementById('consultasAgendadasPerfil');
+      const concluidasEl = document.getElementById('consultasConcluidasPerfil');
+      
+      if (totalEl) totalEl.textContent = consultasPaciente.length;
+      if (agendadasEl) agendadasEl.textContent = consultasPaciente.filter(a => new Date(a.data) >= hoje).length;
+      if (concluidasEl) concluidasEl.textContent = consultasPaciente.filter(a => new Date(a.data) < hoje).length;
+      
+      // Upload foto
+      const fotoContainer = document.getElementById('fotoPerfilContainer');
+      const fotoInput = document.getElementById('fotoInput');
+      
+      if (fotoContainer && fotoInput) {
+        fotoContainer.addEventListener('click', () => fotoInput.click());
+        
+        fotoInput.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          
+          if (!file.type.startsWith('image/')) {
+            alert('Selecione uma imagem válida!');
+            return;
+          }
+          
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            fotoPerfil.src = ev.target.result;
+            Storage.salvarFotoUsuario(user.id, ev.target.result);
+            if (btnRemoverFoto) btnRemoverFoto.style.display = 'inline-block';
+            alert('Foto atualizada!');
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+      
+      // Remover foto
+      if (btnRemoverFoto) {
+        btnRemoverFoto.addEventListener('click', () => {
+          if (confirm('Remover foto?')) {
+            fotoPerfil.src = 'assets/images/avatar.png';
+            Storage.removerFotoUsuario(user.id);
+            btnRemoverFoto.style.display = 'none';
+          }
+        });
+      }
+      
+      // Submit perfil
+      const formPerfil = document.getElementById('formPerfil');
+      if (formPerfil) {
+        formPerfil.addEventListener('submit', (e) => {
+          e.preventDefault();
+          
+          const usuarios = Storage.getUsuarios();
+          const idx = usuarios.findIndex(u => u.id === user.id);
+          
+          if (idx !== -1) {
+            usuarios[idx].nome = inputNomePerfil.value;
+            usuarios[idx].email = inputEmailPerfil.value;
+            usuarios[idx].telefone = inputTelefonePerfil.value;
+            
+            localStorage.setItem('CallMed_usuarios', JSON.stringify(usuarios));
+            
+            const atualizado = usuarios[idx];
+            localStorage.setItem('usuarioLogado', JSON.stringify(atualizado));
+            
+            if (nomeUsuarioPerfil) nomeUsuarioPerfil.textContent = atualizado.nome;
+            if (emailUsuarioPerfil) emailUsuarioPerfil.textContent = atualizado.email;
+            
+            alert('Perfil atualizado!');
+          }
+        });
+      }
+    }
+    
+    function configurarTabsPaciente() {
+      // Carregar médicos quando a tab for ativada
+      const observer = new MutationObserver(() => {
+        const tabMedicos = document.getElementById('tab-medicos');
+        if (tabMedicos && tabMedicos.classList.contains('active')) {
+          carregarMedicosPaciente();
+        }
+        
+        const tabConsultas = document.getElementById('tab-consultas');
+        if (tabConsultas && tabConsultas.classList.contains('active')) {
+          carregarConsultasPaciente();
+        }
+      });
+      
+      document.querySelectorAll('.tab-content').forEach(el => {
+        observer.observe(el, { attributes: true, attributeFilter: ['class'] });
+      });
+    }
+    
+    function carregarMedicosPaciente() {
+      const medicos = Storage.getMedicos();
+      const grid = document.getElementById('medicosGrid');
+      const selectEsp = document.getElementById('filtroEspecialidade');
+      
+      if (!grid) return;
+      
+      // Carrega especialidades no filtro
+      if (selectEsp && selectEsp.children.length <= 1) {
+        const especialidades = [...new Set(medicos.map(m => m.especialidade).filter(Boolean))];
+        especialidades.forEach(esp => {
+          const opt = document.createElement('option');
+          opt.value = esp;
+          opt.textContent = esp;
+          selectEsp.appendChild(opt);
+        });
+      }
+      
+      if (medicos.length === 0) {
+        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px;">Nenhum médico cadastrado</div>';
+        return;
+      }
+      
+      grid.innerHTML = medicos.map(medico => `
+        <div class="medico-card">
+          <div class="medico-foto">${medico.nome?.charAt(0) || 'M'}</div>
+          <h3>${medico.nome}</h3>
+          <div class="medico-especialidade">${medico.especialidade || 'Clínico Geral'}</div>
+          <div class="medico-details">
+            <div class="detail-item">${medico.email || 'Não informado'}</div>
+            <div class="detail-item">${medico.telefone || 'Não informado'}</div>
+            ${medico.crm ? `<div class="detail-item">CRM: ${medico.crm}</div>` : ''}
+          </div>
+          <button class="btn-primary" onclick="agendarComMedico(${medico.id})" style="width: 100%;">
+            Agendar Consulta
+          </button>
+        </div>
+      `).join('');
+    }
+    
+    function agendarComMedico(medicoId) {
+      Tabs.irPara('agendar');
+      setTimeout(() => {
+        const medico = Storage.getMedicos().find(m => m.id == medicoId);
+        if (medico) {
+          const selectEsp = document.getElementById('selectEspecialidade');
+          const selectMed = document.getElementById('selectMedico');
+          
+          if (selectEsp && selectMed) {
+            selectEsp.value = medico.especialidade;
+            carregarMedicosPorEspecialidade(medico.especialidade);
+            setTimeout(() => {
+              selectMed.value = medicoId;
+              mostrarDetalhesMedico(medicoId);
+              dadosAgendamento.medicoId = parseInt(medicoId);
+              dadosAgendamento.especialidade = medico.especialidade;
+            }, 100);
+          }
+        }
+      }, 300);
+    }
+    
+    // ============================================
+    // AGENDAMENTO EM PASSOS
+    // ============================================
+    let passoAtual = 1;
+    let dadosAgendamento = {
+      medicoId: null,
+      especialidade: null,
+      data: null,
+      hora: null
+    };
+    
+    function inicializarAgendamento() {
+      carregarEspecialidades();
+      configurarNavegacao();
+      
+      const hoje = new Date().toISOString().split('T')[0];
+      const selectData = document.getElementById('selectData');
+      if (selectData) selectData.min = hoje;
+    }
+    
+    function carregarEspecialidades() {
+      const medicos = Storage.getMedicos();
+      const especialidades = [...new Set(medicos.map(m => m.especialidade).filter(Boolean))];
+      const select = document.getElementById('selectEspecialidade');
+      
+      if (!select) return;
+      
+      especialidades.forEach(esp => {
+        const option = document.createElement('option');
+        option.value = esp;
+        option.textContent = esp;
+        select.appendChild(option);
+      });
+      
+      select.addEventListener('change', function() {
+        carregarMedicosPorEspecialidade(this.value);
+        const infoMedico = document.getElementById('infoMedico');
+        if (infoMedico) infoMedico.style.display = 'none';
+      });
+    }
+    
+    function carregarMedicosPorEspecialidade(especialidade) {
+      const medicos = Storage.getMedicos();
+      const selectMedico = document.getElementById('selectMedico');
+      
+      if (!selectMedico) return;
+      
+      selectMedico.innerHTML = '<option value="">Selecione um médico</option>';
+      selectMedico.disabled = !especialidade;
+      
+      if (especialidade) {
+        const filtrados = medicos.filter(m => m.especialidade === especialidade);
+        
+        filtrados.forEach(medico => {
+          const option = document.createElement('option');
+          option.value = medico.id;
+          option.textContent = `${medico.nome} ${medico.crm ? `- CRM: ${medico.crm}` : ''}`;
+          selectMedico.appendChild(option);
+        });
+        
+        selectMedico.onchange = function() {
+          const medicoId = this.value;
+          if (medicoId) {
+            mostrarDetalhesMedico(medicoId);
+            dadosAgendamento.medicoId = parseInt(medicoId);
+            dadosAgendamento.especialidade = especialidade;
+          }
+        };
+      }
+    }
+    
+    function mostrarDetalhesMedico(medicoId) {
+      const medico = Storage.getMedicos().find(m => m.id == medicoId);
+      const infoDiv = document.getElementById('infoMedico');
+      const detalhesDiv = document.getElementById('detalhesMedico');
+      
+      if (medico && infoDiv && detalhesDiv) {
+        detalhesDiv.innerHTML = `
+          <p><strong>Nome:</strong> ${medico.nome}</p>
+          <p><strong>Especialidade:</strong> ${medico.especialidade}</p>
+          ${medico.crm ? `<p><strong>CRM:</strong> ${medico.crm}</p>` : ''}
+          ${medico.telefone ? `<p><strong>Telefone:</strong> ${medico.telefone}</p>` : ''}
+        `;
+        infoDiv.style.display = 'block';
+      }
+    }
+    
+    function configurarNavegacao() {
+      const btnVoltar = document.getElementById('btnVoltar');
+      const btnAvancar = document.getElementById('btnAvancar');
+      
+      if (btnVoltar) btnVoltar.addEventListener('click', voltarPasso);
+      if (btnAvancar) btnAvancar.addEventListener('click', avancarPasso);
+    }
+    
+    function avancarPasso() {
+      if (!validarPassoAtual()) return;
+      
+      if (passoAtual === 4) {
+        confirmarAgendamento();
+        return;
+      }
+      
+      passoAtual++;
+      atualizarInterface();
+      
+      if (passoAtual === 3) carregarHorariosDisponiveis();
+      else if (passoAtual === 4) atualizarResumo();
+    }
+    
+    function voltarPasso() {
+      passoAtual--;
+      atualizarInterface();
+    }
+    
+    function atualizarInterface() {
+      document.querySelectorAll('.passo').forEach((passo, index) => {
+        const num = index + 1;
+        passo.classList.remove('ativo', 'concluido');
+        if (num === passoAtual) passo.classList.add('ativo');
+        else if (num < passoAtual) passo.classList.add('concluido');
+      });
+      
+      document.querySelectorAll('.passo-conteudo').forEach((conteudo, index) => {
+        const num = index + 1;
+        conteudo.classList.remove('ativo');
+        if (num === passoAtual) conteudo.classList.add('ativo');
+      });
+      
+      const btnVoltar = document.getElementById('btnVoltar');
+      const btnAvancar = document.getElementById('btnAvancar');
+      
+      if (btnVoltar) btnVoltar.style.display = passoAtual > 1 ? 'inline-block' : 'none';
+      if (btnAvancar) btnAvancar.textContent = passoAtual === 4 ? 'Confirmar Agendamento' : 'Avançar';
+    }
+    
+    function validarPassoAtual() {
+      switch (passoAtual) {
+        case 1:
+          if (!dadosAgendamento.medicoId) {
+            alert('Por favor, selecione um médico.');
+            return false;
+          }
+          break;
+        case 2:
+          const data = document.getElementById('selectData')?.value;
+          if (!data) {
+            alert('Por favor, selecione uma data.');
+            return false;
+          }
+          dadosAgendamento.data = data;
+          break;
+        case 3:
+          if (!dadosAgendamento.hora) {
+            alert('Por favor, selecione um horário.');
+            return false;
+          }
+          break;
+      }
+      return true;
+    }
+    
+    function carregarHorariosDisponiveis() {
+      const loading = document.getElementById('loadingHorarios');
+      const container = document.getElementById('horariosContainer');
+      const semHorarios = document.getElementById('semHorarios');
+      
+      if (loading) loading.style.display = 'block';
+      if (container) container.style.display = 'none';
+      if (semHorarios) semHorarios.style.display = 'none';
+      
+      setTimeout(() => {
+        const horarios = gerarHorariosDisponiveis();
+        renderizarHorarios(horarios);
+        
+        if (loading) loading.style.display = 'none';
+        if (horarios.length > 0) {
+          if (container) container.style.display = 'block';
+        } else {
+          if (semHorarios) semHorarios.style.display = 'block';
+        }
+      }, 500);
+    }
+    
+    function gerarHorariosDisponiveis() {
+      const agendamentos = Storage.getAgendamentos();
+      const ocupados = agendamentos
+        .filter(a => a.medicoId == dadosAgendamento.medicoId && 
+                     a.data === dadosAgendamento.data && 
+                     a.status !== 'cancelado')
+        .map(a => a.hora);
+      
+      const todos = ['08:00', '09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'];
+      
+      return todos.map(horario => ({
+        horario,
+        disponivel: !ocupados.includes(horario)
+      }));
+    }
+    
+    function renderizarHorarios(horarios) {
+      const grid = document.getElementById('gridHorarios');
+      if (!grid) return;
+      
+      grid.innerHTML = '';
+      
+      horarios.forEach(({ horario, disponivel }) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `horario-btn ${disponivel ? '' : 'ocupado'}`;
+        btn.textContent = horario;
+        btn.disabled = !disponivel;
+        
+        if (disponivel) {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.horario-btn').forEach(b => b.classList.remove('selecionado'));
+            btn.classList.add('selecionado');
+            dadosAgendamento.hora = horario;
+          });
+        }
+        
+        grid.appendChild(btn);
+      });
+    }
+    
+    function atualizarResumo() {
+      const medico = Storage.getMedicos().find(m => m.id == dadosAgendamento.medicoId);
+      const dataObj = new Date(dadosAgendamento.data);
+      
+      const resumoMedico = document.getElementById('resumoMedico');
+      const resumoEsp = document.getElementById('resumoEspecialidade');
+      const resumoData = document.getElementById('resumoData');
+      const resumoHorario = document.getElementById('resumoHorario');
+      
+      if (resumoMedico) resumoMedico.textContent = medico?.nome || 'Não informado';
+      if (resumoEsp) resumoEsp.textContent = dadosAgendamento.especialidade;
+      if (resumoData) resumoData.textContent = dataObj.toLocaleDateString('pt-BR');
+      if (resumoHorario) resumoHorario.textContent = dadosAgendamento.hora;
+    }
+    
+    function confirmarAgendamento() {
+      const user = Storage.getUsuarioLogado();
+      const pacientes = Storage.getPacientes();
+      const paciente = pacientes.find(p => p.usuarioId == user.id) || pacientes.find(p => p.id == user.id);
+      
+      if (!paciente) {
+        alert('Erro: Perfil de paciente não encontrado.');
+        return;
+      }
+      
+      const agendamento = {
+        pacienteId: paciente.id,
+        medicoId: dadosAgendamento.medicoId,
+        data: dadosAgendamento.data,
+        hora: dadosAgendamento.hora,
+        observacoes: document.getElementById('observacoes')?.value || '',
+        status: 'agendado',
+        criadoEm: new Date().toISOString()
+      };
+      
+      Storage.salvarAgendamento(agendamento);
+      
+      alert('Consulta agendada com sucesso!');
+      
+      // Reset
+      passoAtual = 1;
+      dadosAgendamento = { medicoId: null, especialidade: null, data: null, hora: null };
+      atualizarInterface();
+      
+      // Volta para dashboard
+      setTimeout(() => {
+        Tabs.irPara('dashboard');
+        carregarConsultasPacienteDashboard(paciente.id);
+      }, 1000);
+    }
+    
+    function carregarConsultasPaciente() {
+      const user = Storage.getUsuarioLogado();
+      const pacientes = Storage.getPacientes();
+      const paciente = pacientes.find(p => p.usuarioId == user.id);
+      
+      if (!paciente) return;
+      
+      const agendamentos = Storage.getAgendamentos();
+      const medicos = Storage.getMedicos();
+      const consultas = agendamentos.filter(a => a.pacienteId == paciente.id);
+      
+      const container = document.getElementById('consultasContainer');
+      if (!container) return;
+      
+      if (consultas.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 40px; color: var(--cor-secundaria);">
+            <h3>Nenhuma consulta encontrada</h3>
+            <p><a href="#" onclick="event.preventDefault(); Tabs.irPara('agendar')" style="color: var(--cor-principal);">Agende sua primeira consulta</a></p>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = consultas.map(consulta => {
+        const medico = medicos.find(m => m.id == consulta.medicoId);
+        const data = new Date(consulta.data);
+        const podeCancelar = data > new Date() && consulta.status !== 'cancelado';
+        
+        return `
+          <div class="consulta-card">
+            <div class="consulta-header">
+              <div>
+                <h3>${medico?.nome || 'Médico'}</h3>
+                <p>${medico?.especialidade || 'Consulta'}</p>
+              </div>
+              <span class="consulta-status status-${consulta.status || 'agendado'}">
+                ${consulta.status || 'Agendado'}
+              </span>
+            </div>
+            <div class="consulta-details">
+              <div class="detail-item">${data.toLocaleDateString('pt-BR')}</div>
+              <div class="detail-item">${consulta.hora}</div>
+            </div>
+            <div style="margin-top: 15px; display: flex; gap: 10px;">
+              ${podeCancelar ? `<button class="btn-delete" onclick="cancelarConsulta(${consulta.id})">Cancelar</button>` : ''}
+              <button class="btn-edit" onclick="verDetalhesConsulta(${consulta.id})">Detalhes</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    function cancelarConsulta(consultaId) {
+      if (!confirm('Tem certeza que deseja cancelar esta consulta?')) return;
+      
+      const agendamentos = Storage.getAgendamentos();
+      const idx = agendamentos.findIndex(a => a.id == consultaId);
+      
+      if (idx !== -1) {
+        agendamentos[idx].status = 'cancelado';
+        agendamentos[idx].canceladoEm = new Date().toISOString();
+        localStorage.setItem('CallMed_agendamentos', JSON.stringify(agendamentos));
+        
+        alert('Consulta cancelada!');
+        carregarConsultasPaciente();
+      }
+    }
+    
+    function verDetalhesConsulta(consultaId) {
+      const consulta = Storage.getAgendamentos().find(a => a.id == consultaId);
+      const medico = Storage.getMedicos().find(m => m.id == consulta.medicoId);
+      const data = new Date(consulta.data);
+      
+      alert(`
+Consulta #${consulta.id}
+Médico: ${medico?.nome}
+Especialidade: ${medico?.especialidade}
+Data: ${data.toLocaleDateString('pt-BR')}
+Horário: ${consulta.hora}
+Status: ${consulta.status}
+      `);
+    }
+  </script>
+</body>
+</html>
