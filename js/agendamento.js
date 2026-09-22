@@ -185,7 +185,7 @@ const Agendamento = {
       return;
     }
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       console.log('📝 Submetendo formulário de agendamento...');
       
@@ -218,7 +218,7 @@ const Agendamento = {
       console.log('💾 Tentando salvar agendamento:', agendamento);
       
       try {
-        const resultado = Storage.salvarAgendamento(agendamento);
+        const resultado = await Storage.salvarAgendamento(agendamento);
         console.log('✅ Agendamento salvo com sucesso:', resultado);
         
         // Atualizar interface
@@ -241,10 +241,10 @@ const Agendamento = {
   // =============================================
   // CANCELAR AGENDAMENTO
   // =============================================
-  cancelarAgendamento(id) {
+  async cancelarAgendamento(id) {
     if (confirm('Tem certeza que deseja cancelar esta consulta?')) {
       console.log('🗑️ Cancelando agendamento ID:', id);
-      Storage.excluirAgendamento(id);
+      await Storage.excluirAgendamento(id);
       this.renderTable();
       alert('✅ Consulta cancelada com sucesso!');
     }

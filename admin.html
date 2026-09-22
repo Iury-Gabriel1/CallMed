@@ -1,7 +1,3 @@
-/* ===========================================================
-   CallMed -  admin.html
-   =========================================================== */
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -1250,7 +1246,8 @@
     // ============================================
     // INICIALIZAÇÃO ESPECÍFICA DA PÁGINA ADMIN
     // ============================================
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      await Storage.ready;
       console.log('Admin inicializando...');
       
       // Verifica login
@@ -1448,26 +1445,22 @@
       
       // Submit do perfil
       if (perfilForm) {
-        perfilForm.addEventListener('submit', (e) => {
+        perfilForm.addEventListener('submit', async (e) => {
           e.preventDefault();
-          
-          const usuarios = Storage.getUsuarios();
-          const idx = usuarios.findIndex(u => u.id === user.id);
-          
-          if (idx !== -1) {
-            usuarios[idx].nome = userNome.value;
-            usuarios[idx].email = userEmail.value;
-            usuarios[idx].telefone = userTelefone.value;
-            
-            localStorage.setItem('CallMed_usuarios', JSON.stringify(usuarios));
-            
-            const usuarioAtualizado = usuarios[idx];
+          try {
+            const usuarioAtualizado = await Storage.salvarPerfil(user.id, {
+              nome: userNome.value,
+              email: userEmail.value,
+              telefone: userTelefone.value
+            });
             localStorage.setItem('usuarioLogado', JSON.stringify(usuarioAtualizado));
             
             if (userNameDisplay) userNameDisplay.textContent = usuarioAtualizado.nome;
             if (userEmailDisplay) userEmailDisplay.textContent = usuarioAtualizado.email;
             
             alert('Perfil atualizado com sucesso!');
+          } catch (error) {
+            alert(error.message);
           }
         });
       }

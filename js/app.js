@@ -3,53 +3,21 @@
    Storage + Notificações + Main + Login + Configurações
    =========================================================== */
 
-/* ===========================================================
-   PARTE 1: STORAGE
-   =========================================================== */
-
 const Storage = {
   init() {
-    if (!localStorage.getItem('CallMed_pacientes')) {
-      localStorage.setItem('CallMed_pacientes', JSON.stringify([]));
-    }
-    if (!localStorage.getItem('CallMed_medicos')) {
-      localStorage.setItem('CallMed_medicos', JSON.stringify([]));
-    }
-    if (!localStorage.getItem('CallMed_agendamentos')) {
-      localStorage.setItem('CallMed_agendamentos', JSON.stringify([]));
-    }
-    if (!localStorage.getItem('CallMed_clinicas')) {
-      localStorage.setItem('CallMed_clinicas', JSON.stringify([]));
-    }
-    if (!localStorage.getItem('CallMed_usuarios')) {
-      const usuariosDemo = [
-        { id: 1, nome: "Admin", email: "admin@CallMed.com", senha: "123456", tipo: "clinica", tipoClinica: "admin" },
-        { id: 2, nome: "Dr. Altemar", email: "altemar@clinica.com", senha: "123456", tipo: "clinica", tipoClinica: "medico" }
-      ];
-      localStorage.setItem('CallMed_usuarios', JSON.stringify(usuariosDemo));
-    }
     if (!localStorage.getItem('CallMed_user_photos')) {
       localStorage.setItem('CallMed_user_photos', JSON.stringify({}));
     }
   },
 
-  // ========== FOTOS ==========
   salvarFotoUsuario(userId, fotoData) {
     const fotos = JSON.parse(localStorage.getItem('CallMed_user_photos') || '{}');
     fotos[userId] = fotoData;
     localStorage.setItem('CallMed_user_photos', JSON.stringify(fotos));
-    
-    const usuarios = this.getUsuarios();
-    const usuarioIndex = usuarios.findIndex(u => u.id == userId);
-    if (usuarioIndex !== -1) {
-      usuarios[usuarioIndex].foto = fotoData;
-      localStorage.setItem('CallMed_usuarios', JSON.stringify(usuarios));
-      
-      const usuarioLogado = this.getUsuarioLogado();
-      if (usuarioLogado && usuarioLogado.id == userId) {
-        usuarioLogado.foto = fotoData;
-        localStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
-      }
+    const usuarioLogado = this.getUsuarioLogado();
+    if (usuarioLogado && usuarioLogado.id == userId) {
+      usuarioLogado.foto = fotoData;
+      localStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
     }
   },
 
@@ -65,34 +33,7 @@ const Storage = {
   },
 
   temFotoCustomizada(userId) {
-    const fotos = JSON.parse(localStorage.getItem('CallMed_user_photos') || '{}');
-    return !!fotos[userId];
-  },
-
-  // ========== USUÁRIOS ==========
-  getUsuarios() {
-    return JSON.parse(localStorage.getItem('CallMed_usuarios') || '[]');
-  },
-
-  criarUsuario(nome, email, senha) {
-    const usuarios = this.getUsuarios();
-    if (usuarios.find(u => u.email === email)) return null;
-    
-    const novoUsuario = { id: Date.now(), nome, email, senha };
-    usuarios.push(novoUsuario);
-    localStorage.setItem('CallMed_usuarios', JSON.stringify(usuarios));
-    return novoUsuario;
-  },
-
-  login(email, senha) {
-    const usuarios = this.getUsuarios();
-    const usuario = usuarios.find(u => u.email === email && u.senha === senha);
-    
-    if (usuario) {
-      localStorage.setItem('usuarioLogado', JSON.stringify(usuario));
-      return usuario;
-    }
-    return null;
+    return !!this.getFotoUsuario(userId);
   },
 
   getUsuarioLogado() {
@@ -103,53 +44,74 @@ const Storage = {
     localStorage.removeItem('usuarioLogado');
   },
 
-  // ========== PACIENTES ==========
-  getPacientes() {
-    return JSON.parse(localStorage.getItem('CallMed_pacientes') || '[]');
-  },
-
-  salvarPaciente(paciente) {
-    const pacientes = this.getPacientes();
-    if (paciente.id) {
-      const index = pacientes.findIndex(p => p.id === paciente.id);
-      if (index !== -1) pacientes[index] = paciente;
-    } else {
-      paciente.id = Date.now();
-      pacientes.push(paciente);
-    }
-    localStorage.setItem('CallMed_pacientes', JSON.stringify(pacientes));
-    return paciente;
-  },
-
-  excluirPaciente(id) {
-    const pacientes = this.getPacientes().filter(p => p.id !== id);
-    localStorage.setItem('CallMed_pacientes', JSON.stringify(pacientes));
-  },
-
   getPacientePorUsuarioId(usuarioId) {
-    const pacientes = this.getPacientes();
-    return pacientes.find(paciente => paciente.usuarioId == usuarioId);
+    return this.getPacientes().find(paciente => paciente.usuarioId == usuarioId || paciente.id == usuarioId);
   },
 
   criarPacienteParaUsuario(usuarioId, dadosPaciente) {
-    const pacientes = this.getPacientes();
     const usuario = this.getUsuarios().find(u => u.id == usuarioId);
     if (!usuario) return null;
-    
-    const novoPaciente = {
-      id: Date.now().toString(),
+    return this.salvarPaciente({
+      ...dadosPaciente,
       nome: dadosPaciente.nome || usuario.nome,
       email: dadosPaciente.email || usuario.email,
-      telefone: dadosPaciente.telefone || '',
-      dataNascimento: dadosPaciente.dataNascimento || '',
-      usuarioId: usuarioId,
-      dataCadastro: new Date().toISOString(),
+      usuarioId,
       status: 'ativo'
-    };
-    
-    pacientes.push(novoPaciente);
-    localStorage.setItem('CallMed_pacientes', JSON.stringify(pacientes));
-    return novoPaciente;
+    });
+  },
+
+  getMedicoPorUsuarioId(usuarioId) {
+    return this.getMedicos().find(medico => medico.usuarioId == usuarioId);
+  },
+
+  adicionarMedicoAutomaticamente(usuario) {
+    return this.getMedicos().find(medico => medico.email === usuario.email) || null;
+  },
+
+  getMedicosPorClinica(clinicaId) {
+    return this.getMedicos().filter(medico => medico.clinicaId == clinicaId);
+  },
+
+  getAgendamentosPorPaciente(pacienteId) {
+    return this.getAgendamentos().filter(agendamento => agendamento.pacienteId == pacienteId);
+  },
+
+  salvarConfiguracaoUsuario(usuarioId, chave, dados) {
+    const storageKey = `CallMed_config_${usuarioId}`;
+    const configs = JSON.parse(localStorage.getItem(storageKey) || '{}');
+    configs[chave] = dados;
+    localStorage.setItem(storageKey, JSON.stringify(configs));
+    return dados;
+  },
+
+  getConfiguracaoUsuario(usuarioId, chave) {
+    const configs = JSON.parse(localStorage.getItem(`CallMed_config_${usuarioId}`) || '{}');
+    return configs[chave] || null;
+  },
+
+  getInfoProfissionalMedico(usuarioId) {
+    return this.getConfiguracaoUsuario(usuarioId, 'info_profissional');
+  },
+
+  getMatchmakingMedico(usuarioId) {
+    return this.getConfiguracaoUsuario(usuarioId, 'matchmaking');
+  },
+
+  salvarInfoProfissionalMedico(usuarioId, dados) {
+    return this.salvarConfiguracaoUsuario(usuarioId, 'info_profissional', dados);
+  },
+
+  salvarMatchmakingMedico(usuarioId, dados) {
+    return this.salvarConfiguracaoUsuario(usuarioId, 'matchmaking', dados);
+  },
+
+  getMedicoCompletoParaChatbot(medicoId) {
+    const medico = this.getMedicos().find(item => item.id == medicoId);
+    return medico || null;
+  },
+
+  listarMedicosCompletosParaChatbot() {
+    return this.getMedicos();
   },
 
   // ========== MÉDICOS ==========
@@ -550,6 +512,187 @@ const Storage = {
 };
 
 /* ===========================================================
+   API PRINCIPAL
+   =========================================================== */
+
+const API_URL = 'http://localhost:5000/api';
+
+async function apiRequest(endpoint, options = {}) {
+  let response;
+  try {
+    response = await fetch(`${API_URL}${endpoint}`, {
+      headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+      ...options
+    });
+  } catch (error) {
+    throw new Error('Backend indisponível. Verifique se a API está em execução.');
+  }
+
+  const data = response.status === 204 ? null : await response.json().catch(() => null);
+  if (response.status === 401) {
+    Storage.logout();
+    throw new Error('Sessão expirada. Faça login novamente.');
+  }
+  if (!response.ok) throw new Error(data?.erro || 'Erro na requisição');
+  return data;
+}
+
+const apiList = data => Array.isArray(data) ? data : data?.data || [];
+
+Storage._cache = { usuarios: [], pacientes: [], medicos: [], agendamentos: [], clinicas: [] };
+Storage._config = { tema: 'light', notificacoes: true };
+
+Storage.init = async function() {
+  const responses = await Promise.allSettled([
+    apiRequest('/usuarios'),
+    apiRequest('/pacientes'),
+    apiRequest('/medicos'),
+    apiRequest('/agendamentos'),
+    apiRequest('/clinicas'),
+    apiRequest('/config')
+  ]);
+  const [usuarios, pacientes, medicos, agendamentos, clinicas, config] = responses;
+  if (usuarios.status === 'fulfilled') this._cache.usuarios = apiList(usuarios.value);
+  if (pacientes.status === 'fulfilled') this._cache.pacientes = apiList(pacientes.value);
+  if (medicos.status === 'fulfilled') this._cache.medicos = apiList(medicos.value);
+  if (agendamentos.status === 'fulfilled') this._cache.agendamentos = apiList(agendamentos.value);
+  if (clinicas.status === 'fulfilled') this._cache.clinicas = apiList(clinicas.value);
+  if (config.status === 'fulfilled') this._config = config.value;
+  window.dispatchEvent(new CustomEvent('storageReady'));
+  return this._cache;
+};
+
+Storage.getUsuarios = () => Storage._cache.usuarios;
+Storage.getPacientes = () => Storage._cache.pacientes;
+Storage.getMedicos = () => Storage._cache.medicos;
+Storage.getAgendamentos = () => Storage._cache.agendamentos;
+Storage.getClinicas = () => Storage._cache.clinicas;
+Storage.getConfiguracoes = () => Storage._config;
+Storage.getPacientePorUsuarioId = usuarioId => Storage._cache.pacientes.find(
+  paciente => paciente.usuarioId == usuarioId || paciente.id == usuarioId
+);
+Storage.criarPacienteParaUsuario = async function(usuarioId, dadosPaciente) {
+  const usuario = this._cache.usuarios.find(item => item.id == usuarioId);
+  if (!usuario) return null;
+  return this.salvarPaciente({
+    ...dadosPaciente,
+    nome: dadosPaciente.nome || usuario.nome,
+    email: dadosPaciente.email || usuario.email,
+    usuarioId,
+    status: 'ativo'
+  });
+};
+
+Storage.login = async function(email, senha) {
+  const result = await apiRequest('/login', { method: 'POST', body: JSON.stringify({ email, senha }) });
+  const user = result.usuario || result;
+  localStorage.setItem('usuarioLogado', JSON.stringify(user));
+  return user;
+};
+
+Storage.criarUsuario = async function(nome, email, senha, tipo = 'paciente') {
+  const result = await apiRequest('/cadastro', {
+    method: 'POST',
+    body: JSON.stringify({ nome, email, senha, tipo })
+  });
+  const user = result.usuario || result;
+  this._cache.usuarios.push(user);
+  return user;
+};
+
+Storage.salvarPaciente = async function(paciente) {
+  const result = await apiRequest('/pacientes', { method: 'POST', body: JSON.stringify(paciente) });
+  const saved = result.paciente || result;
+  this._cache.pacientes = paciente.id
+    ? this._cache.pacientes.map(item => item.id == paciente.id ? saved : item)
+    : [...this._cache.pacientes, saved];
+  return saved;
+};
+Storage.excluirPaciente = async function(id) {
+  await apiRequest(`/pacientes/${id}`, { method: 'DELETE' });
+  this._cache.pacientes = this._cache.pacientes.filter(item => item.id != id);
+};
+Storage.salvarMedico = async function(medico) {
+  const result = await apiRequest('/medicos', { method: 'POST', body: JSON.stringify(medico) });
+  const saved = result.medico || result;
+  this._cache.medicos = medico.id
+    ? this._cache.medicos.map(item => item.id == medico.id ? saved : item)
+    : [...this._cache.medicos, saved];
+  return saved;
+};
+Storage.excluirMedico = async function(id) {
+  await apiRequest(`/medicos/${id}`, { method: 'DELETE' });
+  this._cache.medicos = this._cache.medicos.filter(item => item.id != id);
+};
+Storage.salvarClinica = async function(clinica) {
+  const result = await apiRequest('/clinicas', { method: 'POST', body: JSON.stringify(clinica) });
+  const saved = result.clinica || result;
+  this._cache.clinicas = clinica.id
+    ? this._cache.clinicas.map(item => item.id == clinica.id ? saved : item)
+    : [...this._cache.clinicas, saved];
+  return saved;
+};
+Storage.excluirClinica = async function(id) {
+  await apiRequest(`/clinicas/${id}`, { method: 'DELETE' });
+  this._cache.clinicas = this._cache.clinicas.filter(item => item.id != id);
+};
+Storage.salvarAgendamento = async function(agendamento) {
+  const paciente = this._cache.pacientes.find(item => item.id == agendamento.pacienteId);
+  const medico = this._cache.medicos.find(item => item.id == agendamento.medicoId);
+  const payload = {
+    ...agendamento,
+    pacienteId: Number(agendamento.pacienteId),
+    medicoId: Number(agendamento.medicoId),
+    pacienteNome: agendamento.pacienteNome || paciente?.nome,
+    pacienteTelefone: agendamento.pacienteTelefone || paciente?.telefone,
+    medicoNome: agendamento.medicoNome || medico?.nome,
+    medicoEspecialidade: agendamento.medicoEspecialidade || medico?.especialidade
+  };
+  const result = await apiRequest(payload.id ? '/agendamentos' : '/agenda', {
+    method: 'POST', body: JSON.stringify(payload)
+  });
+  const saved = result.agendamento || result;
+  this._cache.agendamentos = payload.id
+    ? this._cache.agendamentos.map(item => item.id == payload.id ? saved : item)
+    : [...this._cache.agendamentos, saved];
+  return saved;
+};
+Storage.excluirAgendamento = async function(id) {
+  await apiRequest(`/agenda/${id}`, { method: 'DELETE' });
+  this._cache.agendamentos = this._cache.agendamentos.filter(item => item.id != id);
+};
+Storage.salvarConfiguracoes = async function(config) {
+  this._config = await apiRequest('/config', { method: 'POST', body: JSON.stringify(config) });
+  return this._config;
+};
+Storage.getPerfil = usuarioId => apiRequest(`/perfil/${usuarioId}`);
+Storage.salvarPerfil = (usuarioId, dados) => apiRequest(`/perfil/${usuarioId}`, {
+  method: 'PUT', body: JSON.stringify(dados)
+});
+Storage.buscarMatchmaking = dados => apiRequest('/matchmaking', {
+  method: 'POST', body: JSON.stringify(dados)
+});
+Storage.buscarMatchmakingPrioritario = dados => apiRequest('/matchmaking', {
+  method: 'POST',
+  body: JSON.stringify({
+    pacienteId: dados.pacienteId,
+    necessidade: dados.necessidade,
+    sintomas: dados.sintomas || [],
+    data: dados.data,
+    hora: dados.hora
+  })
+});
+Storage.buscarTriagem = dados => apiRequest('/triagem', {
+  method: 'POST',
+  body: JSON.stringify({
+    pacienteId: dados.pacienteId,
+    necessidade: dados.necessidade,
+    sintomas: dados.sintomas || []
+  })
+});
+Storage.ready = Storage.init();
+
+/* ===========================================================
    PARTE 2: NOTIFICAÇÕES
    =========================================================== */
 
@@ -674,8 +817,10 @@ function registrarServiceWorker() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   console.log('=== CallMed INICIANDO ===');
+
+  await Storage.ready;
   
   aplicarTemaGlobal();
   
@@ -715,101 +860,6 @@ window.addEventListener('storage', function(e) {
 window.addEventListener('temaAlterado', function(e) {
   aplicarTemaGlobal();
 });
-
-/* ===========================================================
-   PARTE 4: LOGIN
-   =========================================================== */
-/* ===========================================================
-   CONTAS DE DEMONSTRAÇÃO (ATUALIZADO)
-   =========================================================== */
-criarContasDemo() ;{
-  const usuarios = this.getUsuarios();
-  
-  // ✅ ADMIN
-  if (!usuarios.find(u => u.email === 'admin@CallMed.com')) {
-    const admin = this.criarUsuario('Administrador', 'admin@CallMed.com', 'admin123');
-    if (admin) {
-      const u = this.getUsuarios();
-      const i = u.findIndex(x => x.id === admin.id);
-      if (i !== -1) {
-        u[i].tipo = 'clinica';
-        u[i].tipoClinica = 'admin';
-        localStorage.setItem('CallMed_usuarios', JSON.stringify(u));
-      }
-    }
-  }
-
-  // ✅ CLÍNICA
-  if (!usuarios.find(u => u.email === 'clinica@CallMed.com')) {
-    const clinica = this.criarUsuario('Clínica Saúde Total', 'clinica@CallMed.com', 'senha123');
-    if (clinica) {
-      const u = this.getUsuarios();
-      const i = u.findIndex(x => x.id === clinica.id);
-      if (i !== -1) {
-        u[i].tipo = 'clinica';
-        u[i].tipoClinica = 'admin';
-        localStorage.setItem('CallMed_usuarios', JSON.stringify(u));
-        
-        this.salvarClinica({
-          nome: 'Clínica Saúde Total',
-          cnpj: '00.000.000/0001-00',
-          telefone: '(11) 9999-8888',
-          email: 'clinica@CallMed.com',
-          endereco: 'Rua Exemplo, 123 - Centro',
-          horario_inicio: '08:00',
-          horario_fim: '18:00',
-          especialidades: ['Clínica Médica', 'Cardiologia', 'Pediatria'],
-          status: 'ativo'
-        });
-      }
-    }
-  }
-  
-  // ✅ MÉDICO
-  if (!usuarios.find(u => u.email === 'medico@CallMed.com')) {
-    const medico = this.criarUsuario('Dr. Carlos Silva', 'medico@CallMed.com', 'senha123');
-    if (medico) {
-      const u = this.getUsuarios();
-      const i = u.findIndex(x => x.id === medico.id);
-      if (i !== -1) {
-        u[i].tipo = 'clinica';
-        u[i].tipoClinica = 'medico';
-        localStorage.setItem('CallMed_usuarios', JSON.stringify(u));
-        this.adicionarMedicoAutomaticamente(u[i]);
-      }
-    }
-  }
-
-  // ✅ SECRETÁRIO
-  if (!usuarios.find(u => u.email === 'secretario@CallMed.com')) {
-    const secretario = this.criarUsuario('Ana Secretária', 'secretario@CallMed.com', 'senha123');
-    if (secretario) {
-      const u = this.getUsuarios();
-      const i = u.findIndex(x => x.id === secretario.id);
-      if (i !== -1) {
-        u[i].tipo = 'clinica';
-        u[i].tipoClinica = 'secretario';
-        localStorage.setItem('CallMed_usuarios', JSON.stringify(u));
-      }
-    }
-  }
-  
-  // ✅ PACIENTE — CORREÇÃO CRÍTICA AQUI
-  if (!usuarios.find(u => u.email === 'paciente@CallMed.com')) {
-    const paciente = this.criarUsuario('João Paciente', 'paciente@CallMed.com', 'senha123');
-    if (paciente) {
-      const u = this.getUsuarios();
-      const i = u.findIndex(x => x.id === paciente.id);
-      if (i !== -1) {
-        // ⚠️ IMPORTANTE: Define tipo = 'paciente' e REMOVE tipoClinica
-        u[i].tipo = 'paciente';
-        delete u[i].tipoClinica;  // ← Isso é crucial!
-        localStorage.setItem('CallMed_usuarios', JSON.stringify(u));
-        this.adicionarPacienteAutomaticamente(u[i]);
-      }
-    }
-  }
-}
 
 /* ===========================================================
    PARTE 5: CONFIGURAÇÕES
@@ -1089,7 +1139,4 @@ function configurarPerfilConfig(user) {
    INICIALIZAÇÃO FINAL
    =========================================================== */
 
-Storage.init();
-Storage.criarContasDemo();
-
-console.log('✅ App Core inicializado');
+console.log('✅ App Core inicializado com API');

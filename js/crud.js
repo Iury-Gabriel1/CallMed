@@ -10,25 +10,25 @@
 const Paciente = {
   getAll: () => Storage.getPacientes(),
 
-  add: (paciente) => {
-    Storage.salvarPaciente(paciente);
+  add: async (paciente) => {
+    await Storage.salvarPaciente(paciente);
     Paciente.renderTable();
     if (typeof Notificacao !== "undefined") {
       Notificacao.show("Paciente adicionado com sucesso!", "success");
     }
   },
 
-  remove: (id) => {
-    Storage.excluirPaciente(id);
+  remove: async (id) => {
+    await Storage.excluirPaciente(id);
     Paciente.renderTable();
     if (typeof Notificacao !== "undefined") {
       Notificacao.show("Paciente removido!", "warning");
     }
   },
 
-  update: (id, dados) => {
+  update: async (id, dados) => {
     const paciente = { id, ...dados };
-    Storage.salvarPaciente(paciente);
+    await Storage.salvarPaciente(paciente);
     Paciente.renderTable();
     if (typeof Notificacao !== "undefined") {
       Notificacao.show("Paciente atualizado!", "success");
@@ -150,15 +150,15 @@ document.addEventListener("DOMContentLoaded", () => {
 const Medico = {
   getAll: () => Storage.getMedicos(),
 
-  add: (medico) => {
-    const resultado = Storage.salvarMedico(medico);
+  add: async (medico) => {
+    const resultado = await Storage.salvarMedico(medico);
     Medico.renderTable();
     if (resultado) alert("✅ Médico adicionado com sucesso!");
     else alert("❌ Erro ao adicionar médico!");
     return resultado;
   },
 
-  remove: (id) => {
+  remove: async (id) => {
     const usuarioLogado = Storage.getUsuarioLogado();
     const medico = Medico.getAll().find(m => m.id == id);
     
@@ -178,12 +178,12 @@ const Medico = {
       if (!confirm('Tem certeza que deseja excluir este médico?')) return;
     }
 
-    Storage.excluirMedico(id);
+    await Storage.excluirMedico(id);
     Medico.renderTable();
     alert("✅ Médico excluído com sucesso!");
   },
 
-  update: (id, dados) => {
+  update: async (id, dados) => {
     const medicoExistente = Medico.getAll().find(m => m.id == id);
     if (!medicoExistente) {
       alert("❌ Médico não encontrado!");
@@ -198,7 +198,7 @@ const Medico = {
       dataCadastro: medicoExistente.dataCadastro
     };
 
-    const resultado = Storage.salvarMedico(medicoAtualizado);
+    const resultado = await Storage.salvarMedico(medicoAtualizado);
     Medico.renderTable();
     if (resultado) alert("✅ Médico atualizado com sucesso!");
     else alert("❌ Erro ao atualizar médico!");
@@ -853,8 +853,8 @@ const Clinica = {
     return Storage.getClinicas();
   },
 
-  add(clinica) {
-    const resultado = Storage.salvarClinica(clinica);
+  async add(clinica) {
+    const resultado = await Storage.salvarClinica(clinica);
     this.renderTable();
     if (resultado) {
       Notificacao?.show('✅ Clínica adicionada com sucesso!', 'success');
@@ -864,7 +864,7 @@ const Clinica = {
     return resultado;
   },
 
-  remove(id) {
+  async remove(id) {
     if (!confirm('Tem certeza que deseja excluir esta clínica?')) return;
     
     const medicos = Storage.getMedicosPorClinica(id);
@@ -872,12 +872,12 @@ const Clinica = {
       if (!confirm(`⚠️ Esta clínica tem ${medicos.length} médicos vinculados. Excluir mesmo assim?`)) return;
     }
 
-    Storage.excluirClinica(id);
+    await Storage.excluirClinica(id);
     this.renderTable();
     Notificacao?.show('🗑️ Clínica excluída com sucesso!', 'warning');
   },
 
-  update(id, dados) {
+  async update(id, dados) {
     const clinicaExistente = this.getAll().find(c => c.id == id);
     if (!clinicaExistente) {
       Notificacao?.show('❌ Clínica não encontrada!', 'error');
@@ -891,7 +891,7 @@ const Clinica = {
       dataCadastro: clinicaExistente.dataCadastro
     };
 
-    const resultado = Storage.salvarClinica(clinicaAtualizada);
+    const resultado = await Storage.salvarClinica(clinicaAtualizada);
     this.renderTable();
     if (resultado) {
       Notificacao?.show('✅ Clínica atualizada com sucesso!', 'success');

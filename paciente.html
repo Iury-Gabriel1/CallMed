@@ -1,7 +1,3 @@
-/* ===========================================================
-   CallMed -  paciente.html
-   =========================================================== */
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -637,6 +633,34 @@
           <p>Tire suas dúvidas</p>
         </div>
       </section>
+
+      <section id="matchmakingSection" style="background: var(--cor-card); padding: var(--espaco-lg); border-radius: var(--radius-lg); margin-bottom: var(--espaco-xl);">
+        <h2 style="color: var(--cor-principal); margin-bottom: var(--espaco-sm);">Encontre o médico ideal</h2>
+        <p>Informe sua necessidade para receber recomendações compatíveis.</p>
+        <form id="matchmakingForm" class="filtros-grid">
+          <div class="form-group">
+            <label for="matchNecessidade">Necessidade</label>
+            <input id="matchNecessidade" required placeholder="Ex.: dor no peito, ansiedade ou consulta de rotina">
+          </div>
+          <div class="form-group">
+            <label for="matchSintomas">Sintomas</label>
+            <input id="matchSintomas" placeholder="Separe os sintomas por vírgula">
+          </div>
+          <div class="form-group">
+            <label for="matchData">Data desejada</label>
+            <input id="matchData" type="date">
+          </div>
+          <div class="form-group">
+            <label for="matchHora">Horário desejado</label>
+            <input id="matchHora" type="time">
+          </div>
+          <div class="form-group" style="align-self: end;">
+            <button class="btn-primary" type="submit">Encontrar médicos</button>
+          </div>
+        </form>
+        <div id="matchmakingStatus" role="status" style="margin-top: var(--espaco-md);"></div>
+        <div id="matchmakingResults" class="medicos-grid" style="margin-top: var(--espaco-md);"></div>
+      </section>
       
       <section style="margin-bottom: var(--espaco-xl);">
         <h2 style="color: var(--cor-principal); margin-bottom: var(--espaco-lg);">Próximas Consultas</h2>
@@ -1089,7 +1113,8 @@
     // ============================================
     // INICIALIZAÇÃO ESPECÍFICA DA PÁGINA PACIENTE
     // ============================================
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      await Storage.ready;
       console.log('Paciente inicializando...');
       
       // Verifica login
@@ -1120,20 +1145,68 @@
       }
       
       // Carrega dados do paciente
-      carregarDadosPaciente(user);
+      await carregarDadosPaciente(user);
       
       // Configura as tabs específicas
       configurarTabsPaciente();
       
       // Configura o agendamento em passos
       inicializarAgendamento();
+      configurarMatchmaking(user);
     });
+
+    function configurarMatchmaking(user) {
+      const form = document.getElementById('matchmakingForm');
+      const status = document.getElementById('matchmakingStatus');
+      const results = document.getElementById('matchmakingResults');
+      if (!form || !status || !results) return;
+
+      form.addEventListener('submit', async event => {
+        event.preventDefault();
+        const paciente = Storage.getPacientePorUsuarioId(user.id);
+        if (!paciente) {
+          status.textContent = 'Perfil de paciente não encontrado.';
+          return;
+        }
+
+        status.textContent = 'Analisando sua necessidade...';
+        results.innerHTML = '';
+        try {
+          const resposta = await Storage.buscarMatchmaking({
+            paciente_id: paciente.id,
+            necessidade: document.getElementById('matchNecessidade').value.trim(),
+            sintomas: document.getElementById('matchSintomas').value.split(',').map(item => item.trim()).filter(Boolean),
+            data: document.getElementById('matchData').value || null,
+            hora: document.getElementById('matchHora').value || null
+          });
+          status.textContent = resposta.triagem?.mensagem || 'Recomendações encontradas.';
+          renderizarRecomendacoes(resposta.recomendacoes || []);
+        } catch (error) {
+          status.textContent = error.message;
+        }
+      });
+
+      function renderizarRecomendacoes(recomendacoes) {
+        if (!recomendacoes.length) {
+          results.innerHTML = '<p>Nenhum médico compatível foi encontrado.</p>';
+          return;
+        }
+        results.innerHTML = recomendacoes.map(medico => `
+          <article class="medico-card">
+            <h3>${medico.nome || 'Médico'}</h3>
+            <p>${medico.especialidade || 'Especialidade não informada'}</p>
+            <p>Compatibilidade: ${medico.score || 0} pontos</p>
+            <button type="button" class="btn-primary" onclick="agendarComMedico(${medico.id})">Escolher médico</button>
+          </article>
+        `).join('');
+      }
+    }
     
-    function carregarDadosPaciente(user) {
+    async function carregarDadosPaciente(user) {
       // Busca paciente
       let paciente = Storage.getPacientePorUsuarioId(user.id);
       if (!paciente) {
-        paciente = Storage.criarPacienteParaUsuario(user.id, {
+        paciente = await Storage.criarPacienteParaUsuario(user.id, {
           nome: user.nome,
           email: user.email,
           telefone: user.telefone || '',
@@ -1645,7 +1718,7 @@
       if (resumoHorario) resumoHorario.textContent = dadosAgendamento.hora;
     }
     
-    function confirmarAgendamento() {
+    async function confirmarAgendamento() {
       const user = Storage.getUsuarioLogado();
       const pacientes = Storage.getPacientes();
       const paciente = pacientes.find(p => p.usuarioId == user.id) || pacientes.find(p => p.id == user.id);
@@ -1665,7 +1738,12 @@
         criadoEm: new Date().toISOString()
       };
       
-      Storage.salvarAgendamento(agendamento);
+      try {
+        await Storage.salvarAgendamento(agendamento);
+      } catch (error) {
+        alert(error.message);
+        return;
+      }
       
       alert('Consulta agendada com sucesso!');
       
