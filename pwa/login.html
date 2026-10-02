@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="manifest" href="pwa/manifest.json">
+  <meta name="theme-color" content="#0a3d91">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CallMed - Login</title>
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" sizes="72x72" href="assets/images/icon-72x72.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="assets/images/icon-96x96.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/images/icon-192x192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/images/icon-152x152.png">
+
+  <link rel="stylesheet" href="css/styles.css">
+
+  <style>
+    /* ============================================
+       LOGIN PAGE - Visual novo (Tela 2) com Lucide
+       ============================================ */
+    * {
+      box-sizing: border-box;
+    }
+
+    body.login-page {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #f4f7fc;
+      overflow-x: hidden;
+    }
+
+    /* ---------- TOPO AZUL COM CURVA ---------- */
+    .login-hero {
+      width: 100%;
+      background: linear-gradient(135deg, #0a3d91 0%, #1565c0 60%, #1e88e5 100%);
+      padding: 40px 20px 60px;
+      text-align: center;
+      color: #fff;
+      position: relative;
+      border-bottom-left-radius: 50% 40px;
+      border-bottom-right-radius: 50% 40px;
+    }
+
+    .login-hero .logo-circle {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 50%;
+      padding: 10px;
+    }
+
+    .login-hero .logo-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    /* Fallback: ícone de coração da Lucide caso não tenha o logo */
+    .login-hero .logo-circle .logo-fallback {
+      width: 32px;
+      height: 32px;
+      color: #fff;
+      display: none;
+    }
+
+    .login-hero h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin: 0 0 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .login-hero p {
+      font-size: 0.95rem;
+      margin: 0;
+      opacity: 0.9;
+      font-weight: 400;
+    }
+
+    /* ---------- CARD BRANCO DE LOGIN ---------- */
+    .login-container {
+      background: #fff;
+      width: 100%;
+      max-width: 420px;
+      margin: -30px auto 30px;
+      padding: 32px 28px 28px;
+      border-radius: 20px;
+      box-shadow: 0 12px 32px rgba(10, 61, 145, 0.12);
+      position: relative;
+      z-index: 2;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .login-header h2 {
+      color: #0a3d91;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0 0 8px;
+    }
+
+    .login-header p {
+      color: #64748b;
+      font-size: 0.9rem;
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    /* ---------- INPUTS COM ÍCONE ---------- */
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-group label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #334155;
+      margin: 0;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Ícone da Lucide dentro do input */
+    .input-wrapper .icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      color: #1565c0;
+      pointer-events: none;
+      stroke-width: 2;
+    }
+
+    .input-wrapper input {
+      width: 100%;
+      padding: 14px 14px 14px 44px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      color: #1e293b;
+      background: #f8fafc;
+      transition: all 0.2s ease;
+      margin: 0;
+    }
+
+    .input-wrapper input:focus {
+      border-color: #1565c0;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.12);
+      outline: none;
+    }
+
+    .input-wrapper input::placeholder {
+      color: #94a3b8;
+    }
+
+    /* Botão de mostrar senha (Lucide) */
+    .toggle-senha {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      margin: 0;
+      box-shadow: none;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+    }
+
+    .toggle-senha svg {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2;
+    }
+
+    .toggle-senha:hover {
+      background: none;
+      transform: translateY(-50%);
+      box-shadow: none;
+      color: #1565c0;
+    }
+
+    /* ---------- LINHA "LEMBRAR-ME" ---------- */
+    .remember-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: #475569;
+    }
+
+    .remember-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      margin: 0;
+    }
+
+    .remember-label input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: #1565c0;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    /* ---------- BOTÃO ENTRAR ---------- */
+    .btn-entrar {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.25s ease;
+      margin-top: 4px;
+      box-shadow: 0 6px 16px rgba(21, 101, 192, 0.3);
+    }
+
+    .btn-entrar:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(21, 101, 192, 0.4);
+    }
+
+    .btn-entrar:active {
+      transform: translateY(0);
+    }
+
+    /* Seta da Lucide dentro do botão */
+    .btn-entrar .arrow {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2.5;
+      transition: transform 0.25s ease;
+    }
+
+    .btn-entrar:hover .arrow {
+      transform: translateX(4px);
+    }
+
+    /* ---------- RODAPÉ "CRIAR CONTA" ---------- */
+    .login-footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .login-footer a {
+      color: #1565c0;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: gap 0.2s ease;
+    }
+
+    .login-footer a:hover {
+      gap: 8px;
+    }
+
+    .login-footer a svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2.5;
+    }
+
+    /* ---------- ERRO ---------- */
+    .login-error {
+      color: #dc3545;
+      font-size: 0.85rem;
+      text-align: center;
+      margin-top: 4px;
+      display: none;
+    }
+
+    /* ---------- MODAL DE CADASTRO ---------- */
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      background: rgba(10, 61, 145, 0.5);
+      z-index: 200;
+      padding: 16px;
+    }
+
+    .modal.active { display: flex; }
+
+    .modal-content {
+      background: #fff;
+      padding: 28px;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 12px; right: 16px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .modal-close svg {
+      width: 22px;
+      height: 22px;
+      stroke-width: 2;
+    }
+
+    .modal-close:hover {
+      color: #dc3545;
+      background: none;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .modal-content h3 {
+      color: #0a3d91;
+      margin: 0 0 20px;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-content h3 svg {
+      width: 22px;
+      height: 22px;
+      stroke-width: 2;
+    }
+
+    .tipo-login {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 20px;
+      background: #f1f5f9;
+      padding: 6px;
+      border-radius: 12px;
+    }
+
+    .tipo-btn {
+      padding: 10px;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      background: transparent;
+      color: #475569;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      box-shadow: none;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .tipo-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2;
+    }
+
+    .tipo-btn.active {
+      background: #1565c0;
+      color: #fff;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      background: #f8fafc;
+      transition: all 0.2s ease;
+      margin: 0;
+    }
+
+    .form-group input:focus {
+      border-color: #1565c0;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.12);
+      outline: none;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(21, 101, 192, 0.4);
+    }
+
+    /* ---------- RESPONSIVO ---------- */
+    @media (max-width: 480px) {
+      .login-hero {
+        padding: 32px 16px 50px;
+      }
+      .login-hero h1 { font-size: 1.5rem; }
+      .login-container {
+        padding: 24px 20px;
+        border-radius: 16px;
+        margin-top: -24px;
+      }
+      .login-header h2 { font-size: 1.3rem; }
+    }
+  </style>
+</head>
+<body class="login-page">
+
+  <!-- TOPO AZUL COM LOGO -->
+  <div class="login-hero">
+    <div class="logo-circle">
+      <!-- Logo real. Se não encontrar, mostra ícone de coração da Lucide -->
+      <img src="assets/images/logo.png" alt="CallMed"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <i data-lucide="heart-pulse" class="logo-fallback"></i>
+    </div>
+    <h1>CallMed</h1>
+    <p>Conectando pessoas ao cuidado ideal.</p>
+  </div>
+
+  <!-- CARD DE LOGIN -->
+  <div class="login-container">
+    <div class="login-header">
+      <h2>Faça login da sua conta</h2>
+      <p>Bem-vindo de volta! Estamos felizes em te ver por aqui.</p>
+    </div>
+
+    <form id="loginForm" class="login-form">
+      <div class="input-group">
+        <label for="email">E-mail</label>
+        <div class="input-wrapper">
+          <i data-lucide="mail" class="icon"></i>
+          <input type="email" id="email" placeholder="Digite o seu e-mail" required>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="senha">Senha</label>
+        <div class="input-wrapper">
+          <i data-lucide="lock" class="icon"></i>
+          <input type="password" id="senha" placeholder="Digite sua senha" required>
+          <button type="button" class="toggle-senha" id="toggleSenha" title="Mostrar/ocultar senha">
+            <i data-lucide="eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="remember-row">
+        <label class="remember-label">
+          <input type="checkbox" id="rememberMe">
+          Lembrar-me
+        </label>
+      </div>
+
+      <button type="submit" class="btn-entrar">
+        Entrar
+        <i data-lucide="arrow-right" class="arrow"></i>
+      </button>
+
+      <div class="login-error" id="loginError">E-mail ou senha incorretos!</div>
+    </form>
+
+    <div class="login-footer">
+      <span>Não tem conta?</span>
+      <a href="#" id="abrirModalCadastro">
+        Criar conta
+        <i data-lucide="arrow-right"></i>
+      </a>
+    </div>
+    <div class="demo-info">
+        <h4>💡 Contas de Demonstração:</h4>
+        <p><strong>Admin:</strong> admin@AgendaMed.com / 123456</p>
+        <p><strong>Médico:</strong> altemar@clinica.com / 123456</p>
+        <p><strong>Sabrina Gabriella:</strong> sabrina@AgendaMed.com / 123456</p>
+      </div>
+  </div>
+
+
+  <!-- MODAL DE CADASTRO -->
+  <div class="modal" id="modalCadastro">
+    <div class="modal-content">
+      <button class="modal-close" id="fecharModalCadastro" title="Fechar">
+        <i data-lucide="x"></i>
+      </button>
+      <h3><i data-lucide="user-plus"></i> Criar Conta</h3>
+
+      <div class="tipo-login">
+        <button type="button" class="tipo-btn active" data-tipo-cadastro="clinica">
+          <i data-lucide="hospital"></i> Clínica
+        </button>
+        <button type="button" class="tipo-btn" data-tipo-cadastro="paciente">
+          <i data-lucide="user"></i> Paciente
+        </button>
+      </div>
+
+      <form id="cadastroForm">
+        <div class="form-group">
+          <label for="novoNome">Nome Completo</label>
+          <input type="text" id="novoNome" required>
+        </div>
+
+        <div class="form-group">
+          <label for="novoEmail">E-mail</label>
+          <input type="email" id="novoEmail" required>
+        </div>
+
+        <div class="form-group">
+          <label for="novaSenha">Senha</label>
+          <input type="password" id="novaSenha" required>
+        </div>
+
+        <button type="submit" class="btn-primary">Cadastrar</button>
+        <div class="login-error" id="cadastroError"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SCRIPTS                                       -->
+  <!-- ============================================ -->
+  <script src="../js/app.js"></script>
+  <script src="../js/lucide.min.js"></script>
+
+  <script>
+    // ============================================
+    // LOGIN - INICIALIZAÇÃO
+    // ============================================
+    document.addEventListener('DOMContentLoaded', async () => {
+      await Storage.ready;
+
+      const config = Storage.getConfiguracoes();
+      document.documentElement.setAttribute('data-theme', config.tema);
+
+      const usuarioLogado = Storage.getUsuarioLogado();
+      if (usuarioLogado) {
+        redirecionarPorTipoUsuario(usuarioLogado);
+        return;
+      }
+
+      configurarLogin();
+      configurarCadastro();
+      configurarModal();
+      configurarToggleSenha();
+
+      // ✅ Inicializa os ícones da Lucide depois que o DOM está pronto
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    });
+
+    let tipoUsuario = 'clinica';
+
+    // ---------- Mostrar/ocultar senha (troca o ícone também) ----------
+    function configurarToggleSenha() {
+      const btn = document.getElementById('toggleSenha');
+      const input = document.getElementById('senha');
+      if (!btn || !input) return;
+
+      let visivel = false;
+
+      btn.addEventListener('click', () => {
+        visivel = !visivel;
+        input.type = visivel ? 'text' : 'password';
+
+        // Troca o ícone: eye <-> eye-off
+        btn.innerHTML = visivel
+          ? '<i data-lucide="eye-off"></i>'
+          : '<i data-lucide="eye"></i>';
+
+        // Re-renderiza apenas os ícones novos
+        if (window.lucide) lucide.createIcons();
+      });
+    }
+
+    function configurarLogin() {
+      document.querySelectorAll('.tipo-btn[data-tipo]').forEach(btn => {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.tipo-btn[data-tipo]').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          tipoUsuario = this.dataset.tipo;
+        });
+      });
+
+      const loginForm = document.getElementById('loginForm');
+      if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const email = document.getElementById('email').value.trim();
+          const senha = document.getElementById('senha').value.trim();
+          const loginError = document.getElementById('loginError');
+
+          try {
+            const user = await Storage.login(email, senha);
+
+            if (user) {
+              if (user.tipo === 'clinica' && !user.tipoClinica) {
+                mostrarModalTipoClinica(user);
+              } else {
+                redirecionarPorTipoUsuario(user);
+              }
+            } else {
+              loginError.textContent = 'E-mail ou senha incorretos!';
+              loginError.style.display = 'block';
+            }
+          } catch (error) {
+            loginError.textContent = error.message;
+            loginError.style.display = 'block';
+          }
+        });
+      }
+    }
+
+    function mostrarModalTipoClinica(user) {
+      const modalHTML = `
+        <div class="modal active" id="modalTipoClinica">
+          <div class="modal-content" style="max-width: 400px;">
+            <h3><i data-lucide="stethoscope"></i> Selecione seu Perfil</h3>
+            <p>Como você atua na clínica?</p>
+
+            <div style="display: flex; flex-direction: column; gap: 10px; margin: 20px 0;">
+              <button type="button" class="tipo-clinica-btn" data-tipo-clinica="medico" style="padding: 15px; border: 2px solid #e2e8f0; border-radius: 10px; background: #f8fafc; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 12px;">
+                <i data-lucide="stethoscope" style="width: 24px; height: 24px; color: #1565c0; flex-shrink: 0;"></i>
+                <div>
+                  <strong>Médico</strong>
+                  <div style="font-size: 0.9rem; color: #64748b; margin-top: 5px;">
+                    Acesso à agenda, pacientes e consultas
+                  </div>
+                </div>
+              </button>
+
+              <button type="button" class="tipo-clinica-btn" data-tipo-clinica="secretario" style="padding: 15px; border: 2px solid #e2e8f0; border-radius: 10px; background: #f8fafc; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 12px;">
+                <i data-lucide="clipboard-list" style="width: 24px; height: 24px; color: #1565c0; flex-shrink: 0;"></i>
+                <div>
+                  <strong>Secretário(a)</strong>
+                  <div style="font-size: 0.9rem; color: #64748b; margin-top: 5px;">
+                    Agendamentos, cadastros e atendimento
+                  </div>
+                </div>
+              </button>
+
+              <button type="button" class="tipo-clinica-btn" data-tipo-clinica="admin" style="padding: 15px; border: 2px solid #e2e8f0; border-radius: 10px; background: #f8fafc; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 12px;">
+                <i data-lucide="settings" style="width: 24px; height: 24px; color: #1565c0; flex-shrink: 0;"></i>
+                <div>
+                  <strong>Administrador</strong>
+                  <div style="font-size: 0.9rem; color: #64748b; margin-top: 5px;">
+                    Acesso completo ao sistema
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            <button type="button" id="confirmarTipoClinica" class="btn-primary" disabled>
+              Confirmar e Entrar
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+      // ✅ Renderiza os ícones do modal recém-criado
+      if (window.lucide) lucide.createIcons();
+
+      let tipoSelecionado = null;
+
+      document.querySelectorAll('.tipo-clinica-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.tipo-clinica-btn').forEach(b => {
+            b.style.borderColor = '#e2e8f0';
+            b.style.background = '#f8fafc';
+          });
+
+          this.style.borderColor = '#1565c0';
+          this.style.background = '#e3f2fd';
+
+          tipoSelecionado = this.dataset.tipoClinica;
+          document.getElementById('confirmarTipoClinica').disabled = false;
+        });
+      });
+
+      document.getElementById('confirmarTipoClinica').addEventListener('click', () => {
+        if (tipoSelecionado) {
+          user.tipoClinica = tipoSelecionado;
+          localStorage.setItem('usuarioLogado', JSON.stringify(user));
+          redirecionarPorTipoUsuario(user);
+          document.getElementById('modalTipoClinica').remove();
+        }
+      });
+    }
+
+    function redirecionarPorTipoUsuario(usuario) {
+      console.log('🚀 Redirecionando usuário:', usuario.nome, 'Tipo:', usuario.tipo, 'TipoClinica:', usuario.tipoClinica);
+
+      if (usuario.tipo === 'paciente') {
+        window.location.href = 'paciente.html';
+      } else if (usuario.tipo === 'clinica') {
+        window.location.href = 'admin.html';
+      } else {
+        window.location.href = 'admin.html';
+      }
+    }
+
+    function configurarModal() {
+      const modalCadastro = document.getElementById('modalCadastro');
+      const abrirModalCadastro = document.getElementById('abrirModalCadastro');
+      const fecharModalCadastro = document.getElementById('fecharModalCadastro');
+
+      if (abrirModalCadastro) {
+        abrirModalCadastro.addEventListener('click', e => {
+          e.preventDefault();
+          modalCadastro.classList.add('active');
+        });
+      }
+
+      if (fecharModalCadastro) {
+        fecharModalCadastro.addEventListener('click', () => {
+          modalCadastro.classList.remove('active');
+        });
+      }
+
+      window.addEventListener('click', e => {
+        if (e.target === modalCadastro) modalCadastro.classList.remove('active');
+      });
+    }
+
+    function configurarCadastro() {
+      document.querySelectorAll('.tipo-btn[data-tipo-cadastro]').forEach(btn => {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.tipo-btn[data-tipo-cadastro]').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+        });
+      });
+
+      const cadastroForm = document.getElementById('cadastroForm');
+      if (cadastroForm) {
+        cadastroForm.addEventListener('submit', async e => {
+          e.preventDefault();
+          const nome = document.getElementById('novoNome').value.trim();
+          const email = document.getElementById('novoEmail').value.trim();
+          const senha = document.getElementById('novaSenha').value.trim();
+
+          const tipoAtivo = document.querySelector('.tipo-btn[data-tipo-cadastro].active');
+          const tipoCadastro = tipoAtivo ? tipoAtivo.dataset.tipoCadastro : 'clinica';
+
+          const erro = document.getElementById('cadastroError');
+
+          if (!nome || !email || !senha) {
+            erro.textContent = 'Preencha todos os campos.';
+            erro.style.display = 'block';
+            return;
+          }
+
+          let novoUsuario;
+          try {
+            novoUsuario = await Storage.criarUsuario(nome, email, senha, tipoCadastro);
+          } catch (error) {
+            erro.textContent = error.message;
+            erro.style.display = 'block';
+            return;
+          }
+
+          alert('Conta criada com sucesso! Agora você pode fazer login.');
+          document.getElementById('modalCadastro').classList.remove('active');
+          cadastroForm.reset();
+        });
+      }
+    }
+  </script>
+</body>
+</html>
