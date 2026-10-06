@@ -189,6 +189,33 @@
       border-color: var(--cor-principal);
       box-shadow: var(--shadow-lg);
     }
+
+    .matchmaking-card {
+      text-align: left;
+      border: 1px solid var(--cor-borda);
+      border-top: 4px solid var(--cor-principal);
+    }
+
+    .matchmaking-card h3 {
+      margin-bottom: var(--espaco-xs);
+    }
+
+    .matchmaking-score,
+    .matchmaking-availability {
+      margin: var(--espaco-sm) 0;
+      color: var(--cor-texto);
+    }
+
+    .matchmaking-card button {
+      width: 100%;
+      margin-top: var(--espaco-sm);
+    }
+
+    .matchmaking-card button:focus-visible,
+    #matchmakingForm input:focus-visible {
+      outline: 3px solid var(--cor-principal);
+      outline-offset: 2px;
+    }
     
     .medico-foto {
       width: 100px;
@@ -1161,16 +1188,33 @@
       const results = document.getElementById('matchmakingResults');
       if (!form || !status || !results) return;
 
+      const submitButton = form.querySelector('button[type="submit"]');
+      const dateInput = document.getElementById('matchData');
+      if (dateInput) {
+        const hoje = new Date();
+        const ano = hoje.getFullYear();
+        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+        const dia = String(hoje.getDate()).padStart(2, '0');
+        dateInput.min = `${ano}-${mes}-${dia}`;
+      }
+
       form.addEventListener('submit', async event => {
         event.preventDefault();
+        if (submitButton?.disabled) return;
+
         const paciente = Storage.getPacientePorUsuarioId(user.id);
         if (!paciente) {
           status.textContent = 'Perfil de paciente não encontrado.';
           return;
         }
 
-        status.textContent = 'Analisando sua necessidade...';
-        results.innerHTML = '';
+        const textoBotao = submitButton?.textContent;
+        if (submitButton) {
+          submitButton.disabled = true;
+          submitButton.textContent = 'Buscando...';
+        }
+        status.textContent = 'Analisando sua necessidade e verificando os profissionais compatíveis...';
+        results.replaceChildren();
         try {
           const resposta = await Storage.buscarMatchmaking({
             paciente_id: paciente.id,
@@ -1179,26 +1223,66 @@
             data: document.getElementById('matchData').value || null,
             hora: document.getElementById('matchHora').value || null
           });
-          status.textContent = resposta.triagem?.mensagem || 'Recomendações encontradas.';
-          renderizarRecomendacoes(resposta.recomendacoes || []);
+          const triagem = resposta?.triagem;
+          status.textContent = triagem?.mensagem || 'Análise concluída. Confira as recomendações e a disponibilidade antes de agendar.';
+          renderizarRecomendacoes(Array.isArray(resposta?.recomendacoes) ? resposta.recomendacoes : []);
         } catch (error) {
-          status.textContent = error.message;
+          status.textContent = error?.message || 'Não foi possível buscar recomendações. Tente novamente.';
+        } finally {
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = textoBotao || 'Encontrar médicos';
+          }
         }
       });
 
       function renderizarRecomendacoes(recomendacoes) {
         if (!recomendacoes.length) {
-          results.innerHTML = '<p>Nenhum médico compatível foi encontrado.</p>';
+          const vazio = document.createElement('p');
+          vazio.textContent = 'Nenhum médico compatível foi encontrado. Tente descrever a necessidade com outras palavras ou escolha outra data e horário.';
+          results.replaceChildren(vazio);
           return;
         }
-        results.innerHTML = recomendacoes.map(medico => `
-          <article class="medico-card">
-            <h3>${medico.nome || 'Médico'}</h3>
-            <p>${medico.especialidade || 'Especialidade não informada'}</p>
-            <p>Compatibilidade: ${medico.score || 0} pontos</p>
-            <button type="button" class="btn-primary" onclick="agendarComMedico(${medico.id})">Escolher médico</button>
-          </article>
-        `).join('');
+
+        const cards = recomendacoes.map(medico => {
+          const card = document.createElement('article');
+          card.className = 'medico-card matchmaking-card';
+
+          const nome = document.createElement('h3');
+          nome.textContent = medico.nome || 'Médico';
+          card.appendChild(nome);
+
+          const especialidade = document.createElement('p');
+          especialidade.textContent = medico.especialidade || 'Especialidade não informada';
+          card.appendChild(especialidade);
+
+          if (medico.score !== undefined && medico.score !== null && medico.score !== '') {
+            const pontuacao = document.createElement('p');
+            pontuacao.className = 'matchmaking-score';
+            pontuacao.textContent = `Compatibilidade: ${medico.score} pontos`;
+            card.appendChild(pontuacao);
+          }
+
+          const disponibilidade = medico.disponibilidade ?? medico.disponivel;
+          if (disponibilidade !== undefined && disponibilidade !== null) {
+            const statusDisponibilidade = document.createElement('p');
+            statusDisponibilidade.className = 'matchmaking-availability';
+            statusDisponibilidade.textContent = typeof disponibilidade === 'boolean'
+              ? (disponibilidade ? 'Disponível no horário solicitado' : 'Sem disponibilidade no horário solicitado')
+              : `Disponibilidade: ${disponibilidade}`;
+            card.appendChild(statusDisponibilidade);
+          }
+
+          const escolher = document.createElement('button');
+          escolher.type = 'button';
+          escolher.className = 'btn-primary';
+          escolher.textContent = 'Escolher médico';
+          escolher.addEventListener('click', () => agendarComMedico(medico.id));
+          card.appendChild(escolher);
+          return card;
+        });
+
+        results.replaceChildren(...cards);
       }
     }
     
