@@ -40,22 +40,24 @@ const Components = {
     const links = tipo === 'admin' ? linksAdmin : linksPaciente;
     
     return `
-      <header class="header">
+      <header class="header" aria-label="Navegação principal">
         <div class="logo">
           <img src="assets/images/logo.png" alt="CallMed Logo">
           <span>CallMed</span>
         </div>
-        <nav class="nav">
+        <nav class="nav" aria-label="Menu principal">
           <ul>
             ${links.map(l => `
               <li>
                 <a href="#${l.tab}" 
-                   data-tab-link="${l.tab}">
+                   data-tab-link="${l.tab}"
+                   aria-label="Abrir seção ${l.texto}"
+                   aria-current="page">
                   ${l.texto}
                 </a>
               </li>
             `).join('')}
-            <li><a href="#" id="logoutBtn">Sair</a></li>
+            <li><a href="#" id="logoutBtn" aria-label="Encerrar sessão">Sair</a></li>
           </ul>
         </nav>
       </header>
@@ -136,11 +138,9 @@ const Components = {
   
   atualizarLinksAtivos(tab) {
     document.querySelectorAll('[data-tab-link]').forEach(link => {
-      if (link.dataset.tabLink === tab) {
-        link.classList.add('active');
-      } else {
-        link.classList.remove('active');
-      }
+      const isActive = link.dataset.tabLink === tab;
+      link.classList.toggle('active', isActive);
+      link.setAttribute('aria-current', isActive ? 'page' : 'false');
     });
   },
   

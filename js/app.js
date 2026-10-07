@@ -542,7 +542,35 @@ const apiList = data => Array.isArray(data) ? data : data?.data || [];
 Storage._cache = { usuarios: [], pacientes: [], medicos: [], agendamentos: [], clinicas: [] };
 Storage._config = { tema: 'light', notificacoes: true };
 
+Storage.syncCacheFromLocalStorage = function() {
+  const readJson = key => {
+    try {
+      return JSON.parse(localStorage.getItem(key) || '[]');
+    } catch (error) {
+      return [];
+    }
+  };
+
+  this._cache.usuarios = this._cache.usuarios.length ? this._cache.usuarios : readJson('CallMed_usuarios');
+  this._cache.pacientes = this._cache.pacientes.length ? this._cache.pacientes : readJson('CallMed_pacientes');
+  this._cache.medicos = this._cache.medicos.length ? this._cache.medicos : readJson('CallMed_medicos');
+  this._cache.agendamentos = this._cache.agendamentos.length ? this._cache.agendamentos : readJson('CallMed_agendamentos');
+  this._cache.clinicas = this._cache.clinicas.length ? this._cache.clinicas : readJson('CallMed_clinicas');
+
+  try {
+    const savedConfig = JSON.parse(localStorage.getItem('CallMed_config') || '{}');
+    if (savedConfig && Object.keys(savedConfig).length) {
+      this._config = { ...this._config, ...savedConfig };
+    }
+  } catch (error) {
+    this._config = this._config;
+  }
+
+  return this._cache;
+};
+
 Storage.init = async function() {
+  this.syncCacheFromLocalStorage();
   const responses = await Promise.allSettled([
     apiRequest('/usuarios'),
     apiRequest('/pacientes'),
@@ -558,17 +586,18 @@ Storage.init = async function() {
   if (agendamentos.status === 'fulfilled') this._cache.agendamentos = apiList(agendamentos.value);
   if (clinicas.status === 'fulfilled') this._cache.clinicas = apiList(clinicas.value);
   if (config.status === 'fulfilled') this._config = config.value;
+  if (!this._cache.medicos.length) this.syncCacheFromLocalStorage();
   window.dispatchEvent(new CustomEvent('storageReady'));
   return this._cache;
 };
 
-Storage.getUsuarios = () => Storage._cache.usuarios;
-Storage.getPacientes = () => Storage._cache.pacientes;
-Storage.getMedicos = () => Storage._cache.medicos;
-Storage.getAgendamentos = () => Storage._cache.agendamentos;
-Storage.getClinicas = () => Storage._cache.clinicas;
-Storage.getConfiguracoes = () => Storage._config;
-Storage.getPacientePorUsuarioId = usuarioId => Storage._cache.pacientes.find(
+Storage.getUsuarios = () => Storage._cache.usuarios.length ? Storage._cache.usuarios : JSON.parse(localStorage.getItem('CallMed_usuarios') || '[]');
+Storage.getPacientes = () => Storage._cache.pacientes.length ? Storage._cache.pacientes : JSON.parse(localStorage.getItem('CallMed_pacientes') || '[]');
+Storage.getMedicos = () => Storage._cache.medicos.length ? Storage._cache.medicos : JSON.parse(localStorage.getItem('CallMed_medicos') || '[]');
+Storage.getAgendamentos = () => Storage._cache.agendamentos.length ? Storage._cache.agendamentos : JSON.parse(localStorage.getItem('CallMed_agendamentos') || '[]');
+Storage.getClinicas = () => Storage._cache.clinicas.length ? Storage._cache.clinicas : JSON.parse(localStorage.getItem('CallMed_clinicas') || '[]');
+Storage.getConfiguracoes = () => Storage._config && Object.keys(Storage._config).length ? Storage._config : JSON.parse(localStorage.getItem('CallMed_config') || '{"tema":"light","notificacoes":true}');
+Storage.getPacientePorUsuarioId = usuarioId => Storage.getPacientes().find(
   paciente => paciente.usuarioId == usuarioId || paciente.id == usuarioId
 );
 Storage.criarPacienteParaUsuario = async function(usuarioId, dadosPaciente) {
@@ -637,8 +666,8 @@ Storage.excluirClinica = async function(id) {
   this._cache.clinicas = this._cache.clinicas.filter(item => item.id != id);
 };
 Storage.salvarAgendamento = async function(agendamento) {
-  const paciente = this._cache.pacientes.find(item => item.id == agendamento.pacienteId);
-  const medico = this._cache.medicos.find(item => item.id == agendamento.medicoId);
+  const paciente = this.getPacientes().find(item => item.id == agendamento.pacienteId);
+  const medico = this.getMedicos().find(item => item.id == agendamento.medicoId);
   const payload = {
     ...agendamento,
     pacienteId: Number(agendamento.pacienteId),
@@ -646,20 +675,45 @@ Storage.salvarAgendamento = async function(agendamento) {
     pacienteNome: agendamento.pacienteNome || paciente?.nome,
     pacienteTelefone: agendamento.pacienteTelefone || paciente?.telefone,
     medicoNome: agendamento.medicoNome || medico?.nome,
-    medicoEspecialidade: agendamento.medicoEspecialidade || medico?.especialidade
+    medicoEspecialidade: agendamento.medicoEspecialidade || medico?.especialidade,
+    status: agendamento.status || 'agendado',
+    data: agendamento.data || new Date().toISOString().split('T')[0],
+    hora: agendamento.hora || agendamento.horario || '08:00'
   };
-  const result = await apiRequest(payload.id ? '/agendamentos' : '/agenda', {
-    method: 'POST', body: JSON.stringify(payload)
-  });
-  const saved = result.agendamento || result;
-  this._cache.agendamentos = payload.id
-    ? this._cache.agendamentos.map(item => item.id == payload.id ? saved : item)
-    : [...this._cache.agendamentos, saved];
-  return saved;
+
+  const localAgendamentos = this.getAgendamentos();
+  const savedLocal = payload.id
+    ? localAgendamentos.map(item => item.id == payload.id ? { ...item, ...payload } : item)
+    : [...localAgendamentos, { ...payload, id: payload.id || Date.now() }];
+
+  this._cache.agendamentos = savedLocal;
+  localStorage.setItem('CallMed_agendamentos', JSON.stringify(savedLocal));
+
+  try {
+    const result = await apiRequest(payload.id ? '/agendamentos' : '/agenda', {
+      method: 'POST', body: JSON.stringify(payload)
+    });
+    const saved = result?.agendamento || result || { ...payload, id: payload.id || Date.now() };
+    this._cache.agendamentos = payload.id
+      ? this._cache.agendamentos.map(item => item.id == payload.id ? { ...saved, ...item, id: payload.id } : item)
+      : [...this._cache.agendamentos.filter(item => item.id != saved.id), saved];
+    localStorage.setItem('CallMed_agendamentos', JSON.stringify(this._cache.agendamentos));
+    return saved;
+  } catch (error) {
+    return savedLocal.find(item => item.id == (payload.id || savedLocal[savedLocal.length - 1]?.id)) || savedLocal[savedLocal.length - 1];
+  }
 };
 Storage.excluirAgendamento = async function(id) {
-  await apiRequest(`/agenda/${id}`, { method: 'DELETE' });
-  this._cache.agendamentos = this._cache.agendamentos.filter(item => item.id != id);
+  const agendamentos = this.getAgendamentos().filter(item => item.id != id);
+  this._cache.agendamentos = agendamentos;
+  localStorage.setItem('CallMed_agendamentos', JSON.stringify(agendamentos));
+
+  try {
+    await apiRequest(`/agenda/${id}`, { method: 'DELETE' });
+  } catch (error) {
+    // fallback local: já foi salvo em storage acima
+  }
+  return agendamentos;
 };
 Storage.salvarConfiguracoes = async function(config) {
   this._config = await apiRequest('/config', { method: 'POST', body: JSON.stringify(config) });
@@ -669,19 +723,184 @@ Storage.getPerfil = usuarioId => apiRequest(`/perfil/${usuarioId}`);
 Storage.salvarPerfil = (usuarioId, dados) => apiRequest(`/perfil/${usuarioId}`, {
   method: 'PUT', body: JSON.stringify(dados)
 });
-Storage.buscarMatchmaking = dados => apiRequest('/matchmaking', {
-  method: 'POST', body: JSON.stringify(dados)
-});
-Storage.buscarMatchmakingPrioritario = dados => apiRequest('/matchmaking', {
-  method: 'POST',
-  body: JSON.stringify({
+Storage.normalizarMatchmaking = function(dados = {}) {
+  const necessidade = String(dados.necessidade || dados.nec || '').trim();
+  const sintomas = Array.isArray(dados.sintomas)
+    ? dados.sintomas.map(item => String(item).trim()).filter(Boolean)
+    : typeof dados.sintomas === 'string'
+      ? dados.sintomas.split(',').map(item => item.trim()).filter(Boolean)
+      : [];
+
+  const pacienteId = dados.pacienteId ?? dados.paciente_id ?? dados.paciente?.id ?? null;
+
+  return {
+    pacienteId,
+    paciente_id: dados.paciente_id ?? pacienteId ?? null,
+    necessidade,
+    sintomas,
+    data: dados.data || null,
+    hora: dados.hora || null
+  };
+};
+
+Storage.criarRecomendacoesLocais = function(dados = {}) {
+  const payload = this.normalizarMatchmaking(dados);
+  const medicos = this.getMedicos();
+
+  if (!payload.necessidade) {
+    throw new Error('Descreva sua necessidade para receber recomendações.');
+  }
+
+  if (!medicos.length) {
+    return {
+      triagem: { mensagem: 'Ainda não há médicos cadastrados para esta recomendação.' },
+      recomendacoes: []
+    };
+  }
+
+  const textoBase = `${payload.necessidade} ${payload.sintomas.join(' ')}`.toLowerCase();
+  const especialidades = [
+    { nome: 'Cardiologia', padroes: ['dor no peito', 'pressão alta', 'pressao alta', 'pressão', 'coração', 'cardio', 'arritmia', 'palpitação', 'falta de ar', 'desmaio', 'infarto'], peso: 26 },
+    { nome: 'Neurologia', padroes: ['dor de cabeça', 'cefaleia', 'confusão', 'confusao', 'tontura', 'nervoso', 'desmaio', 'formigamento', 'convulsão', 'fraqueza', 'sono'], peso: 24 },
+    { nome: 'Endocrinologia', padroes: ['diabetes', 'glicemia', 'peso', 'metabolismo', 'hormônio', 'hormoneio', 'tiroide', 'endócrino', 'endocrino', 'obesidade'], peso: 22 },
+    { nome: 'Ortopedia', padroes: ['joelho', 'quadril', 'ombro', 'coluna', 'tornozelo', 'dor no osso', 'articulação', 'articulacao', 'movimento', 'lesão', 'lesao'], peso: 23 },
+    { nome: 'Ginecologia', padroes: ['menstruação', 'menstruacao', 'ovário', 'ovario', 'ginecológico', 'ginecologico', 'ciclo', 'mulher', 'vaginal', 'infecção vaginal', 'infeccao vaginal'], peso: 21 },
+    { nome: 'Pediatria', padroes: ['criança', 'crianca', 'bebê', 'bebe', 'filho', 'infantil', 'pediatria', 'vacina', 'crescimento'], peso: 20 },
+    { nome: 'Psiquiatria', padroes: ['ansiedade', 'depressão', 'depressao', 'estresse', 'stresse', 'psiquiátrico', 'psiquiatrico', 'humor', 'insônia', 'insonia', 'sono'], peso: 24 },
+    { nome: 'Dermatologia', padroes: ['pele', 'mancha', 'coceira', 'dermatite', 'acne', 'espinha', 'rash', 'erupção', 'erupcao'], peso: 22 },
+    { nome: 'Oftalmologia', padroes: ['olho', 'visão', 'visao', 'vista', 'acuidade', 'oftalmologia', 'fotofobia', 'ardor nos olhos'], peso: 22 },
+    { nome: 'Gastroenterologia', padroes: ['estômago', 'estomago', 'digestão', 'digestao', 'azia', 'barriga', 'intestino', 'gastro', 'refluxo', 'náusea', 'nausea'], peso: 23 },
+    { nome: 'Urologia', padroes: ['urina', 'micção', 'miccao', 'próstata', ' prostata', 'infeccao urinaria', 'dor ao urinar', 'disúria', 'disuria'], peso: 22 },
+    { nome: 'Otorrinolaringologia', padroes: ['ouvido', 'nariz', 'garganta', 'sinusite', 'otite', 'tosse', 'dor de garganta'], peso: 20 },
+    { nome: 'Pneumologia', padroes: ['tosse', 'falta de ar', 'respiração', 'respiracao', 'pulmão', 'pulmao', 'asma'], peso: 23 },
+    { nome: 'Clínica Geral', padroes: ['consulta', 'rotina', 'checkup', 'exame', 'dor', 'febre', 'bem-estar', 'bem estar', 'atendimento inicial'], peso: 12 }
+  ];
+
+  const recomendacoes = medicos.map(medico => {
+    const especialidade = medico.especialidade || 'Clínica Geral';
+    const txtEspecialidade = especialidade.toLowerCase();
+    const context = `${medico.nome || ''} ${txtEspecialidade} ${payload.necessidade} ${payload.sintomas.join(' ')}`.toLowerCase();
+
+    let score = 18;
+    const motivos = [];
+
+    const especialidadeMatch = especialidades.filter(item =>
+      item.nome.toLowerCase() === txtEspecialidade.toLowerCase()
+      || item.padroes.some(padrao => textoBase.includes(padrao.toLowerCase()))
+    );
+
+    if (especialidadeMatch.length) {
+      const melhorMatch = especialidadeMatch.sort((a, b) => (b.peso || 0) - (a.peso || 0))[0];
+      score += 32 + (melhorMatch.peso || 0);
+      motivos.push(`Especialidade mais indicada: ${melhorMatch.nome}`);
+    }
+
+    const matchEspecialidadeDireta = especialidades.some(item =>
+      item.nome.toLowerCase() === txtEspecialidade.toLowerCase()
+    );
+    if (matchEspecialidadeDireta) {
+      score += 16;
+    }
+
+    if (payload.sintomas.length) {
+      const sintomasMatch = payload.sintomas.filter(sintoma => {
+        const termo = sintoma.toLowerCase();
+        return textoBase.includes(termo) || context.includes(termo);
+      }).length;
+      if (sintomasMatch > 0) {
+        score += Math.min(26, sintomasMatch * 10);
+        motivos.push(`${sintomasMatch} sintoma(s) compatível(is) com a especialidade.`);
+      }
+    }
+
+    const sintomasUrgentes = ['dor no peito', 'desmaio', 'falta de ar', 'sangramento', 'febre alta', 'pressão alta', 'desmaio', 'dificuldade para respirar'];
+    const urgencia = sintomasUrgentes.some(termo => textoBase.includes(termo));
+    if (urgencia && txtEspecialidade.includes('cardiologia')) {
+      score += 12;
+      motivos.push('Sintomas urgentes com priorização cardiológica');
+    }
+    if (urgencia && !txtEspecialidade.includes('cardiologia') && !txtEspecialidade.includes('clínica geral') && !txtEspecialidade.includes('clinica geral')) {
+      score -= 8;
+    }
+
+    const matchNecessidade = payload.necessidade.toLowerCase();
+    if (matchNecessidade) {
+      const termosNecessidade = matchNecessidade.split(/\s+/).filter(Boolean);
+      const necessidadePontos = termosNecessidade.filter(termo =>
+        txtEspecialidade.includes(termo) || context.includes(termo)
+      ).length;
+      if (necessidadePontos > 0) {
+        score += Math.min(12, necessidadePontos * 6);
+      }
+    }
+
+    const disponibilidade = !payload.hora || (payload.hora >= '08:00' && payload.hora <= '18:00');
+    score += disponibilidade ? 10 : 0;
+    motivos.push(disponibilidade ? 'Disponível em horário comercial' : 'Consulta preferencial em horário comercial');
+
+    return {
+      id: medico.id,
+      nome: medico.nome || 'Médico',
+      especialidade,
+      score: Math.min(99, Math.max(35, Math.round(score))),
+      disponibilidade,
+      motivo: motivos.slice(0, 2).join(' • '),
+      motivos: motivos.slice(0, 2)
+    };
+  }).sort((a, b) => b.score - a.score).slice(0, 5);
+
+  const mensagem = recomendacoes.length
+    ? `Encontrei ${recomendacoes.length} opção(ões) compatível(is) com sua necessidade.`
+    : 'Não foi possível encontrar uma sugestão com esses critérios. Tente outras palavras-chave.';
+
+  return { triagem: { mensagem }, recomendacoes };
+};
+
+Storage.buscarMatchmaking = async function(dados) {
+  const payload = this.normalizarMatchmaking(dados);
+
+  if (!payload.necessidade) {
+    throw new Error('Descreva sua necessidade para receber recomendações.');
+  }
+
+  try {
+    const result = await apiRequest('/matchmaking', {
+      method: 'POST',
+      body: JSON.stringify({
+        pacienteId: payload.pacienteId,
+        paciente_id: payload.paciente_id,
+        necessidade: payload.necessidade,
+        sintomas: payload.sintomas,
+        data: payload.data,
+        hora: payload.hora
+      })
+    });
+
+    if (result && Array.isArray(result.recomendacoes)) {
+      return result;
+    }
+
+    return {
+      triagem: result?.triagem || { mensagem: 'Análise concluída. Confira as recomendações abaixo.' },
+      recomendacoes: Array.isArray(result?.recomendacoes) ? result.recomendacoes : []
+    };
+  } catch (error) {
+    const fallback = this.criarRecomendacoesLocais(payload);
+    if (fallback.recomendacoes.length) {
+      return fallback;
+    }
+    throw error;
+  }
+};
+Storage.buscarMatchmakingPrioritario = function(dados) {
+  return this.buscarMatchmaking({
     pacienteId: dados.pacienteId,
     necessidade: dados.necessidade,
     sintomas: dados.sintomas || [],
     data: dados.data,
     hora: dados.hora
-  })
-});
+  });
+};
 Storage.buscarTriagem = dados => apiRequest('/triagem', {
   method: 'POST',
   body: JSON.stringify({

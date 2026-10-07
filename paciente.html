@@ -194,21 +194,107 @@
       text-align: left;
       border: 1px solid var(--cor-borda);
       border-top: 4px solid var(--cor-principal);
+      display: flex;
+      flex-direction: column;
+      gap: var(--espaco-sm);
     }
 
     .matchmaking-card h3 {
-      margin-bottom: var(--espaco-xs);
+      margin: 0;
+    }
+
+    .matchmaking-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--espaco-sm);
+      flex-wrap: wrap;
+    }
+
+    .matchmaking-tier {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 94px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: rgba(36, 104, 255, 0.12);
+      color: var(--cor-principal);
+    }
+
+    .matchmaking-score-wrap {
+      display: grid;
+      gap: 6px;
+      margin-top: var(--espaco-xs);
+    }
+
+    .matchmaking-score-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      color: var(--cor-texto-fraco);
+    }
+
+    .matchmaking-score-bar {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(36, 104, 255, 0.12);
+      overflow: hidden;
+    }
+
+    .matchmaking-score-fill {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #4f8cff 0%, #2ccf7a 100%);
     }
 
     .matchmaking-score,
     .matchmaking-availability {
-      margin: var(--espaco-sm) 0;
+      margin: 0;
       color: var(--cor-texto);
+      line-height: 1.5;
+    }
+
+    .matchmaking-reasons {
+      margin: 0;
+      padding-left: 1.1rem;
+      color: var(--cor-texto-secundario);
+      display: grid;
+      gap: 6px;
+    }
+
+    .matchmaking-form-quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: var(--espaco-sm);
+    }
+
+    .matchmaking-chip {
+      border: 1px solid var(--cor-borda);
+      background: var(--cor-fundo);
+      color: var(--cor-texto);
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-size: 0.82rem;
+    }
+
+    .matchmaking-chip:hover,
+    .matchmaking-chip:focus-visible {
+      border-color: var(--cor-principal);
+      color: var(--cor-principal);
+      outline: none;
     }
 
     .matchmaking-card button {
       width: 100%;
-      margin-top: var(--espaco-sm);
+      margin-top: var(--espaco-xs);
     }
 
     .matchmaking-card button:focus-visible,
@@ -618,12 +704,13 @@
   </style>
 </head>
 <body data-tipo="paciente">
+  <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
 
   <!-- Header (injetado pelo components.js) -->
   <div id="header-placeholder"></div>
   
   <!-- Conteúdo das Tabs -->
-  <main class="container">
+  <main id="main-content" class="container" aria-label="Conteúdo principal do paciente">
     
     <!-- ============================================ -->
     <!-- TAB: DASHBOARD                                -->
@@ -640,31 +727,31 @@
       </section>
       
       <section class="quick-actions">
-        <div class="action-card" onclick="Tabs.irPara('agendar')">
+        <div class="action-card" tabindex="0" role="button" aria-label="Ir para agendar consulta" onclick="Tabs.irPara('agendar')" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); Tabs.irPara('agendar'); }">
           <h3>Agendar Consulta</h3>
           <p>Marque uma nova consulta</p>
         </div>
         
-        <div class="action-card" onclick="Tabs.irPara('consultas')">
+        <div class="action-card" tabindex="0" role="button" aria-label="Ir para minhas consultas" onclick="Tabs.irPara('consultas')" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); Tabs.irPara('consultas'); }">
           <h3>Minhas Consultas</h3>
           <p>Ver histórico e próximas</p>
         </div>
         
-        <div class="action-card" onclick="Tabs.irPara('medicos')">
+        <div class="action-card" tabindex="0" role="button" aria-label="Ir para médicos" onclick="Tabs.irPara('medicos')" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); Tabs.irPara('medicos'); }">
           <h3>Médicos</h3>
           <p>Encontre especialistas</p>
         </div>
         
-        <div class="action-card" onclick="Tabs.irPara('chatbot')">
+        <div class="action-card" tabindex="0" role="button" aria-label="Abrir assistente virtual" onclick="Tabs.irPara('chatbot')" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); Tabs.irPara('chatbot'); }">
           <h3>Assistente</h3>
           <p>Tire suas dúvidas</p>
         </div>
       </section>
 
-      <section id="matchmakingSection" style="background: var(--cor-card); padding: var(--espaco-lg); border-radius: var(--radius-lg); margin-bottom: var(--espaco-xl);">
-        <h2 style="color: var(--cor-principal); margin-bottom: var(--espaco-sm);">Encontre o médico ideal</h2>
-        <p>Informe sua necessidade para receber recomendações compatíveis.</p>
-        <form id="matchmakingForm" class="filtros-grid">
+      <section id="matchmakingSection" class="content-panel section-panel" aria-labelledby="matchmakingTitle">
+        <h2 id="matchmakingTitle" class="section-title">Encontre o médico ideal</h2>
+        <p class="section-description">Informe sua necessidade para receber recomendações compatíveis.</p>
+        <form id="matchmakingForm" class="filtros-grid" aria-label="Formulário de matchmaking">
           <div class="form-group">
             <label for="matchNecessidade">Necessidade</label>
             <input id="matchNecessidade" required placeholder="Ex.: dor no peito, ansiedade ou consulta de rotina">
@@ -685,8 +772,15 @@
             <button class="btn-primary" type="submit">Encontrar médicos</button>
           </div>
         </form>
-        <div id="matchmakingStatus" role="status" style="margin-top: var(--espaco-md);"></div>
-        <div id="matchmakingResults" class="medicos-grid" style="margin-top: var(--espaco-md);"></div>
+        <div class="matchmaking-form-quick-actions" aria-label="Sugestões rápidas de matchmaking">
+          <span style="font-size: 0.8rem; color: var(--cor-texto-secundario); align-self: center;">Sugestões rápidas:</span>
+          <button type="button" class="matchmaking-chip" data-need="Dor no peito" data-symptoms="pressão, palpitação">Dor no peito</button>
+          <button type="button" class="matchmaking-chip" data-need="Ansiedade" data-symptoms="nervoso, dificuldade para dormir">Ansiedade</button>
+          <button type="button" class="matchmaking-chip" data-need="Consulta de rotina" data-symptoms="checkup, bem-estar">Rotina</button>
+          <button type="button" class="matchmaking-chip" data-need="Dor no joelho" data-symptoms="inchaço, dificuldade para andar">Joelho</button>
+        </div>
+        <div id="matchmakingStatus" class="status-message" role="status" aria-live="polite"></div>
+        <div id="matchmakingResults" class="medicos-grid" style="margin-top: var(--espaco-md);" aria-live="polite"></div>
       </section>
       
       <section style="margin-bottom: var(--espaco-xl);">
@@ -923,10 +1017,10 @@
           </form>
           
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 15px;">
-            <button class="category-btn" data-category="agendamento" style="background: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 8px; padding: 10px; cursor: pointer;">Agendamento</button>
-            <button class="category-btn" data-category="medicos" style="background: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 8px; padding: 10px; cursor: pointer;">Médicos</button>
-            <button class="category-btn" data-category="matchmaking" style="background: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 8px; padding: 10px; cursor: pointer;">Matchmaking</button>
-            <button class="category-btn" data-category="duvidas" style="background: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 8px; padding: 10px; cursor: pointer;">Dúvidas</button>
+            <button type="button" class="category-btn" data-category="agendamento" aria-label="Perguntas sobre agendamento">Agendamento</button>
+            <button type="button" class="category-btn" data-category="medicos" aria-label="Perguntas sobre médicos">Médicos</button>
+            <button type="button" class="category-btn" data-category="matchmaking" aria-label="Perguntas sobre matchmaking">Matchmaking</button>
+            <button type="button" class="category-btn" data-category="duvidas" aria-label="Dúvidas gerais">Dúvidas</button>
           </div>
         </div>
       </div>
@@ -1198,6 +1292,17 @@
         dateInput.min = `${ano}-${mes}-${dia}`;
       }
 
+      const quickButtons = document.querySelectorAll('.matchmaking-chip');
+      quickButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const needInput = document.getElementById('matchNecessidade');
+          const symptomsInput = document.getElementById('matchSintomas');
+          if (needInput) needInput.value = button.dataset.need || needInput.value;
+          if (symptomsInput) symptomsInput.value = button.dataset.symptoms || symptomsInput.value;
+          needInput?.focus();
+        });
+      });
+
       form.addEventListener('submit', async event => {
         event.preventDefault();
         if (submitButton?.disabled) return;
@@ -1205,6 +1310,13 @@
         const paciente = Storage.getPacientePorUsuarioId(user.id);
         if (!paciente) {
           status.textContent = 'Perfil de paciente não encontrado.';
+          return;
+        }
+
+        const necessidade = document.getElementById('matchNecessidade').value.trim();
+        if (!necessidade) {
+          status.textContent = 'Descreva sua necessidade para receber recomendações mais precisas.';
+          document.getElementById('matchNecessidade')?.focus();
           return;
         }
 
@@ -1217,8 +1329,9 @@
         results.replaceChildren();
         try {
           const resposta = await Storage.buscarMatchmaking({
+            pacienteId: paciente.id,
             paciente_id: paciente.id,
-            necessidade: document.getElementById('matchNecessidade').value.trim(),
+            necessidade,
             sintomas: document.getElementById('matchSintomas').value.split(',').map(item => item.trim()).filter(Boolean),
             data: document.getElementById('matchData').value || null,
             hora: document.getElementById('matchHora').value || null
@@ -1248,30 +1361,63 @@
           const card = document.createElement('article');
           card.className = 'medico-card matchmaking-card';
 
+          const cabecalho = document.createElement('div');
+          cabecalho.className = 'matchmaking-header';
+
           const nome = document.createElement('h3');
           nome.textContent = medico.nome || 'Médico';
-          card.appendChild(nome);
+          cabecalho.appendChild(nome);
+
+          const score = Number(medico.score ?? 0);
+          const nivel = score >= 80 ? 'Excelente' : score >= 60 ? 'Boa' : 'Moderada';
+          const tier = document.createElement('span');
+          tier.className = 'matchmaking-tier';
+          tier.textContent = nivel;
+          cabecalho.appendChild(tier);
+          card.appendChild(cabecalho);
 
           const especialidade = document.createElement('p');
+          especialidade.className = 'medico-especialidade';
           especialidade.textContent = medico.especialidade || 'Especialidade não informada';
           card.appendChild(especialidade);
 
-          if (medico.score !== undefined && medico.score !== null && medico.score !== '') {
-            const pontuacao = document.createElement('p');
-            pontuacao.className = 'matchmaking-score';
-            pontuacao.textContent = `Compatibilidade: ${medico.score} pontos`;
-            card.appendChild(pontuacao);
-          }
+          const scoreWrap = document.createElement('div');
+          scoreWrap.className = 'matchmaking-score-wrap';
+          const scoreLabel = document.createElement('div');
+          scoreLabel.className = 'matchmaking-score-label';
+          scoreLabel.innerHTML = '<span>Compatibilidade</span><strong>' + Math.min(100, score) + '%</strong>';
+          scoreWrap.appendChild(scoreLabel);
+
+          const bar = document.createElement('div');
+          bar.className = 'matchmaking-score-bar';
+          const fill = document.createElement('span');
+          fill.className = 'matchmaking-score-fill';
+          fill.style.width = `${Math.min(100, Math.max(0, score))}%`;
+          bar.appendChild(fill);
+          scoreWrap.appendChild(bar);
+          card.appendChild(scoreWrap);
 
           const disponibilidade = medico.disponibilidade ?? medico.disponivel;
-          if (disponibilidade !== undefined && disponibilidade !== null) {
-            const statusDisponibilidade = document.createElement('p');
-            statusDisponibilidade.className = 'matchmaking-availability';
-            statusDisponibilidade.textContent = typeof disponibilidade === 'boolean'
-              ? (disponibilidade ? 'Disponível no horário solicitado' : 'Sem disponibilidade no horário solicitado')
-              : `Disponibilidade: ${disponibilidade}`;
-            card.appendChild(statusDisponibilidade);
-          }
+          const disponibilidadeValor = typeof disponibilidade === 'boolean'
+            ? (disponibilidade ? 'Disponível no horário solicitado' : 'Sem disponibilidade no horário solicitado')
+            : (disponibilidade ? `Disponibilidade: ${disponibilidade}` : 'Disponibilidade a confirmar');
+
+          const statusDisponibilidade = document.createElement('p');
+          statusDisponibilidade.className = 'matchmaking-availability';
+          statusDisponibilidade.textContent = disponibilidadeValor;
+          card.appendChild(statusDisponibilidade);
+
+          const motivos = Array.isArray(medico.motivos) && medico.motivos.length
+            ? medico.motivos
+            : [medico.motivo || 'Perfil compatível com sua necessidade'];
+          const reasonsList = document.createElement('ul');
+          reasonsList.className = 'matchmaking-reasons';
+          motivos.slice(0, 2).forEach(motivo => {
+            const item = document.createElement('li');
+            item.textContent = motivo;
+            reasonsList.appendChild(item);
+          });
+          card.appendChild(reasonsList);
 
           const escolher = document.createElement('button');
           escolher.type = 'button';

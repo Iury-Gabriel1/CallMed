@@ -60,17 +60,25 @@ const Tabs = {
     
     // Desativar todas as tabs (conteúdo)
     document.querySelectorAll('.tab-content').forEach(el => {
-      el.classList.remove('active');
+      const isActive = el === tabContent;
+      el.classList.toggle('active', isActive);
+      el.setAttribute('aria-hidden', String(!isActive));
+      el.setAttribute('tabindex', isActive ? '0' : '-1');
     });
     
     // Desativar todos os botões (se existirem)
     document.querySelectorAll('.tab-btn').forEach(el => {
-      el.classList.remove('active');
+      const isActive = el.dataset.tab === tabName;
+      el.classList.toggle('active', isActive);
+      el.setAttribute('aria-selected', String(isActive));
+      el.tabIndex = isActive ? 0 : -1;
     });
     
     // Desativar todos os links do header
     document.querySelectorAll('[data-tab-link]').forEach(link => {
-      link.classList.remove('active');
+      const isActive = link.dataset.tabLink === tabName;
+      link.classList.toggle('active', isActive);
+      link.setAttribute('aria-current', isActive ? 'page' : 'false');
     });
     
     // Ativar a tab selecionada
