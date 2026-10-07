@@ -1870,42 +1870,38 @@
       return true;
     }
     
-    function carregarHorariosDisponiveis() {
+    async function carregarHorariosDisponiveis() {
       const loading = document.getElementById('loadingHorarios');
       const container = document.getElementById('horariosContainer');
       const semHorarios = document.getElementById('semHorarios');
+      dadosAgendamento.hora = null;
       
       if (loading) loading.style.display = 'block';
       if (container) container.style.display = 'none';
       if (semHorarios) semHorarios.style.display = 'none';
       
-      setTimeout(() => {
-        const horarios = gerarHorariosDisponiveis();
+      try {
+        const resultado = await Storage.buscarDisponibilidadeMedico(
+          dadosAgendamento.medicoId,
+          dadosAgendamento.data
+        );
+        const horarios = (resultado.horarios || []).map(item => ({
+          horario: item.hora,
+          disponivel: item.disponivel
+        }));
         renderizarHorarios(horarios);
-        
-        if (loading) loading.style.display = 'none';
+
         if (horarios.length > 0) {
           if (container) container.style.display = 'block';
         } else {
           if (semHorarios) semHorarios.style.display = 'block';
         }
-      }, 500);
-    }
-    
-    function gerarHorariosDisponiveis() {
-      const agendamentos = Storage.getAgendamentos();
-      const ocupados = agendamentos
-        .filter(a => a.medicoId == dadosAgendamento.medicoId && 
-                     a.data === dadosAgendamento.data && 
-                     a.status !== 'cancelado')
-        .map(a => a.hora);
-      
-      const todos = ['08:00', '09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'];
-      
-      return todos.map(horario => ({
-        horario,
-        disponivel: !ocupados.includes(horario)
-      }));
+      } catch (error) {
+        alert(`Não foi possível consultar os horários: ${error.message}`);
+        if (semHorarios) semHorarios.style.display = 'block';
+      } finally {
+        if (loading) loading.style.display = 'none';
+      }
     }
     
     function renderizarHorarios(horarios) {
@@ -2042,19 +2038,22 @@
       }).join('');
     }
     
-    function cancelarConsulta(consultaId) {
+    async function cancelarConsulta(consultaId) {
       if (!confirm('Tem certeza que deseja cancelar esta consulta?')) return;
       
-      const agendamentos = Storage.getAgendamentos();
-      const idx = agendamentos.findIndex(a => a.id == consultaId);
-      
-      if (idx !== -1) {
-        agendamentos[idx].status = 'cancelado';
-        agendamentos[idx].canceladoEm = new Date().toISOString();
-        localStorage.setItem('CallMed_agendamentos', JSON.stringify(agendamentos));
-        
+      const agendamento = Storage.getAgendamentos().find(a => a.id == consultaId);
+      if (!agendamento) return;
+
+      try {
+        await Storage.salvarAgendamento({
+          ...agendamento,
+          status: 'cancelado',
+          canceladoEm: new Date().toISOString()
+        });
         alert('Consulta cancelada!');
         carregarConsultasPaciente();
+      } catch (error) {
+        alert(`Não foi possível cancelar a consulta: ${error.message}`);
       }
     }
     

@@ -666,54 +666,47 @@ Storage.excluirClinica = async function(id) {
   this._cache.clinicas = this._cache.clinicas.filter(item => item.id != id);
 };
 Storage.salvarAgendamento = async function(agendamento) {
-  const paciente = this.getPacientes().find(item => item.id == agendamento.pacienteId);
-  const medico = this.getMedicos().find(item => item.id == agendamento.medicoId);
+  const existing = agendamento.id
+    ? this.getAgendamentos().find(item => item.id == agendamento.id)
+    : null;
+  const dados = { ...existing, ...agendamento };
+  const paciente = this.getPacientes().find(item => item.id == dados.pacienteId);
+  const medico = this.getMedicos().find(item => item.id == dados.medicoId);
   const payload = {
-    ...agendamento,
-    pacienteId: Number(agendamento.pacienteId),
-    medicoId: Number(agendamento.medicoId),
-    pacienteNome: agendamento.pacienteNome || paciente?.nome,
-    pacienteTelefone: agendamento.pacienteTelefone || paciente?.telefone,
-    medicoNome: agendamento.medicoNome || medico?.nome,
-    medicoEspecialidade: agendamento.medicoEspecialidade || medico?.especialidade,
-    status: agendamento.status || 'agendado',
-    data: agendamento.data || new Date().toISOString().split('T')[0],
-    hora: agendamento.hora || agendamento.horario || '08:00'
+    ...dados,
+    pacienteId: Number(dados.pacienteId),
+    medicoId: Number(dados.medicoId),
+    pacienteNome: dados.pacienteNome || paciente?.nome,
+    pacienteTelefone: dados.pacienteTelefone || paciente?.telefone,
+    medicoNome: dados.medicoNome || medico?.nome,
+    medicoEspecialidade: dados.medicoEspecialidade || medico?.especialidade,
+    status: dados.status || 'agendado',
+    data: dados.data || new Date().toISOString().split('T')[0],
+    hora: dados.hora || dados.horario || '08:00'
   };
 
-  const localAgendamentos = this.getAgendamentos();
-  const savedLocal = payload.id
-    ? localAgendamentos.map(item => item.id == payload.id ? { ...item, ...payload } : item)
-    : [...localAgendamentos, { ...payload, id: payload.id || Date.now() }];
-
-  this._cache.agendamentos = savedLocal;
-  localStorage.setItem('CallMed_agendamentos', JSON.stringify(savedLocal));
-
-  try {
-    const result = await apiRequest(payload.id ? '/agendamentos' : '/agenda', {
-      method: 'POST', body: JSON.stringify(payload)
-    });
-    const saved = result?.agendamento || result || { ...payload, id: payload.id || Date.now() };
-    this._cache.agendamentos = payload.id
-      ? this._cache.agendamentos.map(item => item.id == payload.id ? { ...saved, ...item, id: payload.id } : item)
-      : [...this._cache.agendamentos.filter(item => item.id != saved.id), saved];
-    localStorage.setItem('CallMed_agendamentos', JSON.stringify(this._cache.agendamentos));
-    return saved;
-  } catch (error) {
-    return savedLocal.find(item => item.id == (payload.id || savedLocal[savedLocal.length - 1]?.id)) || savedLocal[savedLocal.length - 1];
-  }
+  const endpoint = payload.id ? `/agendamentos/${payload.id}` : '/agendamentos';
+  const result = await apiRequest(endpoint, {
+    method: payload.id ? 'PUT' : 'POST',
+    body: JSON.stringify(payload)
+  });
+  const saved = result?.agendamento || result;
+  this._cache.agendamentos = payload.id
+    ? this._cache.agendamentos.map(item => item.id == payload.id ? saved : item)
+    : [...this._cache.agendamentos, saved];
+  localStorage.setItem('CallMed_agendamentos', JSON.stringify(this._cache.agendamentos));
+  return saved;
 };
 Storage.excluirAgendamento = async function(id) {
+  await apiRequest(`/agendamentos/${id}`, { method: 'DELETE' });
   const agendamentos = this.getAgendamentos().filter(item => item.id != id);
   this._cache.agendamentos = agendamentos;
   localStorage.setItem('CallMed_agendamentos', JSON.stringify(agendamentos));
-
-  try {
-    await apiRequest(`/agenda/${id}`, { method: 'DELETE' });
-  } catch (error) {
-    // fallback local: já foi salvo em storage acima
-  }
   return agendamentos;
+};
+Storage.buscarDisponibilidadeMedico = async function(medicoId, data) {
+  const query = new URLSearchParams({ data });
+  return apiRequest(`/medicos/${medicoId}/disponibilidade?${query}`);
 };
 Storage.salvarConfiguracoes = async function(config) {
   this._config = await apiRequest('/config', { method: 'POST', body: JSON.stringify(config) });

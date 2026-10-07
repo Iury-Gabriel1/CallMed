@@ -701,14 +701,12 @@ const Medico = {
     if (medico) Medico.carregarAgenda(medico.id, periodo);
   },
 
-  alterarStatusConsulta: (consultaId, novoStatus) => {
-    const agendamentos = Storage.getAgendamentos();
-    const consultaIndex = agendamentos.findIndex(a => a.id == consultaId);
-    
-    if (consultaIndex !== -1) {
-      agendamentos[consultaIndex].status = novoStatus;
-      localStorage.setItem('CallMed_agendamentos', JSON.stringify(agendamentos));
-      
+  alterarStatusConsulta: async (consultaId, novoStatus) => {
+    const consulta = Storage.getAgendamentos().find(a => a.id == consultaId);
+    if (!consulta) return;
+
+    try {
+      await Storage.salvarAgendamento({ ...consulta, status: novoStatus });
       const modal = document.getElementById('modalAgenda');
       if (modal) {
         const titulo = modal.querySelector('h2').textContent;
@@ -720,8 +718,9 @@ const Medico = {
           Medico.carregarAgenda(medico.id, periodoAtivo);
         }
       }
-      
       alert(`Consulta ${novoStatus} com sucesso!`);
+    } catch (error) {
+      alert(`Não foi possível atualizar a consulta: ${error.message}`);
     }
   },
 

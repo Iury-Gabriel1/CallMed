@@ -244,9 +244,13 @@ const Agendamento = {
   async cancelarAgendamento(id) {
     if (confirm('Tem certeza que deseja cancelar esta consulta?')) {
       console.log('🗑️ Cancelando agendamento ID:', id);
-      await Storage.excluirAgendamento(id);
-      this.renderTable();
-      alert('✅ Consulta cancelada com sucesso!');
+      try {
+        await Storage.excluirAgendamento(id);
+        this.renderTable();
+        alert('✅ Consulta cancelada com sucesso!');
+      } catch (error) {
+        alert(`Não foi possível cancelar a consulta: ${error.message}`);
+      }
     }
   },
 
