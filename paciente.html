@@ -1003,24 +1003,25 @@
         <div class="chatbot-header">
           <img src="assets/images/chatbot.png" alt="Chatbot" style="width: 40px; height: 40px;">
           <div>
-            <h2 style="margin: 0; font-size: 1.2rem;">Assistente Virtual</h2>
-            <p style="margin: 0; font-size: 0.8rem; opacity: 0.9;">Como posso ajudar você hoje?</p>
+            <h2 style="margin: 0; font-size: 1.2rem;">Assistente virtual de saúde</h2>
+            <p style="margin: 0; font-size: 0.8rem; opacity: 0.9;">Uma conversa acolhedora, sem diagnósticos</p>
           </div>
+          <button type="button" class="category-btn" data-chat-action="new" style="margin-left: auto; background: transparent; border-color: rgba(255,255,255,.7); color: white;">Nova conversa</button>
         </div>
         
-        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-messages" id="chatMessages" aria-live="polite" aria-label="Mensagens do assistente"></div>
         
         <div class="chat-input-container">
           <form id="chatForm" class="chat-input-form">
-            <textarea class="chat-input" id="messageInput" placeholder="Digite sua mensagem..." rows="1" required></textarea>
+            <textarea class="chat-input" id="messageInput" placeholder="Conte com suas palavras o que está sentindo..." rows="1" maxlength="2000" required></textarea>
             <button type="submit" class="send-btn">Enviar</button>
           </form>
           
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 15px;">
-            <button type="button" class="category-btn" data-category="agendamento" aria-label="Perguntas sobre agendamento">Agendamento</button>
-            <button type="button" class="category-btn" data-category="medicos" aria-label="Perguntas sobre médicos">Médicos</button>
-            <button type="button" class="category-btn" data-category="matchmaking" aria-label="Perguntas sobre matchmaking">Matchmaking</button>
-            <button type="button" class="category-btn" data-category="duvidas" aria-label="Dúvidas gerais">Dúvidas</button>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px;">
+            <button type="button" class="category-btn" data-chat-action="new">Começar triagem</button>
+            <button type="button" class="category-btn" data-chat-message="Como funciona a triagem?">Como funciona?</button>
+            <button type="button" class="category-btn" data-chat-message="Você faz diagnóstico?">Sobre diagnósticos</button>
+            <button type="button" class="category-btn" data-chat-message="Quero saber sobre médicos">Médicos</button>
           </div>
         </div>
       </div>
@@ -1225,7 +1226,9 @@
   <!-- ============================================ -->
   <script src="js/components.js"></script>
   <script src="js/tabs.js"></script>
+  <script src="js/config.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/chatbot.js"></script>
   <script src="js/crud.js"></script>
   <script src="js/agendamento.js"></script>
   <script src="js/features.js"></script>

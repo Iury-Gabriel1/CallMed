@@ -1043,24 +1043,25 @@
         <div class="chatbot-header">
           <img src="assets/images/chatbot.png" alt="Chatbot" style="width: 40px; height: 40px;">
           <div>
-            <h2 style="margin: 0; font-size: 1.2rem;">Assistente Médico Inteligente</h2>
-            <p style="margin: 0; font-size: 0.8rem; opacity: 0.9;">Suporte avançado para decisões clínicas</p>
+            <h2 style="margin: 0; font-size: 1.2rem;">Assistente da CallMed</h2>
+            <p style="margin: 0; font-size: 0.8rem; opacity: 0.9;">Informações sobre a clínica e o sistema</p>
           </div>
+          <button type="button" class="category-btn" data-chat-action="new" style="margin-left: auto; background: transparent; border-color: rgba(255,255,255,.7); color: white;">Nova conversa</button>
         </div>
         
-        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-messages" id="chatMessages" aria-live="polite" aria-label="Mensagens do assistente"></div>
         
         <div class="chat-input-container">
           <form id="chatForm" class="chat-input-form">
-            <textarea class="chat-input" id="messageInput" placeholder="Descreva sintomas, solicite análise..." rows="1" required></textarea>
+            <textarea class="chat-input" id="messageInput" placeholder="Pergunte sobre médicos, agenda ou triagem..." rows="1" maxlength="2000" required></textarea>
             <button type="submit" class="send-btn">Enviar</button>
           </form>
           
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 15px;">
-            <button class="category-btn" data-category="triagem" style="background: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 8px; padding: 10px; cursor: pointer;">Triagem</button>
-            <button class="category-btn" data-category="diagnostico" style="background: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 8px; padding: 10px; cursor: pointer;">Diagnóstico</button>
-            <button class="category-btn" data-category="medicamentos" style="background: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 8px; padding: 10px; cursor: pointer;">Medicamentos</button>
-            <button class="category-btn" data-category="estatisticas" style="background: var(--cor-fundo); border: 1px solid var(--cor-borda); border-radius: 8px; padding: 10px; cursor: pointer;">Estatísticas</button>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px;">
+            <button type="button" class="category-btn" data-chat-message="Quais médicos estão cadastrados?">Médicos</button>
+            <button type="button" class="category-btn" data-chat-message="Como vejo os agendamentos?">Agenda</button>
+            <button type="button" class="category-btn" data-chat-message="Como funciona a triagem?">Triagem</button>
+            <button type="button" class="category-btn" data-chat-message="O que você pode fazer?">Ajuda</button>
           </div>
         </div>
       </div>
@@ -1237,7 +1238,9 @@
   <!-- ============================================ -->
   <script src="js/components.js"></script>
   <script src="js/tabs.js"></script>
+  <script src="js/config.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/chatbot.js"></script>
   <script src="js/crud.js"></script>
   <script src="js/agendamento.js"></script>
   <script src="js/features.js"></script>

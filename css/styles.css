@@ -1341,6 +1341,15 @@ button {
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
 }
 
+.chat-messages .message {
+  white-space: pre-line;
+}
+
+.chat-messages .message.typing {
+  opacity: 0.7;
+  font-style: italic;
+}
+
 .category-btn:hover,
 .category-btn:focus-visible {
   border-color: var(--cor-principal);

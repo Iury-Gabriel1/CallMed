@@ -21,7 +21,9 @@ const urlsToCache = [
   // JS
   '/js/components.js',
   '/js/tabs.js',
+  '/js/config.js',
   '/js/app.js',
+  '/js/chatbot.js',
   '/js/crud.js',
   '/js/agendamento.js',
   '/js/features.js',

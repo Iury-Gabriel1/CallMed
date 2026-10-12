@@ -42,6 +42,7 @@ const Storage = {
 
   logout() {
     localStorage.removeItem('usuarioLogado');
+    localStorage.removeItem('callmed_token');
   },
 
   getPacientePorUsuarioId(usuarioId) {
@@ -515,14 +516,23 @@ const Storage = {
    API PRINCIPAL
    =========================================================== */
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = window.CALLMED_API_URL;
 
 async function apiRequest(endpoint, options = {}) {
   let response;
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(options.headers || {})
+  };
+  const token = localStorage.getItem('callmed_token');
+  if (token && !headers.Authorization) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
   try {
     response = await fetch(`${API_URL}${endpoint}`, {
-      headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
-      ...options
+      ...options,
+      headers
     });
   } catch (error) {
     throw new Error('Backend indisponível. Verifique se a API está em execução.');
@@ -615,6 +625,10 @@ Storage.criarPacienteParaUsuario = async function(usuarioId, dadosPaciente) {
 Storage.login = async function(email, senha) {
   const result = await apiRequest('/login', { method: 'POST', body: JSON.stringify({ email, senha }) });
   const user = result.usuario || result;
+  if (!result.token) {
+    throw new Error('A API não retornou o token de autenticação.');
+  }
+  localStorage.setItem('callmed_token', result.token);
   localStorage.setItem('usuarioLogado', JSON.stringify(user));
   return user;
 };
