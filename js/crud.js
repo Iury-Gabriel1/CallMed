@@ -150,7 +150,21 @@ document.addEventListener("DOMContentLoaded", () => {
 const Medico = {
   getAll: () => Storage.getMedicos(),
 
+  isPerfilMedico: () => Storage.getPerfilAcesso() === 'medico',
+
+  pertenceAoMedicoLogado: (medico) => {
+    const medicoLogado = Storage.getMedicoLogado();
+    return Boolean(medicoLogado && medico && String(medico.id) === String(medicoLogado.id));
+  },
+
+  exigirAdministrador: () => {
+    if (!Medico.isPerfilMedico()) return true;
+    alert('Esta função está disponível somente para administradores.');
+    return false;
+  },
+
   add: async (medico) => {
+    if (!Medico.exigirAdministrador()) return false;
     const resultado = await Storage.salvarMedico(medico);
     Medico.renderTable();
     if (resultado) alert("✅ Médico adicionado com sucesso!");
@@ -159,6 +173,7 @@ const Medico = {
   },
 
   remove: async (id) => {
+    if (!Medico.exigirAdministrador()) return;
     const usuarioLogado = Storage.getUsuarioLogado();
     const medico = Medico.getAll().find(m => m.id == id);
     
@@ -184,6 +199,7 @@ const Medico = {
   },
 
   update: async (id, dados) => {
+    if (!Medico.exigirAdministrador()) return null;
     const medicoExistente = Medico.getAll().find(m => m.id == id);
     if (!medicoExistente) {
       alert("❌ Médico não encontrado!");
@@ -207,7 +223,10 @@ const Medico = {
 
   isMedicoLogado: (medico) => {
     const usuarioLogado = Storage.getUsuarioLogado();
-    return usuarioLogado && medico.usuarioId && medico.usuarioId.toString() === usuarioLogado.id.toString();
+    return Boolean(usuarioLogado && medico && (
+      (medico.usuarioId && String(medico.usuarioId) === String(usuarioLogado.id)) ||
+      (usuarioLogado.email && medico.email?.toLowerCase() === usuarioLogado.email.toLowerCase())
+    ));
   },
 
   carregarClinicasNoSelect: () => {
@@ -289,15 +308,29 @@ const Medico = {
   renderTable: () => {
     const tbody = document.querySelector("#medicosTable tbody");
     const cardsContainer = document.getElementById("medicosCards");
-    const emptyState = document.getElementById("emptyState");
+    const emptyState = document.getElementById("emptyStateMedicos") || document.getElementById("emptyState");
     
     if (!tbody) return;
 
     tbody.innerHTML = "";
     if (cardsContainer) cardsContainer.innerHTML = "";
     
-    const medicos = Medico.getAll();
+    const perfilMedico = Medico.isPerfilMedico();
+    const medicoLogado = Storage.getMedicoLogado();
+    const medicos = Medico.getAll().filter(medico =>
+      !perfilMedico || (medicoLogado && String(medico.id) === String(medicoLogado.id))
+    );
     const clinicas = Storage.getClinicas() || [];
+
+    if (perfilMedico) {
+      const cabecalho = document.querySelectorAll('#medicosTable thead th');
+      ['Médico', 'Especialidade', 'Clínica', 'Contato', 'Ações'].forEach((texto, index) => {
+        if (cabecalho[index]) cabecalho[index].textContent = texto;
+      });
+      cabecalho.forEach((celula, index) => {
+        if (index >= 5) celula.hidden = true;
+      });
+    }
 
     if (medicos.length === 0) {
       if (emptyState) emptyState.style.display = 'block';
@@ -319,34 +352,46 @@ const Medico = {
         tr.style.fontWeight = '600';
       }
 
-      tr.innerHTML = `
-        <td>
-          ${m.nome || 'Nome não informado'}
-          ${isMedicoLogado ? ' <span style="color: var(--cor-principal);">(Você)</span>' : ''}
-          ${m.usuarioId ? '<br><small style="color: var(--cor-secundaria);">👤 Automático</small>' : ''}
-        </td>
-        <td>${m.especialidade || 'Não informada'}</td>
-        <td>
-          ${clinicaNome !== 'Não vinculado' 
-            ? `<span class="clinica-badge">${clinicaNome}</span>` 
-            : '<span style="color: var(--cor-secundaria); font-size: 0.8rem;">Não vinculado</span>'}
-        </td>
-        <td>${m.telefone || 'Não informado'}</td>
-        <td>${m.email || 'Email não informado'}</td>
-        <td>
-          <span class="status-badge ${m.status === 'ativo' ? 'status-ativo' : 'status-inativo'}">
-            ${m.status === 'ativo' ? 'Ativo' : 'Inativo'}
-          </span>
-        </td>
-        <td class="acoes-cell">
-          ${isMedicoLogado ? 
-            `<button class="btn-acao btn-ver-agenda" onclick="Medico.verMinhaAgenda()">📅 Minha Agenda</button>` : 
-            `<button class="btn-acao btn-editar" onclick="Medico.edit(${m.id})">✏️ Editar</button>
-            <button class="btn-acao btn-excluir" onclick="Medico.remove(${m.id})">🗑️ Excluir</button>
-            <button class="btn-acao btn-ver-agenda" onclick="Medico.verAgenda(${m.id})">📅 Agenda</button>`
-          }
-        </td>
-      `;
+      if (perfilMedico) {
+        tr.innerHTML = `
+          <td>${m.nome || 'Nome não informado'}</td>
+          <td>${m.especialidade || 'Não informada'}</td>
+          <td>${clinicaNome}</td>
+          <td>${m.telefone || 'Não informado'}<br><small>${m.email || 'E-mail não informado'}</small></td>
+          <td class="acoes-cell">
+            <button class="btn-acao btn-ver-agenda" onclick="Medico.verMinhaAgenda()">Minha agenda</button>
+          </td>
+        `;
+      } else {
+        tr.innerHTML = `
+          <td>
+            ${m.nome || 'Nome não informado'}
+            ${isMedicoLogado ? ' <span style="color: var(--cor-principal);">(Você)</span>' : ''}
+            ${m.usuarioId ? '<br><small style="color: var(--cor-secundaria);">👤 Automático</small>' : ''}
+          </td>
+          <td>${m.especialidade || 'Não informada'}</td>
+          <td>
+            ${clinicaNome !== 'Não vinculado'
+              ? `<span class="clinica-badge">${clinicaNome}</span>`
+              : '<span style="color: var(--cor-secundaria); font-size: 0.8rem;">Não vinculado</span>'}
+          </td>
+          <td>${m.telefone || 'Não informado'}</td>
+          <td>${m.email || 'Email não informado'}</td>
+          <td>
+            <span class="status-badge ${m.status === 'ativo' ? 'status-ativo' : 'status-inativo'}">
+              ${m.status === 'ativo' ? 'Ativo' : 'Inativo'}
+            </span>
+          </td>
+          <td class="acoes-cell">
+            ${isMedicoLogado ?
+              `<button class="btn-acao btn-ver-agenda" onclick="Medico.verMinhaAgenda()">📅 Minha Agenda</button>` :
+              `<button class="btn-acao btn-editar" onclick="Medico.edit(${m.id})">✏️ Editar</button>
+              <button class="btn-acao btn-excluir" onclick="Medico.remove(${m.id})">🗑️ Excluir</button>
+              <button class="btn-acao btn-ver-agenda" onclick="Medico.verAgenda(${m.id})">📅 Agenda</button>`
+            }
+          </td>
+        `;
+      }
       tbody.appendChild(tr);
     });
 
@@ -399,6 +444,7 @@ const Medico = {
   },
 
   edit: (id) => {
+    if (!Medico.exigirAdministrador()) return;
     const medico = Medico.getAll().find(m => m.id == id);
     if (!medico) {
       alert("❌ Médico não encontrado!");
@@ -528,7 +574,7 @@ const Medico = {
 
   verAgenda: (medicoId) => {
     const medico = Medico.getAll().find(m => m.id == medicoId);
-    if (!medico) {
+    if (!medico || (Medico.isPerfilMedico() && !Medico.pertenceAoMedicoLogado(medico))) {
       alert('❌ Médico não encontrado.');
       return;
     }
@@ -577,6 +623,12 @@ const Medico = {
   },
 
   carregarAgenda: (medicoId, periodo = 'hoje') => {
+    const medicoLogado = Storage.getMedicoLogado();
+    if (Medico.isPerfilMedico() && (!medicoLogado || String(medicoId) !== String(medicoLogado.id))) {
+      alert('Você só pode acessar sua própria agenda.');
+      return;
+    }
+
     const agendamentos = Storage.getAgendamentos();
     const hoje = new Date();
     
@@ -704,6 +756,11 @@ const Medico = {
   alterarStatusConsulta: async (consultaId, novoStatus) => {
     const consulta = Storage.getAgendamentos().find(a => a.id == consultaId);
     if (!consulta) return;
+    const medicoLogado = Storage.getMedicoLogado();
+    if (Medico.isPerfilMedico() && (!medicoLogado || String(consulta.medicoId) !== String(medicoLogado.id))) {
+      alert('Você só pode atualizar consultas da sua agenda.');
+      return;
+    }
 
     try {
       await Storage.salvarAgendamento({ ...consulta, status: novoStatus });
@@ -726,7 +783,8 @@ const Medico = {
 
   verDetalhesConsulta: (consultaId) => {
     const consulta = Storage.getAgendamentos().find(a => a.id == consultaId);
-    if (!consulta) {
+    const medicoLogado = Storage.getMedicoLogado();
+    if (!consulta || (Medico.isPerfilMedico() && (!medicoLogado || String(consulta.medicoId) !== String(medicoLogado.id)))) {
       alert('❌ Consulta não encontrada.');
       return;
     }

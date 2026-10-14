@@ -30,7 +30,7 @@ const urlsToCache = [
   
   // Assets
   '/assets/images/logo.png',
-  '/assets/images/avatar.png',
+  '/assets/images/avatar.svg',
   '/assets/images/chatbot.png',
   
   // Manifest

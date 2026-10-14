@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <link rel="manifest" href="pwa/manifest.json">
-  <meta name="theme-color" content="#007bff">
+  <meta name="theme-color" content="#3422bb">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CallMed - Área do Paciente</title>
@@ -701,6 +701,1101 @@
         right: 15px;
       }
     }
+
+    /* Identidade visual da área do paciente */
+    body[data-tipo="paciente"] {
+      --cor-principal: #5140e8;
+      --cor-secundaria: #727b9a;
+      --cor-sucesso: #16a879;
+      --cor-erro: #e34c68;
+      --cor-aviso: #f0b429;
+      --cor-fundo: #f2f7ff;
+      --cor-texto: #171b43;
+      --cor-card: #fff;
+      --cor-borda: #dce7fb;
+      --cor-hover: #f4f6ff;
+      --cor-sombra: rgba(59, 80, 145, 0.1);
+      --patient-purple: #4f35ed;
+      --patient-cyan: #20c9d2;
+      --patient-muted: #7882a2;
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 5% 16%, rgba(91, 112, 255, 0.08), transparent 28%),
+        radial-gradient(ellipse at 96% 62%, rgba(31, 190, 214, 0.1), transparent 30%),
+        linear-gradient(180deg, #f8fbff 0%, #edf6ff 100%);
+      color: var(--cor-texto);
+    }
+
+    html[data-theme="dark"] body[data-tipo="paciente"] {
+      --cor-principal: #a99bff;
+      --cor-secundaria: #aeb8d0;
+      --cor-sucesso: #58d5a2;
+      --cor-erro: #ff8294;
+      --cor-aviso: #ffd16b;
+      --cor-fundo: #171a33;
+      --cor-texto: #f2f3ff;
+      --cor-card: #222642;
+      --cor-borda: #393f65;
+      --cor-hover: #2c3152;
+      --cor-sombra: rgba(0, 0, 0, 0.28);
+      --patient-purple: #6b5af5;
+      --patient-cyan: #27cbd0;
+      --patient-muted: #aeb8d0;
+      background: linear-gradient(180deg, #171a33 0%, #202744 100%);
+    }
+
+    html[data-theme="blue"] body[data-tipo="paciente"] {
+      --cor-principal: #3476d2;
+      --patient-purple: #3476d2;
+      --patient-cyan: #25bcca;
+    }
+
+    html[data-theme="green"] body[data-tipo="paciente"] {
+      --cor-principal: #288e7a;
+      --patient-purple: #288e7a;
+      --patient-cyan: #25bcca;
+    }
+
+    body[data-tipo="paciente"] .header {
+      position: sticky;
+      min-height: 76px;
+      padding: 12px max(24px, calc((100vw - 1240px) / 2));
+      border: 0;
+      background:
+        radial-gradient(ellipse at 80% -30%, rgba(42, 207, 216, 0.28), transparent 32%),
+        linear-gradient(112deg, #21106e 0%, #3822ca 55%, #5140f4 100%);
+      box-shadow: 0 10px 30px rgba(41, 32, 146, 0.2);
+      flex-wrap: nowrap;
+    }
+
+    body[data-tipo="paciente"] .header .logo {
+      gap: 10px;
+      color: #fff;
+      font-family: var(--font-titulo);
+      font-size: 1.3rem;
+      letter-spacing: -0.04em;
+    }
+
+    body[data-tipo="paciente"] .header .logo img {
+      width: 40px;
+      height: 40px;
+      border: 0;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: none;
+    }
+
+    body[data-tipo="paciente"] .header .nav {
+      justify-content: flex-end;
+    }
+
+    body[data-tipo="paciente"] .header .nav ul {
+      align-items: center;
+      gap: 4px;
+    }
+
+    body[data-tipo="paciente"] .header .nav ul li a {
+      padding: 9px 12px;
+      border-radius: 12px;
+      font-size: 0.84rem;
+    }
+
+    body[data-tipo="paciente"] .header .nav ul li a.active {
+      background: rgba(255, 255, 255, 0.2);
+      box-shadow: none;
+    }
+
+    body[data-tipo="paciente"] .header .nav ul li a.active::after {
+      display: none;
+    }
+
+    body[data-tipo="paciente"] .patient-menu-toggle {
+      display: none;
+    }
+
+    body[data-tipo="paciente"] main.container {
+      width: min(1200px, calc(100% - 48px));
+      max-width: 1200px;
+      margin: 34px auto 52px;
+    }
+
+    body[data-tipo="paciente"] .tab-content.active {
+      animation: patientFadeIn 0.28s ease-out;
+    }
+
+    @keyframes patientFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    body[data-tipo="paciente"] .welcome-section {
+      grid-column: 1 / -1;
+      align-items: center;
+      gap: 16px;
+      margin: 0 0 4px;
+    }
+
+    body[data-tipo="paciente"] .foto-grande {
+      width: 62px;
+      height: 62px;
+      flex: 0 0 62px;
+      border: 2px solid #d7e5ff;
+      background: #e6f0ff;
+      box-shadow: 0 6px 18px rgba(67, 98, 180, 0.1);
+    }
+
+    body[data-tipo="paciente"] .foto-grande .avatar-placeholder {
+      position: absolute;
+      inset: 24%;
+      width: 52%;
+      height: 52%;
+      fill: none;
+      stroke: #5140e8;
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    body[data-tipo="paciente"] .foto-grande img {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      object-fit: cover;
+    }
+
+    body[data-tipo="paciente"] .foto-grande img.is-unavailable {
+      display: none;
+    }
+
+    body[data-tipo="paciente"] .welcome-copy h1 {
+      margin-bottom: 4px;
+      color: #211267;
+      font-size: clamp(1.3rem, 2vw, 1.7rem);
+      font-weight: 750;
+      letter-spacing: -0.045em;
+    }
+
+    html[data-theme="dark"] body[data-tipo="paciente"] .welcome-copy h1 {
+      color: #f2f3ff;
+    }
+
+    body[data-tipo="paciente"] .welcome-copy p {
+      margin: 0;
+      color: var(--patient-muted);
+      font-size: 0.9rem;
+    }
+
+    body[data-tipo="paciente"] #tab-dashboard.active {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(280px, 1fr);
+      grid-template-rows: auto auto 1fr 1fr;
+      align-items: start;
+      gap: 22px;
+    }
+
+    body[data-tipo="paciente"] .quick-actions {
+      grid-column: 1 / -1;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin: 0;
+    }
+
+    body[data-tipo="paciente"] .action-card {
+      min-height: 148px;
+      padding: 18px;
+      border: 1px solid var(--cor-borda);
+      border-radius: 18px;
+      background: var(--cor-card);
+      box-shadow: 0 8px 22px rgba(66, 95, 157, 0.07);
+      text-align: left;
+    }
+
+    body[data-tipo="paciente"] .action-card:hover,
+    body[data-tipo="paciente"] .action-card:focus-visible {
+      border-color: #b9bdff;
+      background: #fff;
+      box-shadow: 0 14px 28px rgba(79, 61, 240, 0.12);
+      transform: translateY(-3px);
+    }
+
+    body[data-tipo="paciente"] .action-icon {
+      display: grid;
+      width: 40px;
+      height: 40px;
+      margin-bottom: 13px;
+      place-items: center;
+      border: 1px solid #e0e5ff;
+      border-radius: 13px;
+      background: linear-gradient(145deg, #f0f0ff, #e8f8ff);
+      color: var(--patient-purple);
+    }
+
+    body[data-tipo="paciente"] .action-icon svg {
+      width: 21px;
+      height: 21px;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    body[data-tipo="paciente"] .action-card h3 {
+      margin: 0 0 5px;
+      color: #22146f;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    html[data-theme="dark"] body[data-tipo="paciente"] .action-card h3 {
+      color: #f2f3ff;
+    }
+
+    body[data-tipo="paciente"] .action-card p {
+      color: var(--patient-muted);
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+
+    body[data-tipo="paciente"] #matchmakingSection,
+    body[data-tipo="paciente"] .dashboard-list,
+    body[data-tipo="paciente"] .filtros-consultas,
+    body[data-tipo="paciente"] .medicos-filtros,
+    body[data-tipo="paciente"] .agendamento-card,
+    body[data-tipo="paciente"] .perfil-section,
+    body[data-tipo="paciente"] .config-item,
+    body[data-tipo="paciente"] .ajuda-container,
+    body[data-tipo="paciente"] .chatbot-container {
+      border: 1px solid var(--cor-borda);
+      border-radius: 20px;
+      background: var(--cor-card);
+      box-shadow: 0 10px 28px rgba(66, 95, 157, 0.075);
+    }
+
+    body[data-tipo="paciente"] #matchmakingSection {
+      grid-column: 1;
+      grid-row: 3 / span 2;
+      margin: 0;
+      padding: 22px;
+    }
+
+    body[data-tipo="paciente"] .section-title {
+      margin-bottom: 5px;
+      color: #251478;
+      font-size: 1.1rem;
+      font-weight: 750;
+    }
+
+    html[data-theme="dark"] body[data-tipo="paciente"] .section-title {
+      color: #f2f3ff;
+    }
+
+    body[data-tipo="paciente"] .section-description {
+      margin-bottom: 18px;
+      color: var(--patient-muted);
+      font-size: 0.84rem;
+    }
+
+    body[data-tipo="paciente"] #matchmakingForm {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 13px;
+    }
+
+    body[data-tipo="paciente"] #matchmakingForm .form-group:last-child {
+      grid-column: 1 / -1;
+    }
+
+    body[data-tipo="paciente"] .dashboard-list {
+      min-width: 0;
+      margin: 0;
+      padding: 18px;
+    }
+
+    body[data-tipo="paciente"] .dashboard-upcoming {
+      grid-column: 2;
+      grid-row: 3;
+    }
+
+    body[data-tipo="paciente"] .dashboard-history {
+      grid-column: 2;
+      grid-row: 4;
+    }
+
+    body[data-tipo="paciente"] .dashboard-list h2 {
+      margin-bottom: 14px !important;
+      color: #251478 !important;
+      font-size: 1rem;
+    }
+
+    html[data-theme="dark"] body[data-tipo="paciente"] .dashboard-list h2 {
+      color: #f2f3ff !important;
+    }
+
+    body[data-tipo="paciente"] .consulta-card {
+      margin-bottom: 10px;
+      padding: 16px;
+      border: 1px solid var(--cor-borda);
+      border-left: 3px solid var(--patient-purple);
+      border-radius: 14px;
+      background: var(--cor-card);
+      box-shadow: 0 4px 14px rgba(66, 95, 157, 0.05);
+    }
+
+    body[data-tipo="paciente"] .consulta-card:hover {
+      transform: translateY(-2px);
+    }
+
+    body[data-tipo="paciente"] .consulta-card h4 {
+      color: #211267;
+      font-size: 0.92rem;
+    }
+
+    html[data-theme="dark"] body[data-tipo="paciente"] .consulta-card h4 {
+      color: #f2f3ff;
+    }
+
+    body[data-tipo="paciente"] .consulta-card p {
+      margin: 0;
+      color: var(--patient-muted);
+      font-size: 0.8rem;
+    }
+
+    body[data-tipo="paciente"] .consulta-status,
+    body[data-tipo="paciente"] .matchmaking-tier {
+      border-radius: 999px;
+      font-size: 0.72rem;
+    }
+
+    body[data-tipo="paciente"] .status-agendado {
+      background: #d9f8ec;
+      color: #087c59;
+    }
+
+    body[data-tipo="paciente"] .status-concluido {
+      background: #e0edff;
+      color: #315db6;
+    }
+
+    body[data-tipo="paciente"] .status-cancelado {
+      background: #ffe5eb;
+      color: #b63752;
+    }
+
+    body[data-tipo="paciente"] .page-header {
+      display: block;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    body[data-tipo="paciente"] .page-header h1 {
+      margin: 0 0 6px;
+      color: #211267;
+      font-size: clamp(1.6rem, 3vw, 2rem);
+      font-weight: 750;
+      letter-spacing: -0.05em;
+    }
+
+    html[data-theme="dark"] body[data-tipo="paciente"] .page-header h1 {
+      color: #f2f3ff;
+    }
+
+    body[data-tipo="paciente"] .page-header p {
+      margin: 0;
+      color: var(--patient-muted);
+      font-size: 0.88rem;
+    }
+
+    body[data-tipo="paciente"] .medicos-filtros,
+    body[data-tipo="paciente"] .filtros-consultas {
+      margin-bottom: 20px;
+      padding: 18px;
+    }
+
+    body[data-tipo="paciente"] .medicos-grid {
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 18px;
+      margin-top: 0;
+    }
+
+    body[data-tipo="paciente"] .medico-card {
+      border: 1px solid var(--cor-borda);
+      border-radius: 18px;
+      background: var(--cor-card);
+      box-shadow: 0 8px 22px rgba(66, 95, 157, 0.07);
+      text-align: left;
+    }
+
+    body[data-tipo="paciente"] .medico-card:hover {
+      border-color: #babfff;
+      box-shadow: 0 14px 30px rgba(79, 61, 240, 0.12);
+    }
+
+    body[data-tipo="paciente"] .medico-foto {
+      width: 58px;
+      height: 58px;
+      margin: 0 0 16px;
+      border-radius: 18px;
+      background: linear-gradient(145deg, #513af1, #2b1bb0);
+      font-size: 1.4rem;
+    }
+
+    body[data-tipo="paciente"] .medico-card h3,
+    body[data-tipo="paciente"] .matchmaking-card h3 {
+      color: #211267;
+      font-size: 1.02rem;
+    }
+
+    html[data-theme="dark"] body[data-tipo="paciente"] .medico-card h3,
+    html[data-theme="dark"] body[data-tipo="paciente"] .matchmaking-card h3 {
+      color: #f2f3ff;
+    }
+
+    body[data-tipo="paciente"] .medico-especialidade {
+      color: var(--patient-muted);
+      font-size: 0.84rem;
+    }
+
+    body[data-tipo="paciente"] .medico-details {
+      color: var(--patient-muted);
+      font-size: 0.82rem;
+    }
+
+    body[data-tipo="paciente"] .agendamento-container,
+    body[data-tipo="paciente"] .config-section,
+    body[data-tipo="paciente"] .ajuda-container {
+      max-width: 780px;
+    }
+
+    body[data-tipo="paciente"] .agendamento-card {
+      padding: clamp(20px, 4vw, 34px);
+    }
+
+    body[data-tipo="paciente"] .passo-indicador::before {
+      background: #dce4ff;
+    }
+
+    body[data-tipo="paciente"] .passo-numero {
+      color: #747d9d;
+      background: #e7edff;
+    }
+
+    body[data-tipo="paciente"] .passo.ativo .passo-numero,
+    body[data-tipo="paciente"] .passo.concluido .passo-numero {
+      background: linear-gradient(145deg, #5642f2, #3b28cf);
+    }
+
+    body[data-tipo="paciente"] .passo-texto {
+      color: var(--patient-muted);
+    }
+
+    body[data-tipo="paciente"] .horario-btn.selecionado,
+    body[data-tipo="paciente"] .btn-primary,
+    body[data-tipo="paciente"] .send-btn {
+      background: linear-gradient(105deg, #5038ed, #693df7);
+      box-shadow: 0 8px 18px rgba(79, 61, 240, 0.2);
+    }
+
+    body[data-tipo="paciente"] .btn-primary:hover,
+    body[data-tipo="paciente"] .send-btn:hover {
+      background: linear-gradient(105deg, #442bdc, #5c30eb);
+    }
+
+    body[data-tipo="paciente"] .btn-secondary,
+    body[data-tipo="paciente"] .btn-limpar {
+      border: 1px solid #cddcff;
+      background: #f4f7ff;
+      color: #5140e8;
+    }
+
+    body[data-tipo="paciente"] input,
+    body[data-tipo="paciente"] select,
+    body[data-tipo="paciente"] textarea {
+      border-color: var(--cor-borda);
+      border-radius: 11px;
+      background-color: var(--cor-card);
+    }
+
+    body[data-tipo="paciente"] input:focus,
+    body[data-tipo="paciente"] select:focus,
+    body[data-tipo="paciente"] textarea:focus {
+      border-color: #7768f5;
+      box-shadow: 0 0 0 3px rgba(102, 85, 245, 0.12);
+    }
+
+    body[data-tipo="paciente"] .chatbot-container {
+      height: min(76vh, 760px);
+    }
+
+    body[data-tipo="paciente"] .chatbot-header {
+      background:
+        radial-gradient(ellipse at 88% -20%, rgba(42, 207, 216, 0.28), transparent 34%),
+        linear-gradient(112deg, #21106e, #4c35ed);
+    }
+
+    body[data-tipo="paciente"] .assistant-mark {
+      display: grid;
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.13);
+      color: #fff;
+    }
+
+    body[data-tipo="paciente"] .assistant-mark svg {
+      width: 24px;
+      height: 24px;
+      stroke: currentColor;
+      stroke-width: 1.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    body[data-tipo="paciente"] .message.bot {
+      border-color: var(--cor-borda);
+      border-radius: 16px 16px 16px 4px;
+      background: #f3f6ff;
+      color: #25294b;
+    }
+
+    body[data-tipo="paciente"] .message.user {
+      border-radius: 16px 16px 4px 16px;
+      background: linear-gradient(105deg, #5038ed, #693df7);
+    }
+
+    body[data-tipo="paciente"] .perfil-section,
+    body[data-tipo="paciente"] .ajuda-container {
+      padding: clamp(20px, 4vw, 34px);
+    }
+
+    body[data-tipo="paciente"] .perfil-header {
+      margin-bottom: 24px;
+    }
+
+    body[data-tipo="paciente"] #fotoPerfilContainer {
+      width: 92px;
+      height: 92px;
+      min-height: 92px;
+      flex-shrink: 0;
+      aspect-ratio: 1;
+      border-color: #5a45f0;
+      background: #e5efff;
+    }
+
+    .profile-photo-actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 12px auto 0;
+    }
+
+    .profile-photo-actions button {
+      border: 1px solid #d9dcf5;
+      border-radius: 999px;
+      background: #f7f7ff;
+      color: #4333cb;
+      padding: 8px 14px;
+      font: inherit;
+      font-size: 0.88rem;
+      font-weight: 650;
+      cursor: pointer;
+      transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+    }
+
+    .profile-photo-actions button:hover {
+      background: #eeedff;
+      border-color: #a8a1f5;
+      transform: translateY(-1px);
+    }
+
+    .profile-photo-hint {
+      width: 100%;
+      margin: 0;
+      color: var(--cor-texto-secundario);
+      font-size: 0.78rem;
+      text-align: center;
+    }
+
+    .visually-hidden-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    body[data-tipo="paciente"] .perfil-header h2 {
+      margin: 10px 0 4px;
+      color: #211267;
+      font-size: 1.25rem;
+    }
+
+    html[data-theme="dark"] body[data-tipo="paciente"] .perfil-header h2 {
+      color: #f2f3ff;
+    }
+
+    body[data-tipo="paciente"] .perfil-stats {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    body[data-tipo="paciente"] .stat-card {
+      padding: 15px 10px;
+      border: 1px solid var(--cor-borda);
+      border-left: 3px solid #5a45f0;
+      border-radius: 14px;
+      background: #f7f9ff;
+    }
+
+    body[data-tipo="paciente"] .stat-number {
+      color: #3721cf;
+      font-size: 1.55rem;
+    }
+
+    body[data-tipo="paciente"] .stat-label {
+      display: block;
+      margin-top: 2px;
+      font-size: 0.74rem;
+      line-height: 1.4;
+    }
+
+    body[data-tipo="paciente"] .config-item {
+      padding: 20px;
+      text-align: left;
+    }
+
+    body[data-tipo="paciente"] .config-item h3 {
+      margin-bottom: 14px;
+      color: #3520ce;
+      font-size: 1rem;
+    }
+
+    body[data-tipo="paciente"] .config-item label {
+      color: var(--patient-muted);
+      font-size: 0.86rem;
+    }
+
+    body[data-tipo="paciente"] .config-item input[type="checkbox"] {
+      accent-color: #5742f0;
+    }
+
+    body[data-tipo="paciente"] .config-item #themeSelect {
+      max-width: none !important;
+      width: 100%;
+      margin: 0 !important;
+    }
+
+    body[data-tipo="paciente"] .ajuda-container > h3,
+    body[data-tipo="paciente"] .faq-item h4 {
+      color: #3520ce;
+    }
+
+    body[data-tipo="paciente"] .faq-item {
+      margin-bottom: 12px;
+      padding: 18px;
+      border: 1px solid var(--cor-borda);
+      border-left: 3px solid #5742f0;
+      border-radius: 14px;
+      background: #f8faff;
+    }
+
+    body[data-tipo="paciente"] .faq-item p {
+      margin: 0;
+      color: var(--patient-muted);
+    }
+
+    body[data-tipo="paciente"] .help-contact {
+      margin-top: 24px !important;
+      padding: 24px !important;
+      border-radius: 16px !important;
+      background: linear-gradient(112deg, #21106e, #4f35ed) !important;
+    }
+
+    body[data-tipo="paciente"] .chatbot-fixed {
+      display: grid;
+      width: 56px;
+      height: 56px;
+      padding: 0;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      background: linear-gradient(145deg, #5945f2, #3420c4);
+      box-shadow: 0 12px 28px rgba(58, 44, 195, 0.28);
+    }
+
+    body[data-tipo="paciente"] .chatbot-fixed svg {
+      width: 26px;
+      height: 26px;
+      margin: auto;
+      stroke: #fff;
+      stroke-width: 1.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    body[data-tipo="paciente"] .modal-content {
+      border: 1px solid var(--cor-borda);
+      border-radius: 20px;
+      box-shadow: 0 24px 70px rgba(24, 29, 80, 0.22);
+    }
+
+    @media (max-width: 960px) {
+      body[data-tipo="paciente"] .header {
+        z-index: 110;
+        min-height: 62px;
+        padding: 9px 16px 13px;
+        border-radius: 0 0 48% 8% / 0 0 12% 4%;
+      }
+
+      body[data-tipo="paciente"] .header .logo {
+        font-size: 1.2rem;
+      }
+
+      body[data-tipo="paciente"] .header .logo img {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+      }
+
+      body[data-tipo="paciente"] .patient-menu-toggle {
+        display: flex;
+        width: 42px;
+        height: 42px;
+        flex: 0 0 42px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 0;
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: none;
+      }
+
+      body[data-tipo="paciente"] .patient-menu-toggle span {
+        width: 19px;
+        height: 2px;
+        border-radius: 2px;
+        background: #fff;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+      }
+
+      body[data-tipo="paciente"] .patient-menu-toggle[aria-expanded="true"] span:first-child {
+        transform: translateY(7px) rotate(45deg);
+      }
+
+      body[data-tipo="paciente"] .patient-menu-toggle[aria-expanded="true"] span:nth-child(2) {
+        opacity: 0;
+      }
+
+      body[data-tipo="paciente"] .patient-menu-toggle[aria-expanded="true"] span:last-child {
+        transform: translateY(-7px) rotate(-45deg);
+      }
+
+      body[data-tipo="paciente"] .header .nav {
+        position: absolute;
+        top: calc(100% - 2px);
+        right: 12px;
+        left: 12px;
+        display: none;
+        width: auto;
+        max-height: min(70vh, 480px);
+        overflow: auto;
+        padding: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 0 0 18px 18px;
+        background: linear-gradient(145deg, #26127d, #4730db);
+        box-shadow: 0 18px 34px rgba(33, 22, 114, 0.24);
+      }
+
+      body[data-tipo="paciente"] .header .nav.is-open {
+        display: block;
+      }
+
+      body[data-tipo="paciente"] .header .nav ul {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        justify-content: stretch;
+        gap: 4px;
+      }
+
+      body[data-tipo="paciente"] .header .nav ul li a {
+        display: block;
+        padding: 12px;
+        border-radius: 10px;
+        font-size: 0.85rem;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      body[data-tipo="paciente"] .header {
+        flex-direction: row;
+        align-items: center;
+        padding: 10px 22px;
+      }
+
+      body[data-tipo="paciente"] .header .logo {
+        justify-content: flex-start;
+      }
+
+      body[data-tipo="paciente"] .header .nav {
+        width: auto;
+        overflow: visible;
+      }
+
+      body[data-tipo="paciente"] .header .nav ul {
+        justify-content: flex-end;
+      }
+    }
+
+    @media (max-width: 760px) {
+
+      body[data-tipo="paciente"] main.container {
+        width: calc(100% - 28px);
+        margin: 22px auto 34px;
+      }
+
+      body[data-tipo="paciente"] #tab-dashboard.active {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto;
+        gap: 16px;
+      }
+
+      body[data-tipo="paciente"] .welcome-section {
+        gap: 12px;
+        margin: 0 0 2px;
+      }
+
+      body[data-tipo="paciente"] .foto-grande {
+        width: 50px;
+        height: 50px;
+        flex-basis: 50px;
+      }
+
+      body[data-tipo="paciente"] .welcome-copy h1 {
+        font-size: 1.08rem;
+      }
+
+      body[data-tipo="paciente"] .welcome-copy p {
+        font-size: 0.76rem;
+      }
+
+      body[data-tipo="paciente"] .quick-actions {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      body[data-tipo="paciente"] .action-card {
+        min-height: 118px;
+        padding: 11px 9px;
+        border-radius: 14px;
+        text-align: center;
+      }
+
+      body[data-tipo="paciente"] .action-icon {
+        width: 34px;
+        height: 34px;
+        margin: 0 auto 8px;
+        border-radius: 11px;
+      }
+
+      body[data-tipo="paciente"] .action-icon svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      body[data-tipo="paciente"] .action-card h3 {
+        font-size: 0.7rem;
+        line-height: 1.3;
+      }
+
+      body[data-tipo="paciente"] .action-card p {
+        font-size: 0.62rem;
+        line-height: 1.35;
+      }
+
+      body[data-tipo="paciente"] #matchmakingSection {
+        grid-column: 1;
+        grid-row: auto;
+        padding: 16px;
+        border-radius: 16px;
+      }
+
+      body[data-tipo="paciente"] #matchmakingForm {
+        gap: 10px;
+      }
+
+      body[data-tipo="paciente"] .dashboard-list {
+        grid-column: 1;
+        grid-row: auto;
+        padding: 15px;
+        border-radius: 16px;
+      }
+
+      body[data-tipo="paciente"] .dashboard-list h2 {
+        margin-bottom: 10px !important;
+        font-size: 0.9rem;
+      }
+
+      body[data-tipo="paciente"] .page-header {
+        margin-bottom: 18px;
+      }
+
+      body[data-tipo="paciente"] .page-header h1 {
+        font-size: 1.55rem;
+      }
+
+      body[data-tipo="paciente"] .medicos-filtros,
+      body[data-tipo="paciente"] .filtros-consultas {
+        padding: 15px;
+        border-radius: 16px;
+      }
+
+      body[data-tipo="paciente"] .medicos-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      body[data-tipo="paciente"] .medico-card {
+        padding: 16px;
+      }
+
+      body[data-tipo="paciente"] .agendamento-card {
+        padding: 20px 15px;
+        border-radius: 16px;
+      }
+
+      body[data-tipo="paciente"] .passo-texto {
+        font-size: 0.68rem;
+      }
+
+      body[data-tipo="paciente"] .chatbot-container {
+        height: calc(100svh - 112px);
+        min-height: 440px;
+        border-radius: 16px;
+      }
+
+      body[data-tipo="paciente"] .chatbot-header {
+        gap: 10px;
+        padding: 12px;
+      }
+
+      body[data-tipo="paciente"] .assistant-mark {
+        width: 34px;
+        height: 34px;
+        flex-basis: 34px;
+      }
+
+      body[data-tipo="paciente"] .chatbot-header h2 {
+        font-size: 0.95rem !important;
+      }
+
+      body[data-tipo="paciente"] .chatbot-header p {
+        font-size: 0.7rem !important;
+      }
+
+      body[data-tipo="paciente"] .chatbot-header .category-btn {
+        padding: 7px 9px;
+        font-size: 0.7rem;
+      }
+
+      body[data-tipo="paciente"] .chat-messages {
+        padding: 12px;
+      }
+
+      body[data-tipo="paciente"] .chat-input-container {
+        padding: 12px;
+      }
+
+      body[data-tipo="paciente"] .chat-input-form {
+        align-items: stretch;
+      }
+
+      body[data-tipo="paciente"] .chat-input {
+        min-width: 0;
+      }
+
+      body[data-tipo="paciente"] .chat-input-form .send-btn {
+        padding: 8px 12px;
+      }
+
+      body[data-tipo="paciente"] .chat-input-container > div {
+        gap: 6px !important;
+        margin-top: 10px !important;
+      }
+
+      body[data-tipo="paciente"] .category-btn {
+        padding: 7px 9px;
+        font-size: 0.7rem;
+      }
+
+      body[data-tipo="paciente"] .perfil-section,
+      body[data-tipo="paciente"] .ajuda-container {
+        padding: 17px;
+        border-radius: 16px;
+      }
+
+      body[data-tipo="paciente"] .perfil-stats {
+        gap: 7px;
+      }
+
+      body[data-tipo="paciente"] .stat-card {
+        padding: 12px 7px;
+      }
+
+      body[data-tipo="paciente"] .stat-number {
+        font-size: 1.25rem;
+      }
+
+      body[data-tipo="paciente"] .stat-label {
+        font-size: 0.63rem;
+      }
+
+      body[data-tipo="paciente"] #formPerfil .form-row,
+      body[data-tipo="paciente"] .config-item .form-row {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      body[data-tipo="paciente"] .config-item {
+        padding: 17px;
+        border-radius: 16px;
+      }
+
+      body[data-tipo="paciente"] .chatbot-fixed {
+        right: 14px;
+        bottom: 14px;
+        width: 48px;
+        height: 48px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      body[data-tipo="paciente"] .quick-actions {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      body[data-tipo="paciente"] .action-card {
+        min-height: 108px;
+      }
+
+      body[data-tipo="paciente"] #matchmakingForm {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      body[data-tipo="paciente"] #matchmakingForm .form-group:last-child {
+        grid-column: auto;
+      }
+    }
   </style>
 </head>
 <body data-tipo="paciente">
@@ -718,9 +1813,10 @@
     <div class="tab-content active" id="tab-dashboard">
       <section class="welcome-section">
         <div class="foto-grande">
-          <img id="userPhoto" alt="Foto do paciente" src="assets/images/avatar.png">
+          <svg class="avatar-placeholder" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5.5 20v-1.4a6.5 6.5 0 0 1 13 0V20z"/></svg>
+          <img id="userPhoto" alt="Foto do paciente" src="assets/images/avatar.svg" onerror="this.classList.add('is-unavailable'); this.alt=''">
         </div>
-        <div>
+        <div class="welcome-copy">
           <h1>Olá, <span id="userWelcomeName">Usuário</span>!</h1>
           <p>Gerencie suas consultas e saúde de forma simples</p>
         </div>
@@ -728,21 +1824,25 @@
       
       <section class="quick-actions">
         <div class="action-card" tabindex="0" role="button" aria-label="Ir para agendar consulta" onclick="Tabs.irPara('agendar')" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); Tabs.irPara('agendar'); }">
+          <span class="action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M7.5 3v4M16.5 3v4M3.5 10h17M8 14h3M8 17h6"/></svg></span>
           <h3>Agendar Consulta</h3>
           <p>Marque uma nova consulta</p>
         </div>
         
         <div class="action-card" tabindex="0" role="button" aria-label="Ir para minhas consultas" onclick="Tabs.irPara('consultas')" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); Tabs.irPara('consultas'); }">
+          <span class="action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span>
           <h3>Minhas Consultas</h3>
           <p>Ver histórico e próximas</p>
         </div>
         
         <div class="action-card" tabindex="0" role="button" aria-label="Ir para médicos" onclick="Tabs.irPara('medicos')" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); Tabs.irPara('medicos'); }">
+          <span class="action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="7.5" r="3.5"/><path d="M5 20v-1.5a7 7 0 0 1 14 0V20z"/></svg></span>
           <h3>Médicos</h3>
           <p>Encontre especialistas</p>
         </div>
         
         <div class="action-card" tabindex="0" role="button" aria-label="Abrir assistente virtual" onclick="Tabs.irPara('chatbot')" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); Tabs.irPara('chatbot'); }">
+          <span class="action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 18.5A8.5 8.5 0 1 1 8.2 21L4 22z"/><path d="M8 10h8M8 14h5"/></svg></span>
           <h3>Assistente</h3>
           <p>Tire suas dúvidas</p>
         </div>
@@ -783,12 +1883,12 @@
         <div id="matchmakingResults" class="medicos-grid" style="margin-top: var(--espaco-md);" aria-live="polite"></div>
       </section>
       
-      <section style="margin-bottom: var(--espaco-xl);">
+      <section class="dashboard-list dashboard-upcoming">
         <h2 style="color: var(--cor-principal); margin-bottom: var(--espaco-lg);">Próximas Consultas</h2>
         <div id="proximasConsultasList"></div>
       </section>
       
-      <section>
+      <section class="dashboard-list dashboard-history">
         <h2 style="color: var(--cor-principal); margin-bottom: var(--espaco-lg);">Histórico Recente</h2>
         <div id="historicoList"></div>
       </section>
@@ -846,7 +1946,7 @@
         <p>Encontre o especialista ideal para sua necessidade</p>
       </div>
       
-      <section style="background: var(--cor-card); padding: var(--espaco-lg); border-radius: var(--radius-lg); margin-bottom: var(--espaco-lg);">
+      <section class="medicos-filtros">
         <div class="filtros-grid">
           <div class="form-group">
             <label for="filtroEspecialidade">Especialidade</label>
@@ -1001,7 +2101,7 @@
     <div class="tab-content" id="tab-chatbot">
       <div class="chatbot-container">
         <div class="chatbot-header">
-          <img src="assets/images/chatbot.png" alt="Chatbot" style="width: 40px; height: 40px;">
+          <span class="assistant-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="7" width="16" height="13" rx="4"/><path d="M12 3v4M8.5 12h.01M15.5 12h.01M9 16h6M2 12v3M22 12v3"/></svg></span>
           <div>
             <h2 style="margin: 0; font-size: 1.2rem;">Assistente virtual de saúde</h2>
             <p style="margin: 0; font-size: 0.8rem; opacity: 0.9;">Uma conversa acolhedora, sem diagnósticos</p>
@@ -1038,9 +2138,14 @@
       
       <div class="perfil-section">
         <div class="perfil-header">
-          <div class="foto-grande" id="fotoPerfilContainer" style="margin: 0 auto 15px; cursor: pointer;">
-            <img id="fotoPerfil" src="assets/images/avatar.png" alt="Foto do perfil">
-            <input type="file" id="fotoInput" accept="image/*" style="display: none;">
+          <div class="foto-grande" id="fotoPerfilContainer" role="button" tabindex="0" aria-label="Escolher foto do perfil" style="margin: 0 auto 15px; cursor: pointer;">
+            <svg class="avatar-placeholder" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5.5 20v-1.4a6.5 6.5 0 0 1 13 0V20z"/></svg>
+            <img id="fotoPerfil" src="assets/images/avatar.svg" alt="Foto do perfil" onerror="this.classList.add('is-unavailable'); this.alt=''">
+          </div>
+          <input type="file" id="fotoInput" class="visually-hidden-input" accept="image/*" aria-hidden="true" tabindex="-1">
+          <div class="profile-photo-actions">
+            <button type="button" id="btnEscolherFotoPerfil">Alterar foto</button>
+            <p class="profile-photo-hint">JPG, PNG ou WebP. A foto fica salva somente neste perfil.</p>
           </div>
           <h2 id="nomeUsuarioPerfil">Carregando...</h2>
           <p id="emailUsuarioPerfil">carregando...</p>
@@ -1190,7 +2295,7 @@
           <p>O assistente pode tirar dúvidas, ajudar no agendamento, e usar o Matchmaking Inteligente para recomendar o médico ideal.</p>
         </div>
         
-        <div style="background: linear-gradient(135deg, var(--cor-principal), #0056b3); color: white; padding: 30px; border-radius: 15px; margin-top: 30px; text-align: center;">
+        <div class="help-contact">
           <h3 style="color: white;">Precisa de mais ajuda?</h3>
           <p style="color: white;">Nossa equipe está sempre disponível</p>
           <div style="font-size: 1.2rem; font-weight: 600; margin: 15px 0;">suporte@CallMed.com</div>
@@ -1202,9 +2307,9 @@
   </main>
   
   <!-- Botão Flutuante do Chatbot -->
-  <div class="chatbot-fixed" onclick="Tabs.irPara('chatbot')">
-    <img src="assets/images/chatbot.png" alt="Chatbot" style="width: 30px; height: 30px;">
-  </div>
+  <button type="button" class="chatbot-fixed" aria-label="Abrir assistente virtual" onclick="Tabs.irPara('chatbot')">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="7" width="16" height="13" rx="4"/><path d="M12 3v4M8.5 12h.01M15.5 12h.01M9 16h6M2 12v3M22 12v3"/></svg>
+  </button>
   
   <!-- Modal Cancelamento -->
   <div class="modal" id="modalCancelar">
@@ -1265,7 +2370,9 @@
       const fotoCustomizada = Storage.getFotoUsuario(user.id);
       const userPhoto = document.getElementById('userPhoto');
       if (userPhoto) {
-        userPhoto.src = fotoCustomizada || 'assets/images/avatar.png';
+        userPhoto.classList.remove('is-unavailable');
+        userPhoto.alt = 'Foto do paciente';
+        userPhoto.src = fotoCustomizada || 'assets/images/avatar.svg';
       }
       
       // Carrega dados do paciente
@@ -1436,15 +2543,17 @@
     }
     
     async function carregarDadosPaciente(user) {
-      // Busca paciente
-      let paciente = Storage.getPacientePorUsuarioId(user.id);
-      if (!paciente) {
+      let paciente = await Storage.getPerfil(user.id);
+      if (!paciente.usuarioId) {
         paciente = await Storage.criarPacienteParaUsuario(user.id, {
           nome: user.nome,
           email: user.email,
           telefone: user.telefone || '',
           dataNascimento: ''
         });
+      }
+      if (!paciente) {
+        throw new Error('Não foi possível carregar o perfil do paciente.');
       }
       
       // Carrega próximas consultas e histórico
@@ -1547,8 +2656,13 @@
       const btnRemoverFoto = document.getElementById('btnRemoverFotoPerfil');
       
       if (fotoCustomizada && fotoPerfil) {
+        fotoPerfil.classList.remove('is-unavailable');
+        fotoPerfil.alt = 'Foto do perfil';
         fotoPerfil.src = fotoCustomizada;
         if (btnRemoverFoto) btnRemoverFoto.style.display = 'inline-block';
+      } else if (fotoPerfil) {
+        fotoPerfil.src = 'assets/images/avatar.svg';
+        if (btnRemoverFoto) btnRemoverFoto.style.display = 'none';
       }
       
       // Stats
@@ -1567,37 +2681,58 @@
       // Upload foto
       const fotoContainer = document.getElementById('fotoPerfilContainer');
       const fotoInput = document.getElementById('fotoInput');
+      const btnEscolherFoto = document.getElementById('btnEscolherFotoPerfil');
       
       if (fotoContainer && fotoInput) {
-        fotoContainer.addEventListener('click', () => fotoInput.click());
-        
-        fotoInput.addEventListener('change', (e) => {
-          const file = e.target.files[0];
-          if (!file) return;
-          
-          if (!file.type.startsWith('image/')) {
-            alert('Selecione uma imagem válida!');
-            return;
+        const abrirSeletorDeFoto = () => fotoInput.click();
+        fotoContainer.addEventListener('click', abrirSeletorDeFoto);
+        fotoContainer.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            abrirSeletorDeFoto();
           }
-          
-          const reader = new FileReader();
-          reader.onload = (ev) => {
-            fotoPerfil.src = ev.target.result;
-            Storage.salvarFotoUsuario(user.id, ev.target.result);
+        });
+        if (btnEscolherFoto) {
+          btnEscolherFoto.addEventListener('click', abrirSeletorDeFoto);
+        }
+
+        fotoInput.addEventListener('change', async (event) => {
+          const file = event.target.files[0];
+          if (!file) return;
+          try {
+            const foto = await Storage.prepararFoto(file);
+            await Storage.salvarFotoUsuario(user.id, foto);
+            fotoPerfil.classList.remove('is-unavailable');
+            fotoPerfil.alt = 'Foto do perfil';
+            fotoPerfil.src = foto;
+            const fotoDashboard = document.getElementById('userPhoto');
+            if (fotoDashboard) {
+              fotoDashboard.classList.remove('is-unavailable');
+              fotoDashboard.src = foto;
+            }
             if (btnRemoverFoto) btnRemoverFoto.style.display = 'inline-block';
-            alert('Foto atualizada!');
-          };
-          reader.readAsDataURL(file);
+            Notificacao.show('Foto do perfil atualizada.', 'success');
+          } catch (error) {
+            Notificacao.show(error.message, 'error');
+          } finally {
+            fotoInput.value = '';
+          }
         });
       }
       
       // Remover foto
       if (btnRemoverFoto) {
-        btnRemoverFoto.addEventListener('click', () => {
-          if (confirm('Remover foto?')) {
-            fotoPerfil.src = 'assets/images/avatar.png';
-            Storage.removerFotoUsuario(user.id);
+        btnRemoverFoto.addEventListener('click', async () => {
+          if (!confirm('Remover foto?')) return;
+          try {
+            await Storage.removerFotoUsuario(user.id);
+            fotoPerfil.src = 'assets/images/avatar.svg';
+            const fotoDashboard = document.getElementById('userPhoto');
+            if (fotoDashboard) fotoDashboard.src = 'assets/images/avatar.svg';
             btnRemoverFoto.style.display = 'none';
+            Notificacao.show('Foto removida do perfil.', 'success');
+          } catch (error) {
+            Notificacao.show(error.message, 'error');
           }
         });
       }
@@ -1605,26 +2740,22 @@
       // Submit perfil
       const formPerfil = document.getElementById('formPerfil');
       if (formPerfil) {
-        formPerfil.addEventListener('submit', (e) => {
+        formPerfil.addEventListener('submit', async (e) => {
           e.preventDefault();
-          
-          const usuarios = Storage.getUsuarios();
-          const idx = usuarios.findIndex(u => u.id === user.id);
-          
-          if (idx !== -1) {
-            usuarios[idx].nome = inputNomePerfil.value;
-            usuarios[idx].email = inputEmailPerfil.value;
-            usuarios[idx].telefone = inputTelefonePerfil.value;
-            
-            localStorage.setItem('CallMed_usuarios', JSON.stringify(usuarios));
-            
-            const atualizado = usuarios[idx];
+          try {
+            const atualizado = await Storage.salvarPerfil(user.id, {
+              nome: inputNomePerfil.value,
+              email: inputEmailPerfil.value,
+              telefone: inputTelefonePerfil.value,
+              dataNascimento: inputNascimentoPerfil.value
+            });
             localStorage.setItem('usuarioLogado', JSON.stringify(atualizado));
-            
             if (nomeUsuarioPerfil) nomeUsuarioPerfil.textContent = atualizado.nome;
             if (emailUsuarioPerfil) emailUsuarioPerfil.textContent = atualizado.email;
-            
-            alert('Perfil atualizado!');
+            document.getElementById('userWelcomeName').textContent = atualizado.nome;
+            Notificacao.show('Perfil atualizado.', 'success');
+          } catch (error) {
+            Notificacao.show(error.message, 'error');
           }
         });
       }

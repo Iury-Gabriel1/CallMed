@@ -37,7 +37,21 @@ const Components = {
       { tab: 'ajuda', texto: 'Ajuda' }
     ];
     
-    const links = tipo === 'admin' ? linksAdmin : linksPaciente;
+    const perfil = tipo === 'admin' && typeof Storage !== 'undefined'
+      ? Storage.getPerfilAcesso()
+      : tipo;
+    const linksMedico = [
+      { tab: 'dashboard', texto: 'Início' },
+      { tab: 'medicos', texto: 'Minha agenda' },
+      { tab: 'agendar', texto: 'Consultas' },
+      { tab: 'historico', texto: 'Histórico' },
+      { tab: 'configuracoes', texto: 'Meu perfil' },
+      { tab: 'ajuda', texto: 'Ajuda' },
+      { tab: 'chatbot', texto: 'Assistente' }
+    ];
+    const links = perfil === 'medico'
+      ? linksMedico
+      : tipo === 'admin' ? linksAdmin : linksPaciente;
     
     return `
       <header class="header" aria-label="Navegação principal">
@@ -45,7 +59,12 @@ const Components = {
           <img src="assets/images/logo.png" alt="CallMed Logo">
           <span>CallMed</span>
         </div>
-        <nav class="nav" aria-label="Menu principal">
+        ${tipo === 'paciente' || tipo === 'admin' ? `
+          <button class="${tipo}-menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="${tipo}-nav">
+            <span></span><span></span><span></span>
+          </button>
+        ` : ''}
+        <nav class="nav" aria-label="Menu principal" ${tipo === 'paciente' || tipo === 'admin' ? `id="${tipo}-nav"` : ''}>
           <ul>
             ${links.map(l => `
               <li>
@@ -85,9 +104,13 @@ const Components = {
     // Injeta header
     const headerEl = document.getElementById('header-placeholder');
     if (headerEl) {
+      if (tipo === 'admin' && typeof Storage !== 'undefined') {
+        document.body.dataset.perfil = Storage.getPerfilAcesso();
+      }
       headerEl.innerHTML = this.header(tipo);
       this.configurarLinksTabs();
       this.configurarLogout();
+      this.configurarMenuPaciente();
     }
     
     // Injeta footer
@@ -116,8 +139,39 @@ const Components = {
         } else {
           console.warn('Sistema de Tabs não carregado');
         }
+        this.fecharMenuPaciente();
       });
     });
+  },
+
+  configurarMenuPaciente() {
+    const toggle = document.querySelector('.patient-menu-toggle, .admin-menu-toggle');
+    const nav = document.getElementById('patient-nav') || document.getElementById('admin-nav');
+    if (!toggle || !nav || toggle.hasAttribute('data-listener')) return;
+
+    toggle.setAttribute('data-listener', 'true');
+    toggle.addEventListener('click', () => {
+      const aberto = toggle.getAttribute('aria-expanded') !== 'true';
+      toggle.setAttribute('aria-expanded', String(aberto));
+      toggle.setAttribute('aria-label', aberto ? 'Fechar menu' : 'Abrir menu');
+      nav.classList.toggle('is-open', aberto);
+    });
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && nav.classList.contains('is-open')) {
+        this.fecharMenuPaciente();
+        toggle.focus();
+      }
+    });
+  },
+
+  fecharMenuPaciente() {
+    const toggle = document.querySelector('.patient-menu-toggle, .admin-menu-toggle');
+    const nav = document.getElementById('patient-nav') || document.getElementById('admin-nav');
+    if (!toggle || !nav) return;
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Abrir menu');
+    nav.classList.remove('is-open');
   },
   
   configurarLogout() {
@@ -153,6 +207,7 @@ const Components = {
       headerEl.innerHTML = this.header(tipo);
       this.configurarLinksTabs();
       this.configurarLogout();
+      this.configurarMenuPaciente();
     }
   }
 };

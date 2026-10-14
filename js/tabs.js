@@ -13,10 +13,31 @@ const Tabs = {
   init() {
     console.log('Inicializando sistema de tabs...');
     
-    // ✅ Detecta tabs pelos .tab-content (não depende de .tab-btn)
+    const tabsMedico = new Set([
+      'dashboard',
+      'medicos',
+      'agendar',
+      'historico',
+      'configuracoes',
+      'ajuda',
+      'chatbot'
+    ]);
+
+    document.querySelectorAll('.tab-content').forEach(el => {
+      const tab = el.id.replace('tab-', '');
+      if (document.body.dataset.perfil === 'medico' && !tabsMedico.has(tab)) {
+        el.hidden = true;
+        document.querySelector(`[data-tab-link="${tab}"]`)?.closest('li')?.setAttribute('hidden', '');
+      }
+    });
+
+    // Detecta abas disponíveis para o perfil atual.
     this.tabsDisponiveis = Array.from(document.querySelectorAll('.tab-content'))
       .map(el => el.id.replace('tab-', ''))
-      .filter(Boolean);
+      .filter(tab => {
+        const el = document.getElementById(`tab-${tab}`);
+        return Boolean(tab && el && !el.hidden);
+      });
     
     console.log(`Tabs disponíveis: ${this.tabsDisponiveis.join(', ')}`);
     
@@ -53,7 +74,7 @@ const Tabs = {
     
     // Validação
     const tabContent = document.getElementById(`tab-${tabName}`);
-    if (!tabContent) {
+    if (!tabContent || tabContent.hidden || !this.tabsDisponiveis.includes(tabName)) {
       console.error(`Tab não encontrada: tab-${tabName}`);
       return;
     }

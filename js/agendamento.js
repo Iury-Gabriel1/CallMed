@@ -83,7 +83,11 @@ const Agendamento = {
       return;
     }
 
-    const agendamentos = Storage.getAgendamentos();
+    const perfilMedico = Storage.getPerfilAcesso() === 'medico';
+    const medicoLogado = Storage.getMedicoLogado();
+    const agendamentos = Storage.getAgendamentos().filter(agendamento =>
+      !perfilMedico || (medicoLogado && String(agendamento.medicoId) === String(medicoLogado.id))
+    );
     const pacientes = Storage.getPacientes();
     const medicos = Storage.getMedicos();
     
@@ -96,10 +100,13 @@ const Agendamento = {
     tbody.innerHTML = '';
     
     if (agendamentos.length === 0) {
+      const mensagemVazia = perfilMedico
+        ? 'Não há consultas vinculadas à sua agenda.'
+        : '📭 Nenhum agendamento encontrado. Clique em "+ Nova Consulta" para agendar.';
       tbody.innerHTML = `
         <tr>
           <td colspan="6" style="text-align: center; padding: 2rem; color: var(--cor-secundaria);">
-            📭 Nenhum agendamento encontrado. Clique em "+ Nova Consulta" para agendar.
+            ${mensagemVazia}
           </td>
         </tr>
       `;
@@ -136,9 +143,9 @@ const Agendamento = {
         <td>${agendamento.hora || agendamento.horario || 'Não informado'}</td>
         <td><span class="badge ${statusClass}">${statusText}</span></td>
         <td>
-          <button onclick="Agendamento.cancelarAgendamento(${agendamento.id})" class="btn-delete">
+          ${perfilMedico ? '' : `<button onclick="Agendamento.cancelarAgendamento(${agendamento.id})" class="btn-delete">
             ❌ Cancelar
-          </button>
+          </button>`}
           <button onclick="Agendamento.verDetalhesAgendamento(${agendamento.id})" class="btn-edit" style="margin-left: 5px;">
             📋 Detalhes
           </button>
@@ -242,6 +249,11 @@ const Agendamento = {
   // CANCELAR AGENDAMENTO
   // =============================================
   async cancelarAgendamento(id) {
+    if (Storage.getPerfilAcesso() === 'medico') {
+      alert('O cancelamento de consultas está disponível somente para administradores.');
+      return;
+    }
+
     if (confirm('Tem certeza que deseja cancelar esta consulta?')) {
       console.log('🗑️ Cancelando agendamento ID:', id);
       try {
@@ -259,7 +271,11 @@ const Agendamento = {
   // =============================================
   verDetalhesAgendamento(id) {
     const agendamento = Storage.getAgendamentos().find(a => a.id == id);
-    if (!agendamento) {
+    const medicoLogado = Storage.getMedicoLogado();
+    if (!agendamento || (
+      Storage.getPerfilAcesso() === 'medico' &&
+      (!medicoLogado || String(agendamento.medicoId) !== String(medicoLogado.id))
+    )) {
       alert('❌ Agendamento não encontrado!');
       return;
     }
@@ -403,6 +419,13 @@ document.addEventListener("DOMContentLoaded", () => {
     let agendamentos = Storage.getAgendamentos();
     const pacientes = Storage.getPacientes();
     const medicos = Storage.getMedicos();
+
+    if (Storage.getPerfilAcesso() === 'medico') {
+      const medicoLogado = Storage.getMedicoLogado();
+      agendamentos = agendamentos.filter(a =>
+        medicoLogado && String(a.medicoId) === String(medicoLogado.id)
+      );
+    }
     
     // Aplicar filtros
     if (filtros.paciente) {

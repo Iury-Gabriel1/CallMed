@@ -16,8 +16,6 @@
 <link rel="apple-touch-icon" sizes="180x180" href="assets/images/icon-152x152.png">
 <link rel="manifest" href="pwa/manifest.json">
 
-  <link rel="stylesheet" href="css/styles.css">
-  
   <style>
     /* ============================================
        LOGIN PAGE - Estilos específicos
@@ -188,46 +186,66 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="login-page">
 
-  <div class="login-container">
-    <div class="login-header">
-      <h2>CallMed</h2>
-      <p>Faça login na sua conta</p>
-    </div>
-
-    <form id="loginForm" class="login-form">
-      <div class="form-group">
-        <label for="email">E-mail</label>
-        <input type="email" id="email" placeholder="Digite seu e-mail" required>
+  <main class="login-shell">
+    <section class="login-brand" aria-label="CallMed">
+      <div class="login-brand-mark">
+        <span class="login-brand-symbol" aria-hidden="true">
+          <img src="assets/images/logo.png" alt="">
+        </span>
+        <span>CallMed</span>
       </div>
-
-      <div class="form-group">
-        <label for="senha">Senha</label>
-        <input type="password" id="senha" placeholder="Digite sua senha" required>
+      <div class="login-brand-copy">
+        <p class="login-eyebrow">Cuidado conectado, sempre perto</p>
+        <h1>Conectando pessoas ao cuidado ideal.</h1>
+        <p>Mais praticidade para cuidar da sua saúde e estar sempre perto de quem cuida de você.</p>
       </div>
+      <p class="login-brand-note">Sua saúde merece cuidado em cada detalhe.</p>
+    </section>
 
-      <label class="remember-label">
-        <input type="checkbox" id="rememberMe"> 
-        Lembrar-me
-      </label>
+    <section class="login-content">
+      <div class="login-container">
+        <div class="login-header">
+          <h2>Faça login na sua conta</h2>
+          <p>Bem-vindo de volta! Estamos felizes em ter você por aqui.</p>
+        </div>
 
-      <button type="submit" class="btn-primary" style="width: 100%;">Entrar</button>
-      <div class="login-error" id="loginError">E-mail ou senha incorretos!</div>
-    </form>
+        <form id="loginForm" class="login-form">
+          <div class="form-group">
+            <label for="email">E-mail</label>
+            <input type="email" id="email" placeholder="Digite seu e-mail" required>
+          </div>
 
-    <div class="login-footer">
-      <p>Não tem conta? <a href="#" id="abrirModalCadastro">Criar conta</a></p>
-    </div>
+          <div class="form-group">
+            <label for="senha">Senha</label>
+            <input type="password" id="senha" placeholder="Digite sua senha" required>
+          </div>
 
-    <div class="demo-info">
-      <h4>💡 Contas de Demonstração:</h4>
-      <p><strong>Admin:</strong> admin@AgendaMed.com / 123456</p>
-      <p><strong>Médico:</strong> altemar@clinica.com / 123456</p>
-      <p><strong>Sabrina Gabriella:</strong> sabrina@AgendaMed.com / 123456</p>
-    </div>
-  </div>
+          <label class="remember-label">
+            <input type="checkbox" id="rememberMe">
+            Lembrar-me
+          </label>
+
+          <button type="submit" class="btn-primary">Entrar</button>
+          <div class="login-error" id="loginError">E-mail ou senha incorretos!</div>
+        </form>
+
+        <div class="login-footer">
+          <p>Não tem conta? <a href="#" id="abrirModalCadastro">Criar conta</a></p>
+        </div>
+
+        <div class="demo-info">
+          <h4>Contas de demonstração</h4>
+          <p><strong>Admin:</strong> admin@AgendaMed.com / 123456</p>
+          <p><strong>Médico:</strong> altemar@clinica.com / 123456</p>
+          <p><strong>Sabrina Gabriella:</strong> sabrina@AgendaMed.com / 123456</p>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <!-- Modal de Cadastro -->
   <div class="modal" id="modalCadastro">

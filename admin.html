@@ -414,6 +414,53 @@
       cursor: pointer;
       margin: 0 auto;
     }
+
+    .admin-photo-actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 12px auto 0;
+    }
+
+    .admin-photo-actions button {
+      border: 1px solid var(--cor-borda);
+      border-radius: 999px;
+      background: var(--cor-fundo);
+      color: var(--cor-principal);
+      padding: 8px 14px;
+      font: inherit;
+      font-size: 0.88rem;
+      font-weight: 650;
+      cursor: pointer;
+      transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+    }
+
+    .admin-photo-actions button:hover {
+      background: rgba(80, 56, 237, 0.07);
+      border-color: var(--cor-principal);
+      transform: translateY(-1px);
+    }
+
+    .admin-photo-hint {
+      width: 100%;
+      margin: 0;
+      color: var(--cor-secundaria);
+      font-size: 0.78rem;
+    }
+
+    .visually-hidden-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
     
     .foto-placeholder {
       width: 100%;
@@ -580,6 +627,631 @@
         flex-direction: column;
       }
     }
+
+    /* Identidade visual administrativa */
+    body[data-tipo="admin"] {
+      --cor-principal: #6546c8;
+      --cor-secundaria: #758099;
+      --cor-sucesso: #2d9b79;
+      --cor-erro: #d95c70;
+      --cor-aviso: #f0b84b;
+      --cor-fundo: #f6f5fb;
+      --cor-texto: #25243a;
+      --cor-card: #fff;
+      --cor-borda: #e8e6f0;
+      --cor-hover: #f2effb;
+      --cor-sombra: rgba(44, 35, 83, .08);
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 85% 0%, rgba(130, 100, 218, .08), transparent 34rem),
+        var(--cor-fundo);
+      font-family: var(--font-base, Inter, sans-serif);
+    }
+
+    body[data-tipo="admin"] [hidden] {
+      display: none !important;
+    }
+
+    body[data-tipo="admin"] h1,
+    body[data-tipo="admin"] h2,
+    body[data-tipo="admin"] h3,
+    body[data-tipo="admin"] h4 {
+      font-family: var(--font-titulo, "Plus Jakarta Sans", sans-serif);
+      letter-spacing: -.025em;
+    }
+
+    body[data-tipo="admin"] .header {
+      min-height: 76px;
+      flex-wrap: nowrap;
+      padding: 12px clamp(20px, 4vw, 64px);
+      background: rgba(255, 255, 255, .94) !important;
+      color: var(--cor-texto) !important;
+      border-bottom: 1px solid var(--cor-borda);
+      box-shadow: 0 6px 24px rgba(44, 35, 83, .05);
+      backdrop-filter: blur(16px);
+    }
+
+    body[data-tipo="admin"] .header .logo {
+      gap: 10px;
+      color: var(--cor-texto);
+      font-family: var(--font-titulo, "Plus Jakarta Sans", sans-serif);
+      font-size: 1.35rem;
+      font-weight: 750;
+    }
+
+    body[data-tipo="admin"] .header .logo img {
+      height: 40px;
+      width: 40px;
+      border: 0;
+      box-shadow: none;
+    }
+
+    body[data-tipo="admin"] .header .nav {
+      width: auto;
+      flex: 1;
+      overflow: visible;
+    }
+
+    body[data-tipo="admin"] .header .nav ul {
+      flex-wrap: nowrap;
+      justify-content: flex-end;
+      gap: 2px;
+    }
+
+    body[data-tipo="admin"] .header .nav ul li a {
+      padding: 9px 10px;
+      color: #697087;
+      font-size: .78rem;
+      font-weight: 600;
+      border-radius: 10px;
+    }
+
+    body[data-tipo="admin"] .header .nav ul li a:hover,
+    body[data-tipo="admin"] .header .nav ul li a.active {
+      color: var(--cor-principal);
+      background: #f1edfc;
+      box-shadow: none;
+      transform: none;
+    }
+
+    body[data-tipo="admin"] .header .nav ul li a.active::after {
+      display: none;
+    }
+
+    body[data-tipo="admin"] .header .nav ul li:last-child a {
+      color: #bb5365;
+    }
+
+    body[data-tipo="admin"] .admin-menu-toggle {
+      display: none;
+      width: 42px;
+      height: 42px;
+      padding: 10px;
+      flex: 0 0 auto;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 5px;
+      color: var(--cor-principal);
+      background: #f1edfc;
+      border: 1px solid #e8e1fa;
+      border-radius: 12px;
+      box-shadow: none;
+    }
+
+    body[data-tipo="admin"] .admin-menu-toggle span {
+      width: 18px;
+      height: 2px;
+      border-radius: 2px;
+      background: currentColor;
+    }
+
+    body[data-tipo="admin"] .container {
+      width: min(100% - 48px, 1320px);
+      max-width: 1320px;
+      margin: 38px auto 56px;
+    }
+
+    body[data-tipo="admin"] .tab-content.active {
+      min-width: 0;
+    }
+
+    body[data-tipo="admin"] .welcome {
+      padding: 28px 32px;
+      border: 1px solid #e9e4f6;
+      border-radius: 22px;
+      background: linear-gradient(115deg, #fff 12%, #f0ebfc 100%);
+      box-shadow: 0 12px 32px rgba(44, 35, 83, .06);
+    }
+
+    body[data-tipo="admin"] .user-welcome {
+      align-items: center;
+      gap: 20px;
+    }
+
+    body[data-tipo="admin"] .foto-grande {
+      border: 3px solid #fff;
+      box-shadow: 0 5px 18px rgba(77, 52, 157, .17);
+    }
+
+    body[data-tipo="admin"] .welcome-text h1 {
+      color: #28243b;
+      font-size: clamp(1.45rem, 2.5vw, 2rem);
+    }
+
+    body[data-tipo="admin"] .welcome-text p {
+      margin: 8px 0 0;
+      color: #77738c;
+    }
+
+    body[data-tipo="admin"] .dashboard-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    body[data-tipo="admin"] .dashboard-grid .card {
+      min-width: 0;
+      padding: 22px;
+      text-align: left;
+      border: 1px solid var(--cor-borda);
+      border-radius: 18px;
+      box-shadow: 0 8px 22px rgba(44, 35, 83, .045);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    body[data-tipo="admin"] .dashboard-grid .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 28px rgba(44, 35, 83, .09);
+    }
+
+    body[data-tipo="admin"] .dashboard-grid .card h3 {
+      margin: 0 0 16px;
+      color: #77738c;
+      font-family: var(--font-base, Inter, sans-serif);
+      font-size: .84rem;
+      font-weight: 600;
+      letter-spacing: 0;
+    }
+
+    body[data-tipo="admin"] .dashboard-grid .card p {
+      margin: 0;
+      color: var(--cor-texto);
+      font-size: 1.8rem;
+      line-height: 1.15;
+      overflow-wrap: anywhere;
+    }
+
+    body[data-tipo="admin"] .proximas-consultas {
+      margin-top: 30px !important;
+      padding: 24px;
+      border: 1px solid var(--cor-borda);
+      border-radius: 18px;
+      background: var(--cor-card);
+      box-shadow: 0 8px 22px rgba(44, 35, 83, .045);
+    }
+
+    body[data-tipo="admin"] .proximas-consultas h2 {
+      margin-bottom: 18px !important;
+      color: var(--cor-texto) !important;
+      font-size: 1.15rem;
+    }
+
+    body[data-tipo="admin"] .page-header {
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    body[data-tipo="admin"] .page-header h1 {
+      color: var(--cor-texto);
+      font-size: clamp(1.55rem, 2.5vw, 2rem);
+    }
+
+    body[data-tipo="admin"] .page-header p {
+      margin: 5px 0 0;
+    }
+
+    body[data-tipo="admin"] .btn-add,
+    body[data-tipo="admin"] .btn-submit {
+      background: linear-gradient(135deg, #7659d2, #5d42bd);
+      border-radius: 11px;
+      box-shadow: 0 6px 14px rgba(101, 70, 200, .18);
+    }
+
+    body[data-tipo="admin"] .btn-add:hover,
+    body[data-tipo="admin"] .btn-submit:hover {
+      background: #553bb0;
+      box-shadow: 0 9px 18px rgba(101, 70, 200, .24);
+    }
+
+    body[data-tipo="admin"] .filtros-container {
+      margin-bottom: 18px;
+      gap: 12px;
+    }
+
+    body[data-tipo="admin"] .search-box input,
+    body[data-tipo="admin"] .filter-select select,
+    body[data-tipo="admin"] .filtro-group input {
+      min-height: 46px;
+      padding: 11px 14px;
+      border: 1px solid var(--cor-borda);
+      border-radius: 11px;
+      background: #fff;
+      box-shadow: 0 2px 7px rgba(44, 35, 83, .025);
+    }
+
+    body[data-tipo="admin"] input:focus,
+    body[data-tipo="admin"] select:focus,
+    body[data-tipo="admin"] textarea:focus {
+      border-color: #9b88df;
+      box-shadow: 0 0 0 3px rgba(101, 70, 200, .12);
+    }
+
+    body[data-tipo="admin"] .table-container,
+    body[data-tipo="admin"] .tabela-container {
+      overflow-x: auto;
+      border: 1px solid var(--cor-borda);
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 8px 22px rgba(44, 35, 83, .045);
+    }
+
+    body[data-tipo="admin"] .table-container table,
+    body[data-tipo="admin"] .tabela-container table {
+      min-width: 680px;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    body[data-tipo="admin"] .table-container table th,
+    body[data-tipo="admin"] .tabela-container table th {
+      padding: 14px 16px;
+      color: #77738c;
+      background: #f8f7fb;
+      font-size: .76rem;
+      font-weight: 700;
+      letter-spacing: .045em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--cor-borda);
+    }
+
+    body[data-tipo="admin"] .table-container table td,
+    body[data-tipo="admin"] .tabela-container table td {
+      padding: 14px 16px;
+      color: #4a4960;
+      border-bottom: 1px solid #f0eef5;
+    }
+
+    body[data-tipo="admin"] .table-container table tr:nth-child(even),
+    body[data-tipo="admin"] .tabela-container table tr:nth-child(even) {
+      background: #fff;
+    }
+
+    body[data-tipo="admin"] .table-container table tbody tr:hover,
+    body[data-tipo="admin"] .tabela-container table tbody tr:hover {
+      background: #faf9fd;
+    }
+
+    body[data-tipo="admin"] .btn-acao {
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: .76rem;
+      font-weight: 600;
+    }
+
+    body[data-tipo="admin"] .btn-editar,
+    body[data-tipo="admin"] .btn-ver-agenda,
+    body[data-tipo="admin"] .btn-ver-medicos {
+      color: #5d42bd;
+      background: #f0edfb;
+    }
+
+    body[data-tipo="admin"] .btn-excluir {
+      color: #b94259;
+      background: #fff0f2;
+    }
+
+    body[data-tipo="admin"] .status-ativo {
+      background: #e5f5ef;
+      color: #25815f;
+    }
+
+    body[data-tipo="admin"] .status-inativo {
+      background: #f0eef4;
+      color: #77738c;
+    }
+
+    body[data-tipo="admin"] .empty-state,
+    body[data-tipo="admin"] .filtros,
+    body[data-tipo="admin"] .config-item,
+    body[data-tipo="admin"] .perfil-section,
+    body[data-tipo="admin"] .ajuda-container {
+      border: 1px solid var(--cor-borda);
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 8px 22px rgba(44, 35, 83, .045);
+    }
+
+    body[data-tipo="admin"] .empty-state h3 {
+      color: var(--cor-texto);
+    }
+
+    body[data-tipo="admin"] .empty-state .icon {
+      display: none;
+    }
+
+    body[data-tipo="admin"] .filtros-form {
+      align-items: end;
+    }
+
+    body[data-tipo="admin"] .filtro-group label,
+    body[data-tipo="admin"] .form-group label {
+      color: #53516b;
+      font-size: .86rem;
+    }
+
+    body[data-tipo="admin"] .btn-limpar {
+      background: #efedf5;
+      color: #5f5b73;
+    }
+
+    body[data-tipo="admin"] .config-item,
+    body[data-tipo="admin"] .perfil-section {
+      padding: 28px;
+    }
+
+    body[data-tipo="admin"] .faq-item {
+      border-left-color: #8d74d8;
+      background: #f8f6fd;
+    }
+
+    body[data-tipo="admin"] .chatbot-container {
+      border: 1px solid var(--cor-borda);
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(44, 35, 83, .07);
+    }
+
+    body[data-tipo="admin"] .chatbot-header,
+    body[data-tipo="admin"] .message.user,
+    body[data-tipo="admin"] .send-btn {
+      background: var(--cor-principal);
+    }
+
+    @media (max-width: 1100px) {
+      body[data-tipo="admin"] .header {
+        position: sticky;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+      }
+
+      body[data-tipo="admin"] .header .logo {
+        justify-content: flex-start;
+      }
+
+      body[data-tipo="admin"] .admin-menu-toggle {
+        display: flex;
+      }
+
+      body[data-tipo="admin"] .header .nav {
+        display: none;
+        position: absolute;
+        top: calc(100% + 1px);
+        left: 0;
+        right: 0;
+        width: 100%;
+        padding: 12px 20px 18px;
+        background: #fff;
+        border-bottom: 1px solid var(--cor-borda);
+        box-shadow: 0 14px 24px rgba(44, 35, 83, .1);
+      }
+
+      body[data-tipo="admin"] .header .nav.is-open {
+        display: block;
+      }
+
+      body[data-tipo="admin"] .header .nav ul {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        justify-content: stretch;
+        gap: 4px;
+      }
+
+      body[data-tipo="admin"] .header .nav ul li a {
+        display: block;
+        white-space: normal;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body[data-tipo="admin"] .container {
+        width: calc(100% - 28px);
+        margin: 22px auto 36px;
+      }
+
+      body[data-tipo="admin"] .welcome {
+        padding: 22px 18px;
+        border-radius: 17px;
+      }
+
+      body[data-tipo="admin"] .user-welcome {
+        flex-direction: row;
+        text-align: left;
+      }
+
+      body[data-tipo="admin"] .dashboard-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 11px;
+        margin-top: 14px;
+      }
+
+      body[data-tipo="admin"] .dashboard-grid .card {
+        min-height: 118px;
+        padding: 16px;
+        align-items: flex-start;
+      }
+
+      body[data-tipo="admin"] .dashboard-grid .card h3 {
+        font-size: .76rem;
+        text-align: left;
+        margin-bottom: 12px;
+      }
+
+      body[data-tipo="admin"] .dashboard-grid .card p {
+        font-size: 1.5rem;
+      }
+
+      body[data-tipo="admin"] .page-header {
+        align-items: stretch;
+      }
+
+      body[data-tipo="admin"] .page-header h1 {
+        text-align: left;
+      }
+
+      body[data-tipo="admin"] .btn-add {
+        width: 100%;
+      }
+
+      body[data-tipo="admin"] .table-container {
+        display: none;
+      }
+
+      body[data-tipo="admin"] #tab-especialidades .table-container,
+      body[data-tipo="admin"] #tab-agendar .table-container {
+        display: block;
+        overflow: visible;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+      }
+
+      body[data-tipo="admin"] #tab-especialidades table,
+      body[data-tipo="admin"] #tab-agendar table,
+      body[data-tipo="admin"] #tab-historico table {
+        min-width: 0;
+      }
+
+      body[data-tipo="admin"] #tab-especialidades thead,
+      body[data-tipo="admin"] #tab-agendar thead,
+      body[data-tipo="admin"] #tab-historico thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+      }
+
+      body[data-tipo="admin"] #tab-especialidades tbody,
+      body[data-tipo="admin"] #tab-agendar tbody,
+      body[data-tipo="admin"] #tab-historico tbody {
+        display: grid;
+        gap: 12px;
+      }
+
+      body[data-tipo="admin"] #tab-especialidades tr,
+      body[data-tipo="admin"] #tab-agendar tr,
+      body[data-tipo="admin"] #tab-historico tr {
+        display: grid;
+        padding: 6px 14px;
+        border: 1px solid var(--cor-borda);
+        border-radius: 14px;
+        background: #fff;
+        box-shadow: 0 5px 16px rgba(44, 35, 83, .04);
+      }
+
+      body[data-tipo="admin"] #tab-especialidades td,
+      body[data-tipo="admin"] #tab-agendar td,
+      body[data-tipo="admin"] #tab-historico td {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 9px 0;
+        white-space: normal;
+        text-align: right;
+        overflow-wrap: anywhere;
+      }
+
+      body[data-tipo="admin"] #tab-especialidades td[colspan],
+      body[data-tipo="admin"] #tab-agendar td[colspan],
+      body[data-tipo="admin"] #tab-historico td[colspan] {
+        justify-content: center;
+        text-align: center;
+      }
+
+      body[data-tipo="admin"] #tab-especialidades td::before,
+      body[data-tipo="admin"] #tab-agendar td::before,
+      body[data-tipo="admin"] #tab-historico td::before {
+        flex: 0 0 auto;
+        color: #77738c;
+        font-size: .73rem;
+        font-weight: 700;
+        text-align: left;
+        text-transform: uppercase;
+      }
+
+      body[data-tipo="admin"] #tab-especialidades td[colspan]::before,
+      body[data-tipo="admin"] #tab-agendar td[colspan]::before,
+      body[data-tipo="admin"] #tab-historico td[colspan]::before {
+        display: none;
+      }
+
+      body[data-tipo="admin"] #tab-especialidades td:nth-child(1)::before { content: "Nome"; }
+      body[data-tipo="admin"] #tab-especialidades td:nth-child(2)::before { content: "Descrição"; }
+      body[data-tipo="admin"] #tab-especialidades td:nth-child(3)::before { content: "Status"; }
+      body[data-tipo="admin"] #tab-especialidades td:nth-child(4)::before { content: "Ações"; }
+      body[data-tipo="admin"] #tab-agendar td:nth-child(1)::before { content: "Paciente"; }
+      body[data-tipo="admin"] #tab-agendar td:nth-child(2)::before { content: "Médico"; }
+      body[data-tipo="admin"] #tab-agendar td:nth-child(3)::before { content: "Data"; }
+      body[data-tipo="admin"] #tab-agendar td:nth-child(4)::before { content: "Hora"; }
+      body[data-tipo="admin"] #tab-agendar td:nth-child(5)::before { content: "Status"; }
+      body[data-tipo="admin"] #tab-agendar td:nth-child(6)::before { content: "Ações"; }
+      body[data-tipo="admin"] #tab-historico td:nth-child(1)::before { content: "Paciente"; }
+      body[data-tipo="admin"] #tab-historico td:nth-child(2)::before { content: "Médico"; }
+      body[data-tipo="admin"] #tab-historico td:nth-child(3)::before { content: "Data"; }
+      body[data-tipo="admin"] #tab-historico td:nth-child(4)::before { content: "Hora"; }
+      body[data-tipo="admin"] #tab-historico td:nth-child(5)::before { content: "Status"; }
+      body[data-tipo="admin"] #tab-historico td:nth-child(6)::before { content: "Diagnóstico"; }
+
+      body[data-tipo="admin"] .tabela-container {
+        padding: 0;
+        overflow: visible;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+      }
+
+      body[data-tipo="admin"] .filtros,
+      body[data-tipo="admin"] .config-item,
+      body[data-tipo="admin"] .perfil-section,
+      body[data-tipo="admin"] .ajuda-container,
+      body[data-tipo="admin"] .proximas-consultas {
+        padding: 18px;
+      }
+
+      body[data-tipo="admin"] .filtros-form {
+        grid-template-columns: 1fr;
+      }
+
+      body[data-tipo="admin"] .filtro-group {
+        min-width: 0;
+      }
+    }
+
+    @media (max-width: 380px) {
+      body[data-tipo="admin"] .dashboard-grid .card {
+        padding: 13px;
+      }
+
+      body[data-tipo="admin"] .dashboard-grid .card h3 {
+        font-size: .7rem;
+      }
+
+      body[data-tipo="admin"] .welcome {
+        padding: 18px 14px;
+      }
+    }
   </style>
 </head>
 <body data-tipo="admin">
@@ -669,7 +1341,6 @@
       <div class="pacientes-cards" id="pacientesCards"></div>
       
       <div class="empty-state" id="emptyStatePacientes" style="display: none;">
-        <div class="icon">👥</div>
         <h3>Nenhum paciente cadastrado</h3>
         <p>Comece adicionando seu primeiro paciente clicando no botão acima.</p>
       </div>
@@ -715,6 +1386,7 @@
               <th>Especialidade</th>
               <th>Clínica</th>
               <th>Telefone</th>
+              <th>E-mail</th>
               <th>Status</th>
               <th>Ações</th>
             </tr>
@@ -726,7 +1398,6 @@
       <div class="medicos-cards" id="medicosCards"></div>
       
       <div class="empty-state" id="emptyStateMedicos" style="display: none;">
-        <div class="icon">👨‍⚕️</div>
         <h3>Nenhum médico cadastrado</h3>
         <p>Comece adicionando seu primeiro médico clicando no botão acima.</p>
       </div>
@@ -773,7 +1444,6 @@
       <div class="clinicas-cards" id="clinicasCards"></div>
       
       <div class="empty-state" id="emptyStateClinicas" style="display: none;">
-        <div class="icon">🏥</div>
         <h3>Nenhuma clínica cadastrada</h3>
         <p>Comece adicionando sua primeira clínica clicando no botão acima.</p>
       </div>
@@ -816,7 +1486,6 @@
       </div>
       
       <div class="empty-state" id="emptyStateEspecialidades" style="display: none;">
-        <div class="icon">🩺</div>
         <h3>Nenhuma especialidade cadastrada</h3>
         <p>Comece adicionando sua primeira especialidade clicando no botão acima.</p>
       </div>
@@ -909,12 +1578,17 @@
       <!-- Perfil -->
       <section class="perfil-section">
         <div class="perfil-header">
-          <div class="foto-perfil-container" id="fotoPerfilContainer">
+          <div class="foto-perfil-container" id="fotoPerfilContainer" role="button" tabindex="0" aria-label="Escolher foto do perfil">
             <div class="foto-placeholder" id="fotoPlaceholder">
               <span id="fotoInicial">U</span>
             </div>
             <img id="fotoPreview" class="foto-preview" alt="Foto do perfil">
-            <input type="file" id="fotoInput" accept="image/*" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;">
+          </div>
+          <input type="file" id="fotoInput" class="visually-hidden-input" accept="image/*" aria-hidden="true" tabindex="-1">
+          <div class="admin-photo-actions">
+            <button type="button" id="btnEscolherFoto">Alterar foto</button>
+            <button type="button" class="btn-delete" id="btnRemoverFoto" style="display: none;">Remover foto</button>
+            <p class="admin-photo-hint">JPG, PNG ou WebP. A foto fica salva somente neste perfil.</p>
           </div>
           <div class="perfil-info" style="text-align: center; margin-top: 15px;">
             <h2 id="userNameDisplay">Usuário</h2>
@@ -945,7 +1619,6 @@
           </div>
           <div style="text-align: center; margin-top: 20px;">
             <button type="submit" class="btn-primary">Salvar Alterações</button>
-            <button type="button" class="btn-delete" id="btnRemoverFoto" style="display: none; margin-left: 10px;">Remover Foto</button>
           </div>
         </form>
       </section>
@@ -1250,6 +1923,11 @@
     // INICIALIZAÇÃO ESPECÍFICA DA PÁGINA ADMIN
     // ============================================
     document.addEventListener('DOMContentLoaded', async () => {
+      const usuarioInicial = Storage.getUsuarioLogado();
+      if (usuarioInicial && usuarioInicial.tipo !== 'paciente') {
+        configurarAcessoPorPerfil();
+      }
+
       await Storage.ready;
       console.log('Admin inicializando...');
       
@@ -1264,6 +1942,8 @@
         window.location.href = 'paciente.html';
         return;
       }
+
+      configurarAcessoPorPerfil();
       
       // Aplica tema
       const config = Storage.getConfiguracoes();
@@ -1277,7 +1957,40 @@
       const fotoCustomizada = Storage.getFotoUsuario(user.id);
       const welcomePhoto = document.getElementById('welcomePhoto');
       if (welcomePhoto) {
-        welcomePhoto.src = fotoCustomizada || 'assets/images/avatar.png';
+        welcomePhoto.addEventListener('error', () => {
+          const placeholder = document.getElementById('welcomePlaceholder');
+          const initials = document.getElementById('welcomeInitials');
+          if (initials) {
+            initials.textContent = String(user.nome || 'Usuário')
+              .split(/\s+/)
+              .filter(Boolean)
+              .slice(0, 2)
+              .map(nome => nome[0])
+              .join('')
+              .toUpperCase();
+          }
+          if (placeholder) placeholder.style.display = 'flex';
+          welcomePhoto.style.display = 'none';
+        }, { once: true });
+        if (fotoCustomizada) {
+          welcomePhoto.src = fotoCustomizada;
+          welcomePhoto.style.display = 'block';
+        } else {
+          welcomePhoto.removeAttribute('src');
+          welcomePhoto.style.display = 'none';
+          const placeholder = document.getElementById('welcomePlaceholder');
+          const initials = document.getElementById('welcomeInitials');
+          if (initials) {
+            initials.textContent = String(user.nome || 'Usuário')
+              .split(/\s+/)
+              .filter(Boolean)
+              .slice(0, 2)
+              .map(nome => nome[0])
+              .join('')
+              .toUpperCase();
+          }
+          if (placeholder) placeholder.style.display = 'flex';
+        }
       }
       
       // Carrega estatísticas do dashboard
@@ -1294,10 +2007,61 @@
       
       // Configura o sistema de abas para inicializar módulos
       configurarModulosTabs();
+      Medico.renderTable();
+      Agendamento.renderTable();
+      if (Tabs.isActive('historico')) {
+        document.getElementById('filtroForm')?.dispatchEvent(
+          new Event('submit', { bubbles: true, cancelable: true })
+        );
+      }
     });
+
+    function configurarAcessoPorPerfil() {
+      if (Storage.getPerfilAcesso() !== 'medico') return;
+
+      document.body.dataset.perfil = 'medico';
+      document.querySelector('#tab-medicos .page-header h1').textContent = 'Minha agenda';
+      document.getElementById('openModalMedicoBtn').hidden = true;
+      document.querySelector('#tab-medicos .filtros-container').hidden = true;
+      document.querySelector('#tab-agendar .page-header h1').textContent = 'Minhas consultas';
+      document.getElementById('openModalAgendamentoBtn').hidden = true;
+
+      document.querySelectorAll(
+        '#modalPaciente, #modalMedico, #modalClinica, #modalEspecialidade, #modalAgendamento'
+      ).forEach(modal => { modal.hidden = true; });
+
+      const medico = Storage.getMedicoLogado();
+      const dashboardCards = document.querySelectorAll('#tab-dashboard .dashboard-grid .card');
+      if (dashboardCards[1]) dashboardCards[1].querySelector('h3').textContent = 'Consultas futuras';
+      if (dashboardCards[2]) dashboardCards[2].querySelector('h3').textContent = 'Minha especialidade';
+      if (dashboardCards[2]) {
+        dashboardCards[2].querySelector('p').textContent = medico?.especialidade || 'Não informada';
+      }
+      if (!medico) {
+        const emptyTitle = document.querySelector('#emptyStateMedicos h3');
+        const emptyDescription = document.querySelector('#emptyStateMedicos p');
+        if (emptyTitle) emptyTitle.textContent = 'Cadastro médico não vinculado';
+        if (emptyDescription) {
+          emptyDescription.textContent = 'Peça ao administrador para vincular seu usuário ao cadastro profissional.';
+        }
+      }
+
+      const backup = document.getElementById('btnExport')?.closest('.config-item');
+      if (backup) backup.hidden = true;
+
+      const perguntasAdmin = document.querySelectorAll('#tab-ajuda .faq-item');
+      perguntasAdmin[0]?.setAttribute('hidden', '');
+      perguntasAdmin[1]?.setAttribute('hidden', '');
+      perguntasAdmin[2]?.setAttribute('hidden', '');
+      const ajudaIntro = document.querySelector('#tab-ajuda .ajuda-container > p');
+      if (ajudaIntro) ajudaIntro.textContent = 'Acesse sua agenda e acompanhe seus atendimentos.';
+    }
     
     function carregarDashboard() {
-      const agendamentos = Storage.getAgendamentos();
+      const medicoLogado = Storage.getMedicoLogado();
+      const agendamentos = Storage.getPerfilAcesso() === 'medico'
+        ? Storage.getAgendamentos().filter(a => medicoLogado && String(a.medicoId) === String(medicoLogado.id))
+        : Storage.getAgendamentos();
       const medicos = Storage.getMedicos();
       const hoje = new Date().toISOString().split('T')[0];
       
@@ -1311,14 +2075,17 @@
       
       if (el1) el1.textContent = consultasHoje;
       if (el2) el2.textContent = proximosPacientes;
-      if (el3) el3.textContent = medicos.length;
+      if (el3 && Storage.getPerfilAcesso() !== 'medico') el3.textContent = medicos.length;
       if (el4) el4.textContent = consultasHoje === 0 ? 'Nenhum' : `${consultasHoje} consultas hoje`;
       
       carregarProximasConsultas();
     }
     
     function carregarProximasConsultas() {
-      const agendamentos = Storage.getAgendamentos();
+      const medicoLogado = Storage.getMedicoLogado();
+      const agendamentos = Storage.getPerfilAcesso() === 'medico'
+        ? Storage.getAgendamentos().filter(a => medicoLogado && String(a.medicoId) === String(medicoLogado.id))
+        : Storage.getAgendamentos();
       const pacientes = Storage.getPacientes();
       const medicos = Storage.getMedicos();
       const hoje = new Date();
@@ -1362,8 +2129,10 @@
     
     function configurarPerfil(user) {
       const fotoInput = document.getElementById('fotoInput');
+      const fotoContainer = document.getElementById('fotoPerfilContainer');
       const perfilForm = document.getElementById('perfilForm');
       const btnRemoverFoto = document.getElementById('btnRemoverFoto');
+      const btnEscolherFoto = document.getElementById('btnEscolherFoto');
       
       // Carrega dados
       const userNome = document.getElementById('userNome');
@@ -1385,63 +2154,91 @@
       const fotoPreview = document.getElementById('fotoPreview');
       const fotoPlaceholder = document.getElementById('fotoPlaceholder');
       const fotoInicial = document.getElementById('fotoInicial');
+      const atualizarFotoExibida = (foto) => {
+        if (foto) {
+          if (fotoPreview) {
+            fotoPreview.src = foto;
+            fotoPreview.classList.add('visible');
+          }
+          if (fotoPlaceholder) fotoPlaceholder.classList.add('hidden');
+          if (btnRemoverFoto) btnRemoverFoto.style.display = 'inline-flex';
+        } else {
+          if (fotoPreview) {
+            fotoPreview.removeAttribute('src');
+            fotoPreview.classList.remove('visible');
+          }
+          if (fotoPlaceholder) fotoPlaceholder.classList.remove('hidden');
+          if (btnRemoverFoto) btnRemoverFoto.style.display = 'none';
+        }
+        const welcomePhoto = document.getElementById('welcomePhoto');
+        const welcomePlaceholder = document.getElementById('welcomePlaceholder');
+        if (welcomePhoto) {
+          if (foto) {
+            welcomePhoto.src = foto;
+            welcomePhoto.style.display = 'block';
+            if (welcomePlaceholder) welcomePlaceholder.style.display = 'none';
+          } else {
+            welcomePhoto.removeAttribute('src');
+            welcomePhoto.style.display = 'none';
+            if (welcomePlaceholder) welcomePlaceholder.style.display = 'flex';
+          }
+        }
+      };
       
       if (fotoCustomizada) {
-        if (fotoPreview) { fotoPreview.src = fotoCustomizada; fotoPreview.classList.add('visible'); }
-        if (fotoPlaceholder) fotoPlaceholder.classList.add('hidden');
-        if (btnRemoverFoto) btnRemoverFoto.style.display = 'inline-block';
+        atualizarFotoExibida(fotoCustomizada);
       } else {
-        if (fotoPreview) fotoPreview.classList.remove('visible');
-        if (fotoPlaceholder) fotoPlaceholder.classList.remove('hidden');
-        if (btnRemoverFoto) btnRemoverFoto.style.display = 'none';
         if (fotoInicial) {
           const iniciais = user.nome ? user.nome.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) : 'U';
           fotoInicial.textContent = iniciais;
         }
+        atualizarFotoExibida(null);
       }
       
-      // Upload foto
+      const abrirSeletorDeFoto = () => fotoInput?.click();
+      if (fotoContainer) {
+        fotoContainer.addEventListener('click', abrirSeletorDeFoto);
+        fotoContainer.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            abrirSeletorDeFoto();
+          }
+        });
+      }
+      if (btnEscolherFoto) {
+        btnEscolherFoto.addEventListener('click', abrirSeletorDeFoto);
+      }
       if (fotoInput) {
-        fotoInput.addEventListener('change', (e) => {
-          const file = e.target.files[0];
+        fotoInput.addEventListener('change', async (event) => {
+          const file = event.target.files[0];
           if (!file) return;
-          
-          if (!file.type.startsWith('image/')) {
-            alert('Por favor, selecione uma imagem válida!');
-            return;
+          try {
+            const foto = await Storage.prepararFoto(file);
+            await Storage.salvarFotoUsuario(user.id, foto);
+            atualizarFotoExibida(foto);
+            Notificacao.show('Foto do perfil atualizada.', 'success');
+          } catch (error) {
+            Notificacao.show(error.message, 'error');
+          } finally {
+            fotoInput.value = '';
           }
-          
-          if (file.size > 5 * 1024 * 1024) {
-            alert('A imagem deve ter no máximo 5MB!');
-            return;
-          }
-          
-          const reader = new FileReader();
-          reader.onload = (ev) => {
-            const fotoUrl = ev.target.result;
-            if (fotoPreview) { fotoPreview.src = fotoUrl; fotoPreview.classList.add('visible'); }
-            if (fotoPlaceholder) fotoPlaceholder.classList.add('hidden');
-            if (btnRemoverFoto) btnRemoverFoto.style.display = 'inline-block';
-            
-            Storage.salvarFotoUsuario(user.id, fotoUrl);
-            if (typeof Notificacao !== 'undefined') {
-              Notificacao.show('Foto atualizada!', 'success');
-            }
-          };
-          reader.readAsDataURL(file);
         });
       }
       
-      // Remover foto
       if (btnRemoverFoto) {
-        btnRemoverFoto.addEventListener('click', () => {
-          if (confirm('Deseja remover sua foto?')) {
-            if (fotoPreview) fotoPreview.classList.remove('visible');
-            if (fotoPlaceholder) fotoPlaceholder.classList.remove('hidden');
-            btnRemoverFoto.style.display = 'none';
-            
-            Storage.removerFotoUsuario(user.id);
-            alert('Foto removida!');
+        btnRemoverFoto.addEventListener('click', async () => {
+          if (!confirm('Deseja remover sua foto?')) return;
+          try {
+            await Storage.removerFotoUsuario(user.id);
+            atualizarFotoExibida(null);
+            if (fotoInicial) {
+              fotoInicial.textContent = user.nome
+                ? user.nome.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
+                : 'U';
+            }
+            Notificacao.show('Foto removida do perfil.', 'success');
+          } catch (error) {
+            Notificacao.show(error.message, 'error');
           }
         });
       }

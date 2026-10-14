@@ -11,25 +11,18 @@ const Storage = {
   },
 
   salvarFotoUsuario(userId, fotoData) {
-    const fotos = JSON.parse(localStorage.getItem('CallMed_user_photos') || '{}');
-    fotos[userId] = fotoData;
-    localStorage.setItem('CallMed_user_photos', JSON.stringify(fotos));
-    const usuarioLogado = this.getUsuarioLogado();
-    if (usuarioLogado && usuarioLogado.id == userId) {
-      usuarioLogado.foto = fotoData;
-      localStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
-    }
+    return this.salvarFotoNoPerfil(userId, fotoData);
   },
 
   getFotoUsuario(userId) {
-    const fotos = JSON.parse(localStorage.getItem('CallMed_user_photos') || '{}');
-    return fotos[userId] || null;
+    const usuarioLogado = this.getUsuarioLogado();
+    return usuarioLogado && String(usuarioLogado.id) === String(userId)
+      ? usuarioLogado.foto || null
+      : null;
   },
 
   removerFotoUsuario(userId) {
-    const fotos = JSON.parse(localStorage.getItem('CallMed_user_photos') || '{}');
-    delete fotos[userId];
-    localStorage.setItem('CallMed_user_photos', JSON.stringify(fotos));
+    return this.salvarFotoNoPerfil(userId, null);
   },
 
   temFotoCustomizada(userId) {
@@ -38,6 +31,13 @@ const Storage = {
 
   getUsuarioLogado() {
     return JSON.parse(localStorage.getItem('usuarioLogado') || 'null');
+  },
+
+  getPerfilAcesso() {
+    const usuario = this.getUsuarioLogado();
+    const tipo = String(usuario?.tipo || '').toLowerCase();
+    const tipoClinica = String(usuario?.tipoClinica || '').toLowerCase();
+    return tipo === 'medico' || tipoClinica === 'medico' ? 'medico' : 'admin';
   },
 
   logout() {
@@ -61,8 +61,10 @@ const Storage = {
     });
   },
 
-  getMedicoPorUsuarioId(usuarioId) {
-    return this.getMedicos().find(medico => medico.usuarioId == usuarioId);
+  getMedicoLogado() {
+    const usuario = this.getUsuarioLogado();
+    if (!usuario) return null;
+    return this.getMedicoPorUsuarioId(usuario.id);
   },
 
   adicionarMedicoAutomaticamente(usuario) {
@@ -153,7 +155,13 @@ const Storage = {
   },
 
   getMedicoPorUsuarioId(usuarioId) {
-    return this.getMedicos().find(medico => medico.usuarioId == usuarioId);
+    const usuario = this.getUsuarioLogado();
+    return this.getMedicos().find(medico =>
+      String(medico.usuarioId) === String(usuarioId) ||
+      (String(usuario?.id) === String(usuarioId) &&
+        usuario?.email &&
+        medico.email?.toLowerCase() === usuario.email.toLowerCase())
+    );
   },
 
   adicionarMedicoAutomaticamente(usuario) {
@@ -611,7 +619,10 @@ Storage.getPacientePorUsuarioId = usuarioId => Storage.getPacientes().find(
   paciente => paciente.usuarioId == usuarioId || paciente.id == usuarioId
 );
 Storage.criarPacienteParaUsuario = async function(usuarioId, dadosPaciente) {
-  const usuario = this._cache.usuarios.find(item => item.id == usuarioId);
+  const usuario = this._cache.usuarios.find(item => item.id == usuarioId)
+    || (String(this.getUsuarioLogado()?.id) === String(usuarioId)
+      ? this.getUsuarioLogado()
+      : null);
   if (!usuario) return null;
   return this.salvarPaciente({
     ...dadosPaciente,
@@ -730,6 +741,77 @@ Storage.getPerfil = usuarioId => apiRequest(`/perfil/${usuarioId}`);
 Storage.salvarPerfil = (usuarioId, dados) => apiRequest(`/perfil/${usuarioId}`, {
   method: 'PUT', body: JSON.stringify(dados)
 });
+Storage.salvarFotoNoPerfil = async function(usuarioId, foto) {
+  const perfilAtualizado = await this.salvarPerfil(usuarioId, { foto });
+  const usuarioLogado = this.getUsuarioLogado();
+  if (usuarioLogado && String(usuarioLogado.id) === String(usuarioId)) {
+    usuarioLogado.foto = perfilAtualizado.foto || null;
+    localStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
+  }
+  return perfilAtualizado.foto || null;
+};
+Storage.prepararFoto = async function(file) {
+  if (!file || !file.type.startsWith('image/')) {
+    throw new Error('Escolha um arquivo de imagem.');
+  }
+  if (file.size > 15 * 1024 * 1024) {
+    throw new Error('A imagem original deve ter no máximo 15 MB.');
+  }
+
+  let bitmap;
+  let image;
+  let releaseImage = () => {};
+  try {
+    bitmap = await createImageBitmap(file);
+  } catch (error) {
+    const objectUrl = URL.createObjectURL(file);
+    releaseImage = () => URL.revokeObjectURL(objectUrl);
+    image = await new Promise((resolve, reject) => {
+      const fallbackImage = new Image();
+      fallbackImage.onload = () => resolve(fallbackImage);
+      fallbackImage.onerror = () => reject(
+        new Error('Não foi possível abrir essa imagem. Escolha outro arquivo.')
+      );
+      fallbackImage.src = objectUrl;
+    }).catch(error => {
+      releaseImage();
+      throw error;
+    });
+  }
+
+  try {
+    image = image || bitmap;
+    const imageWidth = image.width || image.naturalWidth;
+    const imageHeight = image.height || image.naturalHeight;
+    const side = Math.min(imageWidth, imageHeight);
+    if (!side) throw new Error('A imagem selecionada não é válida.');
+
+    for (const size of [512, 384, 256]) {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('Não foi possível preparar a imagem.');
+      const cropX = (imageWidth - side) / 2;
+      const cropY = (imageHeight - side) / 2;
+      context.drawImage(image, cropX, cropY, side, side, 0, 0, size, size);
+
+      for (const quality of [0.84, 0.74, 0.64]) {
+        let photo = canvas.toDataURL('image/webp', quality);
+        if (!photo.startsWith('data:image/webp;')) {
+          photo = canvas.toDataURL('image/jpeg', quality);
+        }
+        const headerLength = photo.indexOf(',') + 1;
+        const approximateBytes = Math.ceil((photo.length - headerLength) * 0.75);
+        if (approximateBytes <= 700 * 1024) return photo;
+      }
+    }
+    throw new Error('Não foi possível reduzir a imagem ao tamanho permitido.');
+  } finally {
+    bitmap?.close();
+    releaseImage();
+  }
+};
 Storage.normalizarMatchmaking = function(dados = {}) {
   const necessidade = String(dados.necessidade || dados.nec || '').trim();
   const sintomas = Array.isArray(dados.sintomas)
@@ -1005,7 +1087,7 @@ function carregarFotoUsuario(user) {
       welcomePhoto.style.display = 'block';
       if (welcomePlaceholder) welcomePlaceholder.style.display = 'none';
     } else {
-      welcomePhoto.src = 'avatar.png';
+      welcomePhoto.src = 'assets/images/avatar.svg';
       welcomePhoto.style.display = 'block';
       if (welcomePlaceholder) welcomePlaceholder.style.display = 'none';
     }
@@ -1021,7 +1103,7 @@ function carregarFotoUsuario(user) {
       fotoPreview.style.display = 'block';
       fotoPlaceholder.style.display = 'none';
     } else {
-      fotoPreview.src = 'avatar.png';
+      fotoPreview.src = 'assets/images/avatar.svg';
       fotoPreview.style.display = 'block';
       fotoPlaceholder.style.display = 'none';
       
@@ -1264,41 +1346,27 @@ function configurarPerfilConfig(user) {
   const btnRemoverFoto = document.getElementById('btnRemoverFoto');
   
   if (fotoInput) {
-    fotoInput.addEventListener('change', function(e) {
+    fotoInput.addEventListener('change', async function(e) {
       const file = e.target.files[0];
       if (!file) return;
-      
-      if (!file.type.startsWith('image/')) {
-        alert('Por favor, selecione uma imagem válida!');
-        return;
-      }
-      
-      if (file.size > 5 * 1024 * 1024) {
-        alert('A imagem deve ter no máximo 5MB!');
-        return;
-      }
-      
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const fotoUrl = e.target.result;
+      try {
+        const fotoUrl = await Storage.prepararFoto(file);
+        await Storage.salvarFotoUsuario(user.id, fotoUrl);
         const fotoPreview = document.getElementById('fotoPreview');
         const fotoPlaceholder = document.getElementById('fotoPlaceholder');
-        
         if (fotoPreview) {
           fotoPreview.src = fotoUrl;
+          fotoPreview.classList.add('visible');
           fotoPreview.style.display = 'block';
         }
         if (fotoPlaceholder) fotoPlaceholder.style.display = 'none';
-        
-        Storage.salvarFotoUsuario(user.id, fotoUrl);
-        
         if (btnRemoverFoto) btnRemoverFoto.style.display = 'inline-block';
-        
-        if (typeof Notificacao !== "undefined") {
-          Notificacao.show("Foto de perfil atualizada!", "success");
-        }
-      };
-      reader.readAsDataURL(file);
+        Notificacao.show("Foto de perfil atualizada.", "success");
+      } catch (error) {
+        Notificacao.show(error.message, "error");
+      } finally {
+        fotoInput.value = '';
+      }
     });
   }
   
@@ -1306,56 +1374,52 @@ function configurarPerfilConfig(user) {
     const fotoCustomizada = Storage.getFotoUsuario(user.id);
     btnRemoverFoto.style.display = fotoCustomizada ? 'inline-block' : 'none';
     
-    btnRemoverFoto.addEventListener('click', function() {
+    btnRemoverFoto.addEventListener('click', async function() {
       if (confirm('Deseja remover sua foto?')) {
-        const fotoPreview = document.getElementById('fotoPreview');
-        const fotoPlaceholder = document.getElementById('fotoPlaceholder');
-        const fotoInicial = document.getElementById('fotoInicial');
-        
-        if (fotoPreview) fotoPreview.style.display = 'none';
-        if (fotoPlaceholder) fotoPlaceholder.style.display = 'flex';
-        
-        const iniciais = user.nome ? 
-          user.nome.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) : 'U';
-        if (fotoInicial) fotoInicial.textContent = iniciais;
-        
-        Storage.removerFotoUsuario(user.id);
-        btnRemoverFoto.style.display = 'none';
-        
-        if (typeof Notificacao !== "undefined") {
-          Notificacao.show("Foto removida!", "success");
+        try {
+          await Storage.removerFotoUsuario(user.id);
+          const fotoPreview = document.getElementById('fotoPreview');
+          const fotoPlaceholder = document.getElementById('fotoPlaceholder');
+          const fotoInicial = document.getElementById('fotoInicial');
+
+          if (fotoPreview) {
+            fotoPreview.style.display = 'none';
+            fotoPreview.classList.remove('visible');
+            fotoPreview.removeAttribute('src');
+          }
+          if (fotoPlaceholder) fotoPlaceholder.style.display = 'flex';
+
+          const iniciais = user.nome
+            ? user.nome.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
+            : 'U';
+          if (fotoInicial) fotoInicial.textContent = iniciais;
+
+          btnRemoverFoto.style.display = 'none';
+          Notificacao.show("Foto removida do perfil.", "success");
+        } catch (error) {
+          Notificacao.show(error.message, "error");
         }
       }
     });
   }
   
   if (perfilForm) {
-    perfilForm.addEventListener('submit', function(e) {
+    perfilForm.addEventListener('submit', async function(e) {
       e.preventDefault();
-      
-      const usuarios = Storage.getUsuarios();
-      const usuarioIndex = usuarios.findIndex(u => u.id === user.id);
-      
-      if (usuarioIndex !== -1) {
-        usuarios[usuarioIndex].nome = document.getElementById('userNome').value;
-        usuarios[usuarioIndex].email = document.getElementById('userEmail').value;
-        usuarios[usuarioIndex].telefone = document.getElementById('userTelefone').value;
-        
-        localStorage.setItem('CallMed_usuarios', JSON.stringify(usuarios));
-        
-        const usuarioAtualizado = usuarios[usuarioIndex];
+      try {
+        const usuarioAtualizado = await Storage.salvarPerfil(user.id, {
+          nome: document.getElementById('userNome').value,
+          email: document.getElementById('userEmail').value,
+          telefone: document.getElementById('userTelefone').value
+        });
         localStorage.setItem('usuarioLogado', JSON.stringify(usuarioAtualizado));
-        
         const userNameDisplay = document.getElementById('userNameDisplay');
         const userEmailDisplay = document.getElementById('userEmailDisplay');
         if (userNameDisplay) userNameDisplay.textContent = usuarioAtualizado.nome;
         if (userEmailDisplay) userEmailDisplay.textContent = usuarioAtualizado.email;
-        
-        if (typeof Notificacao !== "undefined") {
-          Notificacao.show("Perfil atualizado com sucesso!", "success");
-        } else {
-          alert("Perfil atualizado com sucesso!");
-        }
+        Notificacao.show("Perfil atualizado com sucesso!", "success");
+      } catch (error) {
+        Notificacao.show(error.message, "error");
       }
     });
   }
