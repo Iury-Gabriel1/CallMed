@@ -1255,12 +1255,13 @@
   </style>
 </head>
 <body data-tipo="admin">
+  <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
 
   <!-- Header (injetado pelo components.js) -->
   <div id="header-placeholder"></div>
   
   <!-- Conteúdo das Tabs -->
-  <main class="container">
+  <main id="main-content" class="container">
     
     <!-- ============================================ -->
     <!-- TAB: DASHBOARD                                -->
@@ -1627,12 +1628,18 @@
       <section class="config-section">
         <div class="config-item">
           <h3>Tema da Aplicação</h3>
-          <select id="themeSelect" style="max-width: 300px; margin: 0 auto; padding: 10px; border-radius: 8px;">
+          <label class="sr-only" for="themeSelect">Cores do tema</label>
+          <select id="themeSelect" data-theme-select style="max-width: 300px; margin: 0 auto; padding: 10px; border-radius: 8px;">
             <option value="light">Claro</option>
             <option value="dark">Escuro</option>
             <option value="blue">Azul</option>
             <option value="green">Verde</option>
           </select>
+        </div>
+        <div class="config-item">
+          <h3>Acessibilidade</h3>
+          <p>Ajuste o texto, as cores e outros recursos para facilitar o uso.</p>
+          <button type="button" class="accessibility-settings-open">Abrir opções de acessibilidade</button>
         </div>
         
         <div class="config-item">
@@ -2267,22 +2274,7 @@
     }
     
     function configurarTema() {
-      const themeSelect = document.getElementById('themeSelect');
-      if (!themeSelect) return;
-      
-      const config = Storage.getConfiguracoes();
-      themeSelect.value = config.tema;
-      
-      themeSelect.addEventListener('change', (e) => {
-        const novoTema = e.target.value;
-        document.documentElement.setAttribute('data-theme', novoTema);
-        
-        const novaConfig = Storage.getConfiguracoes();
-        novaConfig.tema = novoTema;
-        Storage.salvarConfiguracoes(novaConfig);
-        
-        window.dispatchEvent(new CustomEvent('temaAlterado', { detail: novoTema }));
-      });
+      configurarSeletoresTema();
     }
     
     function configurarBackup() {

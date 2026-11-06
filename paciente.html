@@ -746,14 +746,38 @@
 
     html[data-theme="blue"] body[data-tipo="paciente"] {
       --cor-principal: #3476d2;
+      --cor-secundaria: #52657e;
+      --cor-sucesso: #31875c;
+      --cor-erro: #d34458;
+      --cor-aviso: #a76b12;
+      --cor-fundo: #eaf3ff;
+      --cor-texto: #193653;
+      --cor-card: #fff;
+      --cor-borda: #c8ddf5;
+      --cor-hover: #dfedff;
+      --cor-sombra: rgba(35, 83, 145, 0.12);
       --patient-purple: #3476d2;
-      --patient-cyan: #25bcca;
+      --patient-cyan: #208ba8;
+      --patient-muted: #52657e;
+      background: linear-gradient(180deg, #f3f8ff 0%, #e6f1ff 100%);
     }
 
     html[data-theme="green"] body[data-tipo="paciente"] {
       --cor-principal: #288e7a;
+      --cor-secundaria: #536b60;
+      --cor-sucesso: #24784f;
+      --cor-erro: #c4384b;
+      --cor-aviso: #96600d;
+      --cor-fundo: #edf8f1;
+      --cor-texto: #204332;
+      --cor-card: #fff;
+      --cor-borda: #c9e5d3;
+      --cor-hover: #e2f3e8;
+      --cor-sombra: rgba(35, 105, 69, 0.12);
       --patient-purple: #288e7a;
-      --patient-cyan: #25bcca;
+      --patient-cyan: #247f72;
+      --patient-muted: #536b60;
+      background: linear-gradient(180deg, #f5fbf6 0%, #e8f5ed 100%);
     }
 
     body[data-tipo="paciente"] .header {
@@ -766,6 +790,14 @@
         linear-gradient(112deg, #21106e 0%, #3822ca 55%, #5140f4 100%);
       box-shadow: 0 10px 30px rgba(41, 32, 146, 0.2);
       flex-wrap: nowrap;
+    }
+
+    html[data-theme="blue"] body[data-tipo="paciente"] .header {
+      background: linear-gradient(112deg, #123b70 0%, #2867b2 55%, #4285d4 100%);
+    }
+
+    html[data-theme="green"] body[data-tipo="paciente"] .header {
+      background: linear-gradient(112deg, #164b36 0%, #24784f 55%, #38976b 100%);
     }
 
     body[data-tipo="paciente"] .header .logo {
@@ -2210,12 +2242,18 @@
       <section class="config-section">
         <div class="config-item">
           <h3>Tema da Aplicação</h3>
-          <select id="themeSelect" style="max-width: 300px; margin: 0 auto; padding: 10px; border-radius: 8px;">
+          <label class="sr-only" for="themeSelect">Cores do tema</label>
+          <select id="themeSelect" data-theme-select style="max-width: 300px; margin: 0 auto; padding: 10px; border-radius: 8px;">
             <option value="light">Claro</option>
             <option value="dark">Escuro</option>
             <option value="blue">Azul</option>
             <option value="green">Verde</option>
           </select>
+        </div>
+        <div class="config-item">
+          <h3>Acessibilidade</h3>
+          <p>Ajuste o texto, as cores e outros recursos para facilitar o uso.</p>
+          <button type="button" class="accessibility-settings-open">Abrir opções de acessibilidade</button>
         </div>
         
         <div class="config-item">

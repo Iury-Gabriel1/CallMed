@@ -295,7 +295,7 @@ const Storage = {
 
   // ========== CONFIGURAÇÕES ==========
   getConfiguracoes() {
-    return JSON.parse(localStorage.getItem('CallMed_config') || '{"tema":"light","notificacoes":true}');
+    return JSON.parse(localStorage.getItem('CallMed_config') || '{"tema":"light","notificacoes":true,"acessibilidade":{}}');
   },
 
   salvarConfiguracoes(config) {
@@ -558,7 +558,8 @@ async function apiRequest(endpoint, options = {}) {
 const apiList = data => Array.isArray(data) ? data : data?.data || [];
 
 Storage._cache = { usuarios: [], pacientes: [], medicos: [], agendamentos: [], clinicas: [] };
-Storage._config = { tema: 'light', notificacoes: true };
+Storage._config = { tema: 'light', notificacoes: true, acessibilidade: {} };
+Storage._localConfig = {};
 
 Storage.syncCacheFromLocalStorage = function() {
   const readJson = key => {
@@ -578,10 +579,15 @@ Storage.syncCacheFromLocalStorage = function() {
   try {
     const savedConfig = JSON.parse(localStorage.getItem('CallMed_config') || '{}');
     if (savedConfig && Object.keys(savedConfig).length) {
-      this._config = { ...this._config, ...savedConfig };
+      this._localConfig = savedConfig;
+      this._config = {
+        ...this._config,
+        ...savedConfig,
+        acessibilidade: { ...savedConfig.acessibilidade }
+      };
     }
   } catch (error) {
-    this._config = this._config;
+    console.warn('As configurações locais do CallMed não puderam ser carregadas.', error);
   }
 
   return this._cache;
@@ -603,7 +609,16 @@ Storage.init = async function() {
   if (medicos.status === 'fulfilled') this._cache.medicos = apiList(medicos.value);
   if (agendamentos.status === 'fulfilled') this._cache.agendamentos = apiList(agendamentos.value);
   if (clinicas.status === 'fulfilled') this._cache.clinicas = apiList(clinicas.value);
-  if (config.status === 'fulfilled') this._config = config.value;
+  if (config.status === 'fulfilled') {
+    this._config = {
+      ...config.value,
+      ...this._localConfig,
+      acessibilidade: {
+        ...(config.value?.acessibilidade || {}),
+        ...(this._localConfig.acessibilidade || {})
+      }
+    };
+  }
   if (!this._cache.medicos.length) this.syncCacheFromLocalStorage();
   window.dispatchEvent(new CustomEvent('storageReady'));
   return this._cache;
@@ -614,7 +629,7 @@ Storage.getPacientes = () => Storage._cache.pacientes.length ? Storage._cache.pa
 Storage.getMedicos = () => Storage._cache.medicos.length ? Storage._cache.medicos : JSON.parse(localStorage.getItem('CallMed_medicos') || '[]');
 Storage.getAgendamentos = () => Storage._cache.agendamentos.length ? Storage._cache.agendamentos : JSON.parse(localStorage.getItem('CallMed_agendamentos') || '[]');
 Storage.getClinicas = () => Storage._cache.clinicas.length ? Storage._cache.clinicas : JSON.parse(localStorage.getItem('CallMed_clinicas') || '[]');
-Storage.getConfiguracoes = () => Storage._config && Object.keys(Storage._config).length ? Storage._config : JSON.parse(localStorage.getItem('CallMed_config') || '{"tema":"light","notificacoes":true}');
+Storage.getConfiguracoes = () => Storage._config && Object.keys(Storage._config).length ? Storage._config : JSON.parse(localStorage.getItem('CallMed_config') || '{"tema":"light","notificacoes":true,"acessibilidade":{}}');
 Storage.getPacientePorUsuarioId = usuarioId => Storage.getPacientes().find(
   paciente => paciente.usuarioId == usuarioId || paciente.id == usuarioId
 );
@@ -733,8 +748,10 @@ Storage.buscarDisponibilidadeMedico = async function(medicoId, data) {
   const query = new URLSearchParams({ data });
   return apiRequest(`/medicos/${medicoId}/disponibilidade?${query}`);
 };
-Storage.salvarConfiguracoes = async function(config) {
-  this._config = await apiRequest('/config', { method: 'POST', body: JSON.stringify(config) });
+Storage.salvarConfiguracoes = function(config) {
+  this._config = config;
+  this._localConfig = config;
+  localStorage.setItem('CallMed_config', JSON.stringify(config));
   return this._config;
 };
 Storage.getPerfil = usuarioId => apiRequest(`/perfil/${usuarioId}`);
@@ -1066,7 +1083,9 @@ const Notificacao = {
 
 function aplicarTemaGlobal() {
   const config = Storage.getConfiguracoes();
-  document.documentElement.setAttribute('data-theme', config.tema);
+  const temasDisponiveis = ['light', 'dark', 'blue', 'green'];
+  const tema = temasDisponiveis.includes(config.tema) ? config.tema : 'light';
+  document.documentElement.setAttribute('data-theme', tema);
   
   setTimeout(() => {
     const elementos = document.querySelectorAll('body, .card, .modal-content, table, .header, .nav, .container');
@@ -1074,6 +1093,204 @@ function aplicarTemaGlobal() {
       if (el) el.style.transition = 'background-color 0.3s ease, color 0.3s ease';
     });
   }, 100);
+}
+
+function salvarAcessibilidade(opcoes) {
+  const config = Storage.getConfiguracoes();
+  const ajustes = { ...opcoes };
+  if (typeof ajustes.tamanhoTexto === 'number') {
+    ajustes.tamanhoTexto = Math.min(140, Math.max(100, ajustes.tamanhoTexto));
+  }
+  config.acessibilidade = { ...config.acessibilidade, ...ajustes };
+  Storage.salvarConfiguracoes(config);
+  aplicarAcessibilidade(config.acessibilidade);
+}
+
+function aplicarAcessibilidade(opcoes = {}) {
+  const tamanhoTexto = Math.min(140, Math.max(100, Number(opcoes.tamanhoTexto) || 100));
+  const raiz = document.documentElement;
+  raiz.dataset.textScale = String(tamanhoTexto);
+  raiz.style.fontSize = `${tamanhoTexto}%`;
+  raiz.dataset.highContrast = String(Boolean(opcoes.altoContraste));
+  raiz.dataset.underlineLinks = String(Boolean(opcoes.linksSublinhados));
+  raiz.dataset.reduceMotion = String(Boolean(opcoes.movimentoReduzido));
+
+  const slider = document.getElementById('accessibilityFontSize');
+  const output = document.getElementById('accessibilityFontSizeValue');
+  if (slider) slider.value = String(tamanhoTexto);
+  if (output) output.textContent = `${tamanhoTexto}%`;
+
+  document.querySelectorAll('[data-accessibility-toggle]').forEach(button => {
+    const enabled = Boolean(opcoes[button.dataset.accessibilityToggle]);
+    button.setAttribute('aria-pressed', String(enabled));
+    const state = button.querySelector('.accessibility-toggle-state');
+    if (state) state.textContent = enabled ? 'Ativado' : 'Desativado';
+  });
+}
+
+function configurarSeletoresTema() {
+  const config = Storage.getConfiguracoes();
+  const temasDisponiveis = ['light', 'dark', 'blue', 'green'];
+  const temaAtual = temasDisponiveis.includes(config.tema) ? config.tema : 'light';
+
+  document.querySelectorAll('[data-theme-select]').forEach(select => {
+    select.value = temaAtual;
+    if (select.dataset.themeBound === 'true') return;
+
+    select.addEventListener('change', () => aplicarTema(select.value));
+    select.dataset.themeBound = 'true';
+  });
+}
+
+function aplicarTema(tema) {
+  if (!['light', 'dark', 'blue', 'green'].includes(tema)) {
+    throw new Error('Tema selecionado inválido.');
+  }
+
+  const config = Storage.getConfiguracoes();
+  config.tema = tema;
+  Storage.salvarConfiguracoes(config);
+  aplicarTemaGlobal();
+  document.querySelectorAll('[data-theme-select]').forEach(select => {
+    select.value = tema;
+  });
+  window.dispatchEvent(new CustomEvent('temaAlterado', { detail: tema }));
+  if (typeof Notificacao !== 'undefined') {
+    Notificacao.show(`Tema alterado para ${tema}`, 'success');
+  }
+}
+
+function inicializarAcessibilidade() {
+  const config = Storage.getConfiguracoes();
+  const opcoes = config.acessibilidade || {};
+  const main = document.querySelector('main');
+
+  if (main) {
+    if (!main.id) main.id = 'main-content';
+    main.tabIndex = -1;
+    if (!document.querySelector('.skip-link')) {
+      const skipLink = document.createElement('a');
+      skipLink.className = 'skip-link';
+      skipLink.href = `#${main.id}`;
+      skipLink.textContent = 'Pular para o conteúdo principal';
+      document.body.insertBefore(skipLink, document.body.firstChild);
+    }
+  }
+
+  document.body.insertAdjacentHTML('beforeend', `
+    <aside class="accessibility-widget" aria-label="Ferramentas de acessibilidade">
+      <button class="accessibility-trigger" type="button" aria-controls="accessibilityPanel" aria-expanded="false">
+        Acessibilidade
+      </button>
+      <section class="accessibility-panel" id="accessibilityPanel" aria-labelledby="accessibilityTitle" hidden>
+        <div class="accessibility-panel-header">
+          <h2 id="accessibilityTitle">Acessibilidade</h2>
+          <button class="accessibility-close" type="button" aria-label="Fechar opções de acessibilidade">Fechar</button>
+        </div>
+        <div class="accessibility-control">
+          <label for="accessibilityFontSize">Tamanho do texto</label>
+          <div class="accessibility-font-controls">
+            <button type="button" data-font-step="-10" aria-label="Diminuir texto">A-</button>
+            <input id="accessibilityFontSize" type="range" min="100" max="140" step="10" value="100" aria-describedby="accessibilityFontSizeValue">
+            <button type="button" data-font-step="10" aria-label="Aumentar texto">A+</button>
+            <output id="accessibilityFontSizeValue" for="accessibilityFontSize">100%</output>
+          </div>
+        </div>
+        <div class="accessibility-control">
+          <label for="accessibilityThemeSelect">Cores do tema</label>
+          <select id="accessibilityThemeSelect" data-theme-select>
+            <option value="light">Claro</option>
+            <option value="dark">Escuro</option>
+            <option value="blue">Azul</option>
+            <option value="green">Verde</option>
+          </select>
+        </div>
+        <button class="accessibility-toggle" type="button" data-accessibility-toggle="altoContraste" aria-pressed="false">
+          Alto contraste <span class="accessibility-toggle-state">Desativado</span>
+        </button>
+        <button class="accessibility-toggle" type="button" data-accessibility-toggle="linksSublinhados" aria-pressed="false">
+          Sublinhado de links <span class="accessibility-toggle-state">Desativado</span>
+        </button>
+        <button class="accessibility-toggle" type="button" data-accessibility-toggle="movimentoReduzido" aria-pressed="false">
+          Reduzir animações <span class="accessibility-toggle-state">Desativado</span>
+        </button>
+        <button class="accessibility-read" type="button">Ler conteúdo da página</button>
+        <p class="accessibility-status" aria-live="polite"></p>
+      </section>
+    </aside>
+  `);
+
+  const widget = document.querySelector('.accessibility-widget');
+  const trigger = widget.querySelector('.accessibility-trigger');
+  const panel = widget.querySelector('.accessibility-panel');
+  const status = widget.querySelector('.accessibility-status');
+  const closePanel = () => {
+    panel.hidden = true;
+    trigger.setAttribute('aria-expanded', 'false');
+    trigger.focus();
+  };
+
+  trigger.addEventListener('click', () => {
+    panel.hidden = !panel.hidden;
+    trigger.setAttribute('aria-expanded', String(!panel.hidden));
+    if (!panel.hidden) panel.querySelector('input').focus();
+  });
+  widget.querySelector('.accessibility-close').addEventListener('click', closePanel);
+  widget.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !panel.hidden) closePanel();
+  });
+
+  widget.querySelectorAll('[data-font-step]').forEach(button => {
+    button.addEventListener('click', () => {
+      const current = Number(Storage.getConfiguracoes().acessibilidade?.tamanhoTexto) || 100;
+      salvarAcessibilidade({ tamanhoTexto: current + Number(button.dataset.fontStep) });
+    });
+  });
+  widget.querySelector('#accessibilityFontSize').addEventListener('input', event => {
+    salvarAcessibilidade({ tamanhoTexto: Number(event.target.value) });
+  });
+  widget.querySelectorAll('[data-accessibility-toggle]').forEach(button => {
+    button.addEventListener('click', () => {
+      const key = button.dataset.accessibilityToggle;
+      salvarAcessibilidade({ [key]: button.getAttribute('aria-pressed') !== 'true' });
+    });
+  });
+  document.querySelectorAll('.accessibility-settings-open').forEach(button => {
+    button.addEventListener('click', () => {
+      panel.hidden = false;
+      trigger.setAttribute('aria-expanded', 'true');
+      panel.querySelector('input').focus();
+    });
+  });
+  widget.querySelector('.accessibility-read').addEventListener('click', () => {
+    if (!('speechSynthesis' in window)) {
+      status.textContent = 'A leitura em voz alta não está disponível neste navegador.';
+      return;
+    }
+
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+      status.textContent = 'Leitura interrompida.';
+      return;
+    }
+
+    const content = document.querySelector('main') || document.body;
+    const text = window.getSelection()?.toString().trim() || content.innerText.trim();
+    if (!text) {
+      status.textContent = 'Não há conteúdo disponível para leitura.';
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = document.documentElement.lang || 'pt-BR';
+    utterance.onstart = () => { status.textContent = 'Lendo o conteúdo da página.'; };
+    utterance.onend = () => { status.textContent = 'Leitura concluída.'; };
+    utterance.onerror = () => { status.textContent = 'Não foi possível ler o conteúdo em voz alta.'; };
+    window.speechSynthesis.speak(utterance);
+  });
+
+  aplicarAcessibilidade(opcoes);
+  configurarSeletoresTema();
 }
 
 function carregarFotoUsuario(user) {
@@ -1131,6 +1348,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await Storage.ready;
   
   aplicarTemaGlobal();
+  inicializarAcessibilidade();
   
   if (!window.location.href.includes('login.html')) {
     const user = Storage.getUsuarioLogado();
@@ -1162,6 +1380,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 window.addEventListener('storage', function(e) {
   if (e.key === 'CallMed_config') {
     aplicarTemaGlobal();
+    aplicarAcessibilidade(Storage.getConfiguracoes().acessibilidade || {});
+    configurarSeletoresTema();
   }
 });
 
@@ -1229,45 +1449,7 @@ function carregarPerfilConfig(user) {
 }
 
 function configurarTema() {
-  const config = Storage.getConfiguracoes();
-  const themeSelect = document.getElementById("themeSelect");
-  const temaOptions = document.querySelectorAll('.tema-option');
-  
-  if (themeSelect) themeSelect.value = config.tema;
-  
-  temaOptions.forEach(option => {
-    if (option.dataset.tema === config.tema) option.classList.add('active');
-    
-    option.addEventListener('click', () => {
-      const novoTema = option.dataset.tema;
-      if (themeSelect) themeSelect.value = novoTema;
-      aplicarTema(novoTema);
-      temaOptions.forEach(opt => opt.classList.remove('active'));
-      option.classList.add('active');
-    });
-  });
-  
-  if (themeSelect) {
-    themeSelect.addEventListener("change", (e) => {
-      aplicarTema(e.target.value);
-      temaOptions.forEach(opt => {
-        opt.classList.remove('active');
-        if (opt.dataset.tema === e.target.value) opt.classList.add('active');
-      });
-    });
-  }
-}
-
-function aplicarTema(tema) {
-  document.documentElement.setAttribute('data-theme', tema);
-  const novaConfig = Storage.getConfiguracoes();
-  novaConfig.tema = tema;
-  Storage.salvarConfiguracoes(novaConfig);
-  window.dispatchEvent(new CustomEvent('temaAlterado', { detail: tema }));
-  
-  if (typeof Notificacao !== "undefined") {
-    Notificacao.show(`Tema alterado para ${tema}`, "success");
-  }
+  configurarSeletoresTema();
 }
 
 function configurarBackupConfig() {
